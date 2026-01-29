@@ -34,3 +34,8 @@ coverage
 
 # Vitest
 __screenshots__/
+
+# Test
+src/App.vue
+src/main.ts
+index.html
