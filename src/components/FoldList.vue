@@ -65,7 +65,7 @@ watch(() => props.list, (newList) => {
           :style="{ '--z-index': props.list.length - index, '--translateY': `${slideCount[index] * 100}%` }"
           @animationend="() => slideAnimating = false"
           :class="{ active: index === props.activeIndex, slide: slideAnimating }">
-          {{ item.name }}
+          <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>
       </ul>
     </div>
@@ -113,8 +113,6 @@ watch(() => props.list, (newList) => {
 }
 
 .body li {
-  position: relative;
-  z-index: var(--z-index);
   height: 30px;
   padding: 0 10px;
   border-radius: 6px;

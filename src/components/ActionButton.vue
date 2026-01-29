@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { computed, ref, useSlots } from 'vue';
+import { computed, ref } from 'vue';
 
 interface Props {
+  /** 列表 */
+  list?: string[]
+  /** 点击列表项事件 */
   onItemClick?: (index: number) => void
 }
-
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  list: () => [],
+});
 
 // 弹出列表
 const isPop = ref<boolean>(false)
@@ -24,26 +28,14 @@ const clickIcon = (e: any) => {
   e.target.addEventListener('click', closePop)
   document.addEventListener('click', closePop)
 }
-
-// 根据传入插槽自动生成插槽数组
-const slots = useSlots()
-const itemSlots = computed(() => {
-  const items = []
-  let i = 0
-  while (slots[`item-${i}`]) {
-    items.push(i)
-    i++
-  }
-  return items
-})
 </script>
 
 <template>
   <span class="iconfont icon-info" @click.stop="clickIcon" style="user-select: none; --list-z-index: 10">
     <ul v-if="isPop" :style="{ left: `${popX}px`, top: `${popY}px` }">
-      <li v-for="index in itemSlots" :key="index">
+      <li v-for="(item, index) in list" :key="index">
         <div class="inner" @click="props.onItemClick?.(index)">
-          <slot :name="`item-${index}`" :index="index"></slot>
+          <slot :item="item" :index="index">{{ item }}</slot>
         </div>
       </li>
     </ul>
