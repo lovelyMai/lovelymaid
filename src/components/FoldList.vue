@@ -4,15 +4,18 @@ import { getSlideCount } from '../utils/getSlideCount'
 
 interface Props {
   /** 要渲染的列表 */
-  list: { id: number, name: string }[]
+  list?: { id: number, name: string }[]
   /** 激活项索引 */
-  activeIndex: number
+  activeIndex?: number
   /** 头部点击事件 */
   onHeaderClick?: () => void
   /** 列表项点击事件 */
   onItemClick?: (item: { id: number, name: string }, index: number) => void
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  list: () => [],
+  activeIndex: -1
+});
 
 // 标准流高度动画
 const isOpen = ref<boolean>(true)

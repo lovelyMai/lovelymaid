@@ -8,7 +8,9 @@ interface Props {
   onSearch?: (inputValue: string) => void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  placeholder: '搜索...'
+});
 
 // 输入框内容
 const inputValue = ref<string>('')
@@ -35,7 +37,8 @@ const search = async (inputValue: string) => {
   <div class="container">
     <span class="iconfont icon-search"></span>
     <input v-model="inputValue" class='input' @keyup.enter.prevent="search(inputValue.trim())"
-      @compositionend="compositionend" @compositionstart="compositionstart" type="text" :placeholder="props.placeholder || '搜索...'" />
+      @compositionend="compositionend" @compositionstart="compositionstart" type="text"
+      :placeholder="props.placeholder" />
     <span v-if="inputValue" class="iconfont icon-clear" @click.stop="inputValue = ''"></span>
   </div>
 </template>

@@ -50,7 +50,7 @@ onUnmounted(() => {
 
 <template>
   <transition name="pop">
-    <div class="container" v-if="visible" ref="containerRef"
+    <div class="container" v-if="props.visible" ref="containerRef"
       :style="{ transition: transition ? 'transform .5s ease, opacity .5s ease' : 'none', '--translateX': `${props.isOpen ? 0 : -transformDistance}px`, userSelect: 'none' }">
       <div class="header">
         <div class="title">{{ props.title }}</div>
