@@ -3,6 +3,7 @@ import ContentBar from './components/ContentBar.vue'
 import FoldList from './components/FoldList.vue'
 import Search from './components/Search.vue'
 import SideBar from './components/SideBar.vue'
+import TabBar from './components/TabBar.vue'
 
 import '@/assets/base.css'
 import '@/assets/main.css'
@@ -13,5 +14,6 @@ export {
   ContentBar,
   FoldList,
   Search,
-  SideBar
+  SideBar,
+  TabBar
 }

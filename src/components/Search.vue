@@ -34,7 +34,7 @@ const search = async (inputValue: string) => {
 </script>
 
 <template>
-  <div class="container">
+  <div class="Search">
     <span class="iconfont icon-search"></span>
     <input v-model="inputValue" class='input' @keyup.enter.prevent="search(inputValue.trim())"
       @compositionend="compositionend" @compositionstart="compositionstart" type="text"
@@ -44,7 +44,7 @@ const search = async (inputValue: string) => {
 </template>
 
 <style scoped>
-.container {
+.Search {
   display: flex;
   align-items: center;
   position: relative;

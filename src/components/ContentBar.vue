@@ -8,7 +8,7 @@ interface Props {
   isOpen?: boolean;
   /** 标题 */
   title?: string;
-  /** 点击关闭按钮事件 */
+  /** 关闭按钮点击事件 */
   onCloseClick?: () => void;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -50,7 +50,7 @@ onUnmounted(() => {
 
 <template>
   <transition name="pop">
-    <div class="container" v-if="props.visible" ref="containerRef"
+    <div class="ContentBar" v-if="props.visible" ref="containerRef"
       :style="{ transition: transition ? 'transform .5s ease, opacity .5s ease' : 'none', '--translateX': `${props.isOpen ? 0 : -transformDistance}px`, userSelect: 'none' }">
       <div class="header">
         <div class="title">{{ props.title }}</div>
@@ -64,12 +64,12 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.container {
-  background-color: rgba(242, 242, 242, 0.9);
+.ContentBar {
+  background-color: rgba(248, 248, 248, 0.9);
   backdrop-filter: blur(10px) saturate(1.5);
   border: 1px solid rgba(255, 255, 255, 1);
   border-radius: 20px;
-  box-shadow: 0 0 5px 2px rgba(0, 0, 0, .1);
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   transform: translateX(var(--translateX));
   overflow: auto;
 }
