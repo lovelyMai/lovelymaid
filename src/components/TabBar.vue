@@ -70,8 +70,8 @@ onMounted(() => updateTranslateX())
   z-index: 0;
   width: calc(100% - 4px);
   height: 44px;
-  /* transform: translateZ(0);
-  backface-visibility: hidden; */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .container.top {
