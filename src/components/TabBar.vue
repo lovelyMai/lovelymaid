@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 interface Props {
   /** 列表 */
@@ -17,14 +17,25 @@ const props = withDefaults(defineProps<Props>(), {
 const activeIndex = ref<number>(0)
 const slideRef = ref<HTMLElement | null>(null)
 const liveTranslateX = ref<number>(0)
-const updateTranslateX = (): number => liveTranslateX.value = slideRef.value ? new DOMMatrix(window.getComputedStyle(slideRef.value).transform).m41 : 0
+const updateLiveTranslateX = (): number => liveTranslateX.value = slideRef.value ? new DOMMatrix(window.getComputedStyle(slideRef.value).transform).m41 : 0
 let timer: number
 const clickTab = (index: number) => {
   activeIndex.value = index
-  timer = setInterval(updateTranslateX, 8)
+  updateTranslateX()
+  timer = setInterval(updateLiveTranslateX, 8)
   setTimeout(() => clearInterval(timer), 500)
 }
-onMounted(() => updateTranslateX())
+onMounted(() => updateLiveTranslateX())
+
+// 滑块位置
+const translateX = ref<number>(0)
+const updateTranslateX = ():number => translateX.value = slideRef.value ? activeIndex.value * slideRef.value.offsetWidth : 0
+watch(() => props.list.length, () => {
+  activeIndex.value = 0
+  updateTranslateX()
+  timer = setInterval(updateLiveTranslateX, 8)
+  setTimeout(() => clearInterval(timer), 500)
+})
 </script>
 
 <template>
@@ -42,7 +53,7 @@ onMounted(() => updateTranslateX())
       </li>
     </ul>
     <div class="slide" ref="slideRef"
-      :style="{ '--translateX': slideRef ? `${activeIndex * slideRef.offsetWidth}px` : 0 }">
+      :style="{ '--translateX': `${translateX}px` }">
     </div>
   </div>
 </template>
