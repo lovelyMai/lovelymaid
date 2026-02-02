@@ -12,7 +12,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // 侧边栏开关状态
-const isOpen = ref(true);
+const isOpen = ref<boolean>(true);
 const switchSidebar = () => {
   isOpen.value = !isOpen.value;
   props.onSwitch?.(isOpen.value);
@@ -53,8 +53,8 @@ onUnmounted(() => {
   <transition name="pop">
     <div v-if="visible" class="SideBar" ref="containerRef"
       :style="{ '--translateX': `${isOpen ? 0 : -transformDistance}px`, userSelect: 'none' }">
-      <div class="icon" :class="{ close: !isOpen }" @click="switchSidebar"
-        :style="{ transform: isOpen ? 'translateX(0) translateZ(0)' : `translateX(${transformDistance - containerWidth + 45}px) translateZ(0)` }"
+      <div class="switchButton" :class="{ close: !isOpen }" @click="switchSidebar"
+        :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${transformDistance - containerWidth + 45}px)` }"
         :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
         <span class="iconfont icon-sidebar_left"></span>
       </div>
@@ -75,7 +75,7 @@ onUnmounted(() => {
   transition: transform .5s ease, opacity .5s ease;
 }
 
-.icon {
+.switchButton {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,14 +90,15 @@ onUnmounted(() => {
     border 0s ease .5s,
     box-shadow .5s ease;
   cursor: pointer;
+  will-change: transform;
 }
 
-.icon.close {
+.switchButton.close {
   border: 1px solid #fff;
   box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.1);
 }
 
-.icon:hover {
+.switchButton:hover {
   background-color: #eee;
 }
 

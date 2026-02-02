@@ -73,7 +73,7 @@ const search = async (inputValue: string) => {
 }
 
 .input {
-  background-color: rgba(232, 232, 232, 1);
+  background-color: #eee;
   width: 100%;
   height: 100%;
   border-radius: 20px;

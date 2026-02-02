@@ -92,6 +92,7 @@ watch(() => props.list, (newList) => {
   font-weight: 700;
   transition: transform .3s;
   cursor: pointer;
+  will-change: transform;
 }
 
 .body-container {
