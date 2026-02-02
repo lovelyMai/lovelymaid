@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 interface Props {
   /** 是否显示 */
@@ -54,7 +54,7 @@ onUnmounted(() => {
     <div v-if="visible" class="SideBar" ref="containerRef"
       :style="{ '--translateX': `${isOpen ? 0 : -transformDistance}px`, userSelect: 'none' }">
       <div class="icon" :class="{ close: !isOpen }" @click="switchSidebar"
-        :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${transformDistance - containerWidth + 45}px)` }"
+        :style="{ transform: isOpen ? 'translateX(0) translateZ(0)' : `translateX(${transformDistance - containerWidth + 45}px) translateZ(0)` }"
         :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
         <span class="iconfont icon-sidebar_left"></span>
       </div>
@@ -68,7 +68,7 @@ onUnmounted(() => {
   padding-top: 40px;
   background-color: rgba(248, 248, 248, 0.9);
   backdrop-filter: blur(10px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 1);
+  border: 1px solid #fff;
   border-radius: 20px;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   transform: translateX(var(--translateX));
@@ -85,22 +85,20 @@ onUnmounted(() => {
   width: 35px;
   height: 30px;
   border-radius: 15px;
-  background-color: rgba(242, 242, 242, 0);
-  transition: background-color .1s ease 0s,
-    transform .5s ease 0s,
+  transition:
+    transform .5s ease,
     border 0s ease .5s,
-    box-shadow .5s ease 0s;
+    box-shadow .5s ease;
   cursor: pointer;
 }
 
 .icon.close {
-  background-color: rgba(242, 242, 242, 0.9);
-  border: 1px solid rgba(255, 255, 255, 1);
-  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid #fff;
+  box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.1);
 }
 
 .icon:hover {
-  background-color: rgba(228, 228, 228, 1);
+  background-color: #eee;
 }
 
 .icon-sidebar_left {

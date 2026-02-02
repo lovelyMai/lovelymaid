@@ -66,7 +66,7 @@ watch(() => props.list.length, () => {
 <style scoped>
 .TabBar {
   position: relative;
-  z-index: 10;
+  z-index: 1;
   height: 50px;
   padding: 2px;
   background-color: rgba(248, 248, 248, 0.9);

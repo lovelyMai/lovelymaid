@@ -47,7 +47,7 @@ const clickIcon = (e: any) => {
   font-size: 20px;
   color: #3b86f7;
   cursor: pointer;
-  --list-z-index: 20;
+  --list-z-index: 2;
 }
 
 ul {

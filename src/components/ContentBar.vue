@@ -54,7 +54,7 @@ onUnmounted(() => {
       :style="{ transition: transition ? 'transform .5s ease, opacity .5s ease' : 'none', '--translateX': `${props.isOpen ? 0 : -transformDistance}px`, userSelect: 'none' }">
       <div class="header">
         <div class="title">{{ props.title }}</div>
-        <div class="icon" :class="{ close: !isOpen }" @click="onCloseClick" :title="'收起内容栏'">
+        <div class="closeButton" :class="{ close: !isOpen }" @click="onCloseClick" :title="'收起内容栏'">
           <span class="iconfont icon-iconguanbi"></span>
         </div>
       </div>
@@ -67,50 +67,52 @@ onUnmounted(() => {
 .ContentBar {
   background-color: rgba(248, 248, 248, 0.9);
   backdrop-filter: blur(10px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 1);
+  border: 1px solid #fff;
   border-radius: 20px;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   transform: translateX(var(--translateX));
   overflow: auto;
+  --header-z-index: 3;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   position: sticky;
+  z-index: var(--header-z-index);
   top: 0;
-  height: 35px;
-  padding: 5px 5px 0 5px;
-  background: linear-gradient(to bottom,
-      rgba(242, 242, 242, 1) 0%,
-      rgba(242, 242, 242, 0.98) 50%,
-      rgba(242, 242, 242, 0.6) 100%);
-  box-shadow: 0 0 20px 20px rgba(242, 242, 242, 0.6);
+  height: 0;
+  margin-bottom: 35px;
+  padding: 0 5px;
+  box-shadow: 0 0px 20px 35px rgba(248, 248, 248, .95);
 }
 
 .title {
   flex: 1;
   height: 30px;
+  margin-top: 5px;
   line-height: 30px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.icon {
+.closeButton {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 35px;
+  width: 30px;
   height: 30px;
+  margin-top: 5px;
+  border: 1px solid #fff;
   border-radius: 15px;
-  background-color: rgba(242, 242, 242, 0);
-  transition: background-color .1s ease 0s;
+  background-color: rgba(248, 248, 248, 1);
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   cursor: pointer;
 }
 
-.icon:hover {
-  background-color: rgba(228, 228, 228, 1);
+.closeButton:hover {
+  background-color: #eee;
 }
 
 .icon-iconguanbi {
