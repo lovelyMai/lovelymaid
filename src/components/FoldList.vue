@@ -62,7 +62,7 @@ watch(() => props.list, (newList) => {
       :style="{ height: isOpen ? `calc(0px + ${bodyHeight}px)` : '0px' }">
       <ul ref="bodyRef" class="body" :class="{ close: !isOpen }">
         <li v-for="(item, index) in props.list" :key="index" @click.stop="() => onItemClick?.(item, index)"
-          :style="{ '--z-index': props.list.length - index, '--translateY': `${slideCount[index] * 100}%` }"
+          :style="{ '--translateY': `${slideCount[index] * 100}%` }"
           @animationend="() => slideAnimating = false"
           :class="{ active: index === props.activeIndex, slideAnimation: slideAnimating }">
           <slot :item="item" :index="index">{{ item.name }}</slot>
