@@ -54,6 +54,7 @@ ul {
   position: absolute;
   z-index: var(--list-z-index);
   width: 60px;
+  padding: 2px;
   background-color: #f3f6f6;
   border-radius: 10px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, .1);
@@ -63,8 +64,6 @@ li {
   display: flex;
   justify-content: center;
   height: 26px;
-  margin: 2px;
-  cursor: pointer;
   border-radius: 8px;
   font-size: 14px;
   color: #000;
