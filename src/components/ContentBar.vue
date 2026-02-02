@@ -83,15 +83,16 @@ onUnmounted(() => {
   top: 0;
   height: 0;
   margin-bottom: 35px;
-  padding: 0 5px;
+  padding: 0 5px 0 10px;
   box-shadow: 0 0px 20px 35px rgba(248, 248, 248, .95);
 }
 
 .title {
   flex: 1;
-  height: 30px;
+  height: 35px;
   margin-top: 5px;
-  line-height: 30px;
+  font-size: 16px;
+  line-height: 35px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
