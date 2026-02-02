@@ -1,40 +1,46 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 interface Props {
   /** 列表 */
   list: string[]
-  /** 展示列表文字 */
-  showList?: boolean
   /** 列表项点击事件 */
   onItemClick?: (item: string, index: number) => void
 }
-const props = withDefaults(defineProps<Props>(), {
-  showList: true
-})
+const props = defineProps<Props>()
 
-// tab点击
+// tab点击动画
 const activeIndex = ref<number>(0)
 const slideRef = ref<HTMLElement | null>(null)
+const translateX = ref<number>(0)
 const liveTranslateX = ref<number>(0)
+const updateTranslateX = (): number => translateX.value = slideRef.value ? activeIndex.value * slideRef.value.offsetWidth : 0
 const updateLiveTranslateX = (): number => liveTranslateX.value = slideRef.value ? new DOMMatrix(window.getComputedStyle(slideRef.value).transform).m41 : 0
-let timer: number
-const clickTab = (index: number) => {
+let intervalTimer: number | undefined
+let outTimer: number | undefined
+const clearTimer = () => {
+  if (!intervalTimer && !outTimer) return
+  clearInterval(intervalTimer)
+  clearTimeout(outTimer)
+  intervalTimer = undefined
+  outTimer = undefined
+}
+const startSlide = (index: number) => {
+  clearTimer()
   activeIndex.value = index
   updateTranslateX()
-  timer = setInterval(updateLiveTranslateX, 8)
-  setTimeout(() => clearInterval(timer), 500)
+  intervalTimer = setInterval(updateLiveTranslateX, 8)
+  outTimer = setTimeout(() => clearInterval(intervalTimer), 500)
+}
+const clickTab = (index: number) => {
+  startSlide(index)
 }
 onMounted(() => updateLiveTranslateX())
+onUnmounted(() => clearTimer())
 
-// 滑块位置
-const translateX = ref<number>(0)
-const updateTranslateX = ():number => translateX.value = slideRef.value ? activeIndex.value * slideRef.value.offsetWidth : 0
+// list改变归位
 watch(() => props.list.length, () => {
-  activeIndex.value = 0
-  updateTranslateX()
-  timer = setInterval(updateLiveTranslateX, 8)
-  setTimeout(() => clearInterval(timer), 500)
+  startSlide(0)
 })
 </script>
 
@@ -52,8 +58,7 @@ watch(() => props.list.length, () => {
         <span>{{ item }}</span>
       </li>
     </ul>
-    <div class="slide" ref="slideRef"
-      :style="{ '--translateX': `${translateX}px` }">
+    <div class="slide" ref="slideRef" :style="{ '--translateX': `${translateX}px` }" >
     </div>
   </div>
 </template>
@@ -113,4 +118,5 @@ watch(() => props.list.length, () => {
   transform: translateX(var(--translateX));
   transition: transform .5s;
 }
+
 </style>

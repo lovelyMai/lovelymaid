@@ -64,7 +64,7 @@ watch(() => props.list, (newList) => {
         <li v-for="(item, index) in props.list" :key="index" @click.stop="() => onItemClick?.(item, index)"
           :style="{ '--z-index': props.list.length - index, '--translateY': `${slideCount[index] * 100}%` }"
           @animationend="() => slideAnimating = false"
-          :class="{ active: index === props.activeIndex, slide: slideAnimating }">
+          :class="{ active: index === props.activeIndex, slideAnimation: slideAnimating }">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>
       </ul>
@@ -129,7 +129,7 @@ watch(() => props.list, (newList) => {
   color: #3b86f7;
 }
 
-@keyframes slide {
+@keyframes slideAnimation {
   from {
     transform: translateY(var(--translateY));
   }
@@ -139,7 +139,7 @@ watch(() => props.list, (newList) => {
   }
 }
 
-.slide {
-  animation: slide .5s ease;
+.slideAnimation {
+  animation: slideAnimation .5s;
 }
 </style>

@@ -32,10 +32,8 @@ const clickIcon = (e: any) => {
   <span class="ActionButton">
     <span class="iconfont icon-info" @click.stop="clickIcon" style="user-select: none;">
       <ul v-if="isPop" :style="{ left: `${popX}px`, top: `${popY}px` }">
-        <li v-for="(item, index) in props.list" :key="index">
-          <div class="inner" @click="props.onItemClick?.(index)">
-            <slot :item="item" :index="index">{{ item }}</slot>
-          </div>
+        <li v-for="(item, index) in props.list" :key="index" @click="props.onItemClick?.(index)">
+          <slot :item="item" :index="index">{{ item }}</slot>
         </li>
       </ul>
     </span>
@@ -58,25 +56,22 @@ ul {
   width: 60px;
   background-color: #f3f6f6;
   border-radius: 10px;
-  box-shadow: 0 0 5px 2px rgba(0, 0, 0, .1);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, .1);
 }
 
 li {
-  height: 30px;
-  padding: 2px;
-  cursor: pointer;
-}
-
-.inner {
   display: flex;
   justify-content: center;
-  border-radius: 9px;
+  height: 26px;
+  margin: 2px;
+  cursor: pointer;
+  border-radius: 8px;
   font-size: 14px;
   color: #000;
   line-height: 26px;
 }
 
-.inner:hover {
+li:hover {
   background-color: #3b86f7;
   color: #fff;
 }
