@@ -53,7 +53,7 @@ onUnmounted(() => {
     <div class="ContentBar" v-if="props.visible" ref="containerRef"
       :style="{ transition: transition ? 'transform .5s ease, opacity .5s ease' : 'none', '--translateX': `${props.isOpen ? 0 : -transformDistance}px`, userSelect: 'none' }">
       <div class="header">
-        <div class="title">{{ props.title }}</div>
+        <div class="title" :title="props.title">{{ props.title }}</div>
         <div class="closeButton" :class="{ close: !isOpen }" @click="onCloseClick" :title="'收起内容栏'">
           <span class="iconfont icon-iconguanbi"></span>
         </div>
