@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 interface Props {
   /** 列表 */
@@ -8,58 +8,117 @@ interface Props {
   onItemClick?: (item: string, index: number) => void
 }
 const props = defineProps<Props>()
+const listLength = computed(() => props.list.length)
 
-// tab点击动画
-const activeIndex = ref<number>(0)
+// 定时器
+let virtualTimer1: number | undefined
+let virtualTimer2: number | undefined
+let moveSlideTimer: number | undefined
+let clipTimer: number | undefined
+const clearTimer = (...args: (number | undefined)[]) => {
+  args.forEach(timer => {
+    if (timer) clearInterval(timer)
+  })
+}
+onUnmounted(() => clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, clipTimer))
+
+// 滑块动画
 const slideRef = ref<HTMLElement | null>(null)
-const translateX = ref<number>(0)
-const liveTranslateX = ref<number>(0)
-const updateTranslateX = (): number => translateX.value = slideRef.value ? activeIndex.value * slideRef.value.offsetWidth : 0
-const updateLiveTranslateX = (): number => liveTranslateX.value = slideRef.value ? new DOMMatrix(window.getComputedStyle(slideRef.value).transform).m41 : 0
-let intervalTimer: number | undefined
-let outTimer: number | undefined
-const clearTimer = () => {
-  if (!intervalTimer && !outTimer) return
-  clearInterval(intervalTimer)
-  clearTimeout(outTimer)
-  intervalTimer = undefined
-  outTimer = undefined
+const containerRef = ref<HTMLElement | null>(null)
+
+const backgroundColor = ref<string>('#eee')
+const border = ref<string>('none')
+const scale = ref<number>(1)
+const transition = ref<string>('transform .5s, background .1s')
+const clip = ref<string>('0px')
+
+const realPos = ref<number>(0)
+const slideCenter = computed(() => realPos.value + slideRef.value!.offsetWidth / 2)
+const virtualLeft = ref<number>(0)
+const virtualRight = ref<number>(0)
+onMounted(() => virtualRight.value = slideRef.value!.offsetWidth)
+
+const updateVirtualPos = (duration: number) => {
+  virtualTimer1 = setInterval(() => {
+    virtualLeft.value = (slideRef.value?.getBoundingClientRect().left || 0) - (containerRef.value?.getBoundingClientRect().left || 0)
+    virtualRight.value = (slideRef.value?.getBoundingClientRect().right || 0) - (containerRef.value?.getBoundingClientRect().left || 0)
+  }, 16)
+  virtualTimer2 = setTimeout(() => clearInterval(virtualTimer1), duration)
 }
-const startSlide = (index: number) => {
-  clearTimer()
-  activeIndex.value = index
-  updateTranslateX()
-  intervalTimer = setInterval(updateLiveTranslateX, 8)
-  outTimer = setTimeout(() => clearInterval(intervalTimer), 500)
+const calculateRealPos = (e: PointerEvent) => {
+  if (!slideRef.value || !containerRef.value) return
+  const x = e.clientX - containerRef.value.getBoundingClientRect().left
+  const realLeft = x - slideRef.value!.offsetWidth / 2
+  const realRight = realLeft + slideRef.value!.offsetWidth
+  realPos.value = realLeft < 0 ? 0 : realRight > listLength.value * slideRef.value.offsetWidth ? (listLength.value - 1) * slideRef.value.offsetWidth : realLeft
 }
-const clickTab = (index: number) => {
-  startSlide(index)
+
+let startTime: number
+const startSlide = (e: PointerEvent) => {
+  startTime = Date.now()
+  backgroundColor.value = `linear-gradient(
+    to bottom,
+    transparent 10%,
+    rgba(248, 248, 248, 0.9) 10% calc(100% - 10%),
+    transparent calc(100% - 10%)
+  )`
+  border.value = '1px solid #fff'
+  transition.value = `transform .5s, background .1s`
+  scale.value = 1.4
+  clip.value = '-10px'
+  clearTimer(clipTimer)
+  calculateRealPos(e)
+  clearTimer(virtualTimer1, virtualTimer2)
+  updateVirtualPos(500)
+  document.addEventListener('pointermove', moveSlide)
+  document.addEventListener('pointerup', stopSlide)
 }
-onMounted(() => updateLiveTranslateX())
-onUnmounted(() => clearTimer())
+const moveSlide = (e: PointerEvent) => {
+  if (moveSlideTimer) return
+  transition.value = 'none'
+  calculateRealPos(e)
+  clearTimer(virtualTimer1, virtualTimer2)
+  updateVirtualPos(16)
+  moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 16)
+}
+const stopSlide = (e: PointerEvent) => {
+  if (!slideRef.value || !containerRef.value) return
+  backgroundColor.value = '#eee'
+  border.value = 'none'
+  transition.value = `transform .5s, background .1s`
+  scale.value = 1
+  clearTimer(clipTimer)
+  clipTimer = setTimeout(() => clip.value = '0px', Math.min(Date.now() - startTime, 500))
+  const x = e.clientX - containerRef.value.getBoundingClientRect().left
+  const index = Math.floor(x / slideRef.value.offsetWidth)
+  const activeIndex = index > listLength.value - 1 ? listLength.value - 1 : index < 0 ? 0 : index
+  realPos.value = activeIndex * slideRef.value.offsetWidth
+  clearTimer(virtualTimer1, virtualTimer2)
+  updateVirtualPos(500)
+  document.removeEventListener('pointermove', moveSlide)
+  document.removeEventListener('pointerup', stopSlide)
+}
 
 // list改变归位
-watch(() => props.list.length, () => {
-  startSlide(0)
-})
+watch(() => props.list.length, () => realPos.value = 0)
 </script>
 
 <template>
-  <div class="TabBar" :style="{ '--list-length': props.list.length, '--live-translateX': `${liveTranslateX}px` }">
-    <ul class="container">
-      <li class="tab" v-for="(item, index) in props.list" @click.stop="() => clickTab(index)">
+  <div class="TabBar">
+    <ul class="container" ref="containerRef" @pointerdown="startSlide">
+      <li class="tab" v-for="(item, index) in props.list">
         <slot name="bottom" :item="item" :index="index"></slot>
         <span>{{ item }}</span>
       </li>
+      <ul class="container top">
+        <div class="slide" ref="slideRef">
+        </div>
+        <li class="tab top" v-for="(item, index) in props.list">
+          <slot name="top" :item="item" :index="index"></slot>
+          <span>{{ item }}</span>
+        </li>
+      </ul>
     </ul>
-    <ul class="container top">
-      <li class="tab" v-for="(item, index) in props.list">
-        <slot name="top" :item="item" :index="index"></slot>
-        <span>{{ item }}</span>
-      </li>
-    </ul>
-    <div class="slide" ref="slideRef" :style="{ '--translateX': `${translateX}px` }" >
-    </div>
   </div>
 </template>
 
@@ -75,26 +134,24 @@ watch(() => props.list.length, () => {
   border-radius: 25px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
   font-size: 8px;
+
   --top-color: #0067EC;
 }
 
 .container {
+  position: relative;
   display: flex;
-  position: absolute;
-  left: 2px;
-  top: 2px;
-  z-index: 0;
-  width: calc(100% - 4px);
-  height: 44px;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 .container.top {
-  z-index: 2;
-  color: var(--top-color);
-  will-change: clip-path;
-  clip-path: inset(0 calc(calc((100% - 4px) * calc(var(--list-length) - 1) / var(--list-length)) - var(--live-translateX)) 0 var(--live-translateX) round 22px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  clip-path: inset(v-bind(clip) calc(100% - calc(v-bind(virtualRight) * 1px)) v-bind(clip) calc(v-bind(virtualLeft) * 1px) round 22px);
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .tab {
@@ -102,21 +159,26 @@ watch(() => props.list.length, () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  position: relative;
   flex: 1;
+}
+
+.tab.top {
+  position: relative;
+  z-index: 1;
+  color: var(--top-color);
 }
 
 .slide {
   position: absolute;
-  left: 2px;
-  top: 2px;
-  z-index: 1;
-  width: calc((100% - 4px) / var(--list-length));
-  height: 44px;
-  background-color: #eee;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: calc(100% / v-bind(listLength));
+  height: 100%;
+  background: v-bind(backgroundColor);
+  border: v-bind(border);
   border-radius: 22px;
-  transform: translateX(var(--translateX));
-  transition: transform .5s;
+  transform: translateX(calc(v-bind(realPos) * 1px)) scale(v-bind(scale));
+  transition: v-bind(transition);
 }
-
 </style>
