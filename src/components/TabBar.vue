@@ -14,13 +14,17 @@ const listLength = computed(() => props.list.length)
 let virtualTimer1: number | undefined
 let virtualTimer2: number | undefined
 let moveSlideTimer: number | undefined
+let backgroundTimer: number | undefined
 let clipTimer: number | undefined
 const clearTimer = (...args: (number | undefined)[]) => {
   args.forEach(timer => {
-    if (timer) clearInterval(timer)
+    if (timer) {
+      clearInterval(timer)
+      clearTimeout(timer)
+    }
   })
 }
-onUnmounted(() => clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, clipTimer))
+onUnmounted(() => clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, backgroundTimer, clipTimer))
 
 // 滑块动画
 const slideRef = ref<HTMLElement | null>(null)
@@ -29,15 +33,23 @@ const containerRef = ref<HTMLElement | null>(null)
 const backgroundColor = ref<string>('#eee')
 const border = ref<string>('none')
 const scale = ref<number>(1)
-const transition = ref<string>('transform .5s, background .1s')
+const transition = ref<string>('transform .5s, background .2s')
 const clip = ref<string>('0px')
 
 const realPos = ref<number>(0)
-const slideCenter = computed(() => realPos.value + slideRef.value!.offsetWidth / 2)
 const virtualLeft = ref<number>(0)
 const virtualRight = ref<number>(0)
+const slideCenter = computed(() => (virtualLeft.value + virtualRight.value) / 2)
 onMounted(() => virtualRight.value = slideRef.value!.offsetWidth)
+const maxDistance = computed(() => containerRef.value!.offsetWidth * (listLength.value - 1) / listLength.value)
 
+const calculateTargetPos = (e: PointerEvent) => {
+  if (!slideRef.value || !containerRef.value) return
+  const x = e.clientX - containerRef.value.getBoundingClientRect().left
+  const realLeft = x - slideRef.value!.offsetWidth / 2
+  const realRight = realLeft + slideRef.value!.offsetWidth
+  realPos.value = realLeft < 0 ? 0 : realRight > listLength.value * slideRef.value.offsetWidth ? (listLength.value - 1) * slideRef.value.offsetWidth : realLeft
+}
 const updateVirtualPos = (duration: number) => {
   virtualTimer1 = setInterval(() => {
     virtualLeft.value = (slideRef.value?.getBoundingClientRect().left || 0) - (containerRef.value?.getBoundingClientRect().left || 0)
@@ -45,54 +57,59 @@ const updateVirtualPos = (duration: number) => {
   }, 16)
   virtualTimer2 = setTimeout(() => clearInterval(virtualTimer1), duration)
 }
-const calculateRealPos = (e: PointerEvent) => {
-  if (!slideRef.value || !containerRef.value) return
-  const x = e.clientX - containerRef.value.getBoundingClientRect().left
-  const realLeft = x - slideRef.value!.offsetWidth / 2
-  const realRight = realLeft + slideRef.value!.offsetWidth
-  realPos.value = realLeft < 0 ? 0 : realRight > listLength.value * slideRef.value.offsetWidth ? (listLength.value - 1) * slideRef.value.offsetWidth : realLeft
+const calculateDuration = (e: PointerEvent, maxDuration: number) => {
+  const distance = Math.abs(e.clientX - containerRef.value!.getBoundingClientRect().left - slideCenter.value)
+  const duration = Math.min(distance / maxDistance.value * maxDuration, maxDuration)
+  return duration
 }
 
 let startTime: number
 const startSlide = (e: PointerEvent) => {
   startTime = Date.now()
-  backgroundColor.value = `linear-gradient(
+  backgroundTimer = setTimeout(() => backgroundColor.value = `linear-gradient(
     to bottom,
     transparent 10%,
     rgba(248, 248, 248, 0.9) 10% calc(100% - 10%),
     transparent calc(100% - 10%)
-  )`
+  )`, 100)
   border.value = '1px solid #fff'
-  transition.value = `transform .5s, background .1s`
+  transition.value = `transform .5s, background .2s`
   scale.value = 1.4
   clip.value = '-10px'
   clearTimer(clipTimer)
-  calculateRealPos(e)
+  calculateTargetPos(e)
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
   document.addEventListener('pointermove', moveSlide)
   document.addEventListener('pointerup', stopSlide)
 }
+const followed = ref<boolean>(false)
 const moveSlide = (e: PointerEvent) => {
   if (moveSlideTimer) return
-  transition.value = 'none'
-  calculateRealPos(e)
+  const duration = calculateDuration(e, 500)
+  if (duration > 100 && !followed.value) transition.value = `transform ${duration / 1000}s, background .2s`
+  else {
+    transition.value = `none`
+    followed.value = true
+  }
+  calculateTargetPos(e)
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(16)
   moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 16)
 }
 const stopSlide = (e: PointerEvent) => {
-  if (!slideRef.value || !containerRef.value) return
+  if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
   backgroundColor.value = '#eee'
   border.value = 'none'
-  transition.value = `transform .5s, background .1s`
+  transition.value = `transform .5s, background .2s`
+  followed.value = false
   scale.value = 1
   clearTimer(clipTimer)
-  clipTimer = setTimeout(() => clip.value = '0px', Math.min(Date.now() - startTime, 500))
-  const x = e.clientX - containerRef.value.getBoundingClientRect().left
-  const index = Math.floor(x / slideRef.value.offsetWidth)
+  clipTimer = setTimeout(() => clip.value = '0px', Math.min(Date.now() - startTime, 800))
+  const x = e.clientX - containerRef.value!.getBoundingClientRect().left
+  const index = Math.floor(x / slideRef.value!.offsetWidth)
   const activeIndex = index > listLength.value - 1 ? listLength.value - 1 : index < 0 ? 0 : index
-  realPos.value = activeIndex * slideRef.value.offsetWidth
+  realPos.value = activeIndex * slideRef.value!.offsetWidth
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
   document.removeEventListener('pointermove', moveSlide)
