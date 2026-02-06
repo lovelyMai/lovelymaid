@@ -50,12 +50,12 @@ const calculateTargetPos = (e: PointerEvent) => {
   const realRight = realLeft + slideRef.value!.offsetWidth
   realPos.value = realLeft < 0 ? 0 : realRight > listLength.value * slideRef.value.offsetWidth ? (listLength.value - 1) * slideRef.value.offsetWidth : realLeft
 }
-const updateVirtualPos = (duration: number) => {
+const updateVirtualPos = (duration: number | undefined) => {
   virtualTimer1 = setInterval(() => {
     virtualLeft.value = (slideRef.value?.getBoundingClientRect().left || 0) - (containerRef.value?.getBoundingClientRect().left || 0)
     virtualRight.value = (slideRef.value?.getBoundingClientRect().right || 0) - (containerRef.value?.getBoundingClientRect().left || 0)
   }, 16)
-  virtualTimer2 = setTimeout(() => clearInterval(virtualTimer1), duration)
+  if (duration) virtualTimer2 = setTimeout(() => clearInterval(virtualTimer1), duration)
 }
 const calculateDuration = (e: PointerEvent, maxDuration: number) => {
   const distance = Math.abs(e.clientX - containerRef.value!.getBoundingClientRect().left - slideCenter.value)
@@ -87,14 +87,16 @@ const followed = ref<boolean>(false)
 const moveSlide = (e: PointerEvent) => {
   if (moveSlideTimer) return
   const duration = calculateDuration(e, 500)
-  if (duration > 100 && !followed.value) transition.value = `transform ${duration / 1000}s, background .2s`
-  else {
+  if (duration > 50 && !followed.value) {
+  transition.value = `transform ${duration / 1000}s, background .2s`
+  console.log(duration);
+  } else {
     transition.value = `none`
     followed.value = true
   }
   calculateTargetPos(e)
   clearTimer(virtualTimer1, virtualTimer2)
-  updateVirtualPos(16)
+  updateVirtualPos(undefined)
   moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 16)
 }
 const stopSlide = (e: PointerEvent) => {
