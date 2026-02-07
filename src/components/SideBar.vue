@@ -85,6 +85,7 @@ onUnmounted(() => {
   width: 35px;
   height: 30px;
   border-radius: 15px;
+  background-color: rgba(248, 248, 248, 1);
   transition:
     transform .5s ease,
     border 0s ease .5s,
