@@ -9,6 +9,10 @@ interface Props {
 }
 const props = defineProps<Props>()
 const listLength = computed(() => props.list.length)
+const slideRef = ref<HTMLElement | null>(null)
+const containerRef = ref<HTMLElement | null>(null)
+const borderRadius = ref<number>(0)
+onMounted(() => borderRadius.value = containerRef.value!.offsetHeight / 2)
 
 // 定时器
 let virtualTimer1: number | undefined
@@ -29,14 +33,11 @@ const clearTimer = (...args: (number | undefined)[]) => {
 onUnmounted(() => clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, calculatePosTimer1, calculatePosTimer2, backgroundTimer, clipTimer))
 
 // 滑块动画
-const slideRef = ref<HTMLElement | null>(null)
-const containerRef = ref<HTMLElement | null>(null)
-
 const backgroundColor = ref<string>('#eee')
 const border = ref<string>('none')
 const scale = ref<number>(1)
 const transition = ref<string>('transform .5s, background .2s')
-const clip = ref<string>('0px')
+const clip = ref<string>('0')
 
 const realPos = ref<number>(0)
 const virtualLeft = ref<number>(0)
@@ -91,7 +92,7 @@ const startSlide = (e: PointerEvent) => {
   )`, 100)
   border.value = '1px solid #fff'
   scale.value = 1.4
-  clip.value = '-10px'
+  clip.value = '-50%'
   clearTimer(clipTimer)
   calculateTargetPos(e, 'start')
   clearTimer(virtualTimer1, virtualTimer2)
@@ -99,7 +100,6 @@ const startSlide = (e: PointerEvent) => {
   document.addEventListener('pointermove', moveSlide)
   document.addEventListener('pointerup', stopSlide)
 }
-const followed = ref<boolean>(false)
 const moveSlide = (e: PointerEvent) => {
   if (moveSlideTimer) return
   clearTimer(calculatePosTimer1, calculatePosTimer2)
@@ -113,10 +113,9 @@ const stopSlide = (e: PointerEvent) => {
   backgroundColor.value = '#eee'
   border.value = 'none'
   transition.value = `transform .5s, background .2s`
-  followed.value = false
   scale.value = 1
   clearTimer(clipTimer)
-  clipTimer = setTimeout(() => clip.value = '0px', Math.min(Date.now() - startTime, 500))
+  clipTimer = setTimeout(() => clip.value = '0', Math.min(Date.now() - startTime, 500))
   const x = e.clientX - containerRef.value!.getBoundingClientRect().left
   const index = Math.floor(x / slideRef.value!.offsetWidth)
   const activeIndex = index > listLength.value - 1 ? listLength.value - 1 : index < 0 ? 0 : index
@@ -160,10 +159,9 @@ watch(() => props.list.length, () => realPos.value = 0)
   background-color: rgba(248, 248, 248, 0.9);
   backdrop-filter: blur(10px) saturate(1.5);
   border: 1px solid rgba(255, 255, 255, 1);
-  border-radius: 25px;
+  border-radius: calc((v-bind(borderRadius) + 3) * 1px);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
   font-size: 8px;
-
   --top-color: #0067EC;
 }
 
@@ -206,7 +204,7 @@ watch(() => props.list.length, () => realPos.value = 0)
   height: 100%;
   background: v-bind(backgroundColor);
   border: v-bind(border);
-  border-radius: 22px;
+  border-radius: calc(v-bind(borderRadius) * 1px);
   transform: translateX(calc(v-bind(realPos) * 1px)) scale(v-bind(scale));
   transition: v-bind(transition);
 }

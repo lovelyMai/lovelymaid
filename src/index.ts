@@ -1,4 +1,5 @@
 import ActionButton from './components/ActionButton.vue'
+import Button from './components/Button.vue'
 import ContentBar from './components/ContentBar.vue'
 import FoldList from './components/FoldList.vue'
 import Search from './components/Search.vue'
@@ -11,6 +12,7 @@ import '@/assets/icons/iconfont.css'
 
 export {
   ActionButton,
+  Button,
   ContentBar,
   FoldList,
   Search,

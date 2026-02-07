@@ -105,7 +105,7 @@ onUnmounted(() => {
 
 .icon-sidebar_left {
   font-size: 20px;
-  color: #262626;
+  color: #19191a;
 }
 
 .pop-enter-from,

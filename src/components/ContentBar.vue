@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import Button from './Button.vue';
 
 interface Props {
   /** 是否显示 */
@@ -20,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
 // 计算侧边栏平移距离
 const containerRef = ref<HTMLElement | null>(null)
 const transformDistance = ref<number>(0)
-const transition = ref<boolean>(false)
+const transition = ref<string>('none')
 const calculateTransform = () => {
   const container = containerRef.value
   if (!container) return
@@ -32,8 +33,10 @@ const calculateTransform = () => {
   }
   const width = container.offsetWidth
   transformDistance.value = left + width + 10
-  setTimeout(() => transition.value = true, 100)
+  setTimeout(() => transition.value = 'transform .5s, opacity .5s', 100)
 }
+const translateX = computed<string>(() => `${props.isOpen ? 0 : -transformDistance.value}px`)
+
 let timer: number;
 const delayCalculateTransform = () => {
   clearTimeout(timer)
@@ -50,13 +53,10 @@ onUnmounted(() => {
 
 <template>
   <transition name="pop">
-    <div class="ContentBar" v-if="props.visible" ref="containerRef"
-      :style="{ transition: transition ? 'transform .5s ease, opacity .5s ease' : 'none', '--translateX': `${props.isOpen ? 0 : -transformDistance}px`, userSelect: 'none' }">
+    <div class="ContentBar" v-if="props.visible" ref="containerRef" :style="{ userSelect: 'none' }">
       <div class="header">
         <div class="title" :title="props.title">{{ props.title }}</div>
-        <div class="closeButton" :class="{ close: !isOpen }" @click="onCloseClick" :title="'收起内容栏'">
-          <span class="iconfont icon-iconguanbi"></span>
-        </div>
+        <Button type="close" :onClick="props.onCloseClick" title="收起内容栏"/>
       </div>
       <slot>这是内容</slot>
     </div>
@@ -70,7 +70,8 @@ onUnmounted(() => {
   border: 1px solid #fff;
   border-radius: 20px;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
-  transform: translateX(var(--translateX));
+  transition: v-bind(transition);
+  transform: translateX(v-bind(translateX));
   overflow: auto;
   --header-z-index: 3;
 }
@@ -89,41 +90,22 @@ onUnmounted(() => {
 
 .title {
   flex: 1;
-  height: 35px;
+  height: 30px;
   margin-top: 5px;
   font-size: 16px;
-  line-height: 35px;
+  line-height: 30px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.closeButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 30px;
-  height: 30px;
+.Button {
   margin-top: 5px;
-  border: 1px solid #fff;
-  border-radius: 15px;
-  background-color: rgba(248, 248, 248, 1);
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
-  cursor: pointer;
-}
-
-.closeButton:hover {
-  background-color: #eee;
-}
-
-.icon-iconguanbi {
-  font-size: 20px;
-  color: #262626;
 }
 
 .pop-enter-from,
 .pop-leave-to {
-  transform: translateX(var(--translateX)) scale(0);
+  transform: translateX(v-bind(translateX)) scale(0);
   opacity: 0;
 }
 </style>
