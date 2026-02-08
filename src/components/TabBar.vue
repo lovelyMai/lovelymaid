@@ -123,6 +123,7 @@ const stopSlide = (e: PointerEvent) => {
   realPos.value = activeIndex * slideRef.value!.offsetWidth
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
+  props.onItemClick?.(props.list[activeIndex], activeIndex)
   document.removeEventListener('pointermove', moveSlide)
   document.removeEventListener('pointerup', stopSlide)
 }
