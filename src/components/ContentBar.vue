@@ -6,7 +6,7 @@ interface Props {
   /** 是否显示 */
   visible?: boolean;
   /** 是否展开 */
-  isOpen?: boolean;
+  open?: boolean;
   /** 标题 */
   title?: string;
   /** 关闭按钮点击事件 */
@@ -35,7 +35,7 @@ const calculateTransform = () => {
   transformDistance.value = left + width + 10
   setTimeout(() => transition.value = 'transform .5s, opacity .5s', 100)
 }
-const translateX = computed<string>(() => `${props.isOpen ? 0 : -transformDistance.value}px`)
+const translateX = computed<string>(() => `${props.open ? 0 : -transformDistance.value}px`)
 
 let timer: number;
 const delayCalculateTransform = () => {

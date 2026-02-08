@@ -53,10 +53,12 @@ onUnmounted(() => {
   <transition name="pop">
     <div v-if="visible" class="SideBar" ref="containerRef"
       :style="{ '--translateX': `${isOpen ? 0 : -transformDistance}px`, userSelect: 'none' }">
-      <div class="switchButton" :class="{ close: !isOpen }" @click="switchSidebar"
-        :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${transformDistance - containerWidth + 45}px)` }"
-        :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
-        <span class="iconfont icon-sidebar_left"></span>
+      <div class="header">
+        <div class="switchButton" :class="{ close: !isOpen }" @click="switchSidebar"
+          :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${transformDistance - containerWidth + 45}px)` }"
+          :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
+          <span class="iconfont icon-sidebar_left"></span>
+        </div>
       </div>
       <slot>这是内容</slot>
     </div>
@@ -65,7 +67,6 @@ onUnmounted(() => {
 
 <style scoped>
 .SideBar {
-  padding-top: 40px;
   background-color: rgba(248, 248, 248, 0.9);
   backdrop-filter: blur(10px) saturate(1.5);
   border: 1px solid #fff;
@@ -73,6 +74,11 @@ onUnmounted(() => {
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   transform: translateX(var(--translateX));
   transition: transform .5s ease, opacity .5s ease;
+}
+
+.header {
+  position: relative;
+  height: 40px;
 }
 
 .switchButton {

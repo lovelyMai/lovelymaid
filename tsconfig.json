@@ -20,5 +20,7 @@
   "exclude": [
     "src/main.ts",
     "src/App.vue",
+    "node_modules",
+    "dist",
   ]
 }
