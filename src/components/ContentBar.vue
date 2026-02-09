@@ -101,6 +101,7 @@ onUnmounted(() => {
 
 .Button {
   margin-top: 5px;
+  --font-size: 20px;
 }
 
 .pop-enter-from,

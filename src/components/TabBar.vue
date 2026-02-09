@@ -284,6 +284,8 @@ watch(searchIsActive, (newValue) => {
 .search .Button {
   width: 100%;
   height: 100%;
+  --font-size: 20px;
+  --transform: translateY(-2px);
 }
 
 .search .Search {

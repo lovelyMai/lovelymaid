@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue';
+
 interface Props {
   /** 按钮图标 */
   type: string
@@ -9,10 +11,14 @@ interface Props {
 }
 const props = defineProps<Props>()
 
+// 计算字体大小
+const buttonRef = ref<HTMLElement | null>(null)
+const fontSize = ref<number>(0)
+onMounted(() => setTimeout(() => fontSize.value = buttonRef.value!.offsetWidth * 1 / 2, 0))
 </script>
 
 <template>
-  <div class="Button" @click="props.onClick" :title="props.title ? props.title : ''">
+  <div class="Button" @click="props.onClick" :title="props.title ? props.title : ''" ref="buttonRef">
     <span :class="['iconfont', `icon-${props.type}`]"></span>
   </div>
 </template>
@@ -30,14 +36,17 @@ const props = defineProps<Props>()
   backdrop-filter: blur(10px) saturate(1.5);
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   cursor: pointer;
+  --font-size: calc(v-bind(fontSize) * 1px);
+  --transform: none;
 }
 
 .Button:hover {
   background-color: #eee;
 }
 
-.icon-close {
-  font-size: 20px;
+.iconfont {
+  font-size: var(--font-size);
   color: #19191a;
+  transform: var(--transform);
 }
 </style>
