@@ -64,7 +64,6 @@ const search = async (inputValue: string) => {
 .iconfont {
   position: absolute;
   font-size: 14px;
-  line-height: 35px;
 }
 
 .icon-search {

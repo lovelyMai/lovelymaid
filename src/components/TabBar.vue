@@ -29,13 +29,15 @@ const virtualLeft = ref<number>(0)
 const virtualRight = ref<number>(0)
 const barTransition = ref<string>('none')
 onMounted(() => {
-  barHeight.value = barRef.value!.offsetHeight
-  barWidth.value = props.showSearch ? barRef.value!.offsetWidth - barHeight.value - 5 : barRef.value!.offsetWidth - 5
-  searchWidth.value = barRef.value!.offsetWidth - barHeight.value * 0.8 - 5
-  borderRadius.value = barHeight.value / 2
-  slideWidth.value = (barWidth.value - 6) / listLength.value
-  virtualRight.value = slideWidth.value
-  maxDistance.value = (barWidth.value - 6) * (listLength.value - 1) / listLength.value
+  setTimeout(() => {
+    barHeight.value = barRef.value!.offsetHeight
+    barWidth.value = props.showSearch ? barRef.value!.offsetWidth - barHeight.value - 5 : barRef.value!.offsetWidth - 5
+    searchWidth.value = barRef.value!.offsetWidth - barHeight.value * 0.8 - 5
+    borderRadius.value = barHeight.value / 2
+    slideWidth.value = (barWidth.value - 6) / listLength.value
+    virtualRight.value = slideWidth.value
+    maxDistance.value = (barWidth.value - 6) * (listLength.value - 1) / listLength.value
+  }, 0)
   setTimeout(() => barTransition.value = 'width .3s, height .3s', 500)
 })
 
@@ -284,7 +286,7 @@ watch(searchIsActive, (newValue) => {
 .search .Button {
   width: 100%;
   height: 100%;
-  --font-size: 20px;
+  --font-size: calc(v-bind(barHeight) * 1px / 3);
   --transform: translateY(-2px);
 }
 
