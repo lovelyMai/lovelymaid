@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const searchRef = ref<HTMLElement | null>(null)
 const searchHeight = ref<number>(0)
-onMounted(() => searchHeight.value = searchRef.value!.offsetHeight)
+onMounted(() => setTimeout(() => searchHeight.value = searchRef.value!.offsetHeight, 0))
 
 // 输入框内容
 const inputValue = ref<string>('')
@@ -67,15 +67,12 @@ const search = async (inputValue: string) => {
 }
 
 .icon-search {
-  left: 14px;
+  left: calc((v-bind(searchHeight) / 2 - 7) * 1px);
   color: var(--search-color);
 }
 
 .icon-clear {
-  text-align: center;
-  right: 0;
-  width: 35px;
-  height: 35px;
+  right: calc((v-bind(searchHeight) / 2 - 7) * 1px);
   color: var(--clear-color);
   cursor: pointer;
 }
