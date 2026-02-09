@@ -82,7 +82,7 @@ const search = async (inputValue: string) => {
   height: 100%;
   background-color: transparent;
   border-radius: calc(v-bind(searchHeight) / 2 * 1px);
-  padding: 0 35px;
+  padding: 0 calc(v-bind(searchHeight) * 1px);
   font-size: inherit;
   font-weight: inherit;
   caret-color: #3c86f6;
