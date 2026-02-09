@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 interface Props {
   /** 输入框提示词 */
@@ -11,6 +11,10 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   placeholder: '搜索...'
 });
+
+const searchRef = ref<HTMLElement | null>(null)
+const searchHeight = ref<number>(0)
+onMounted(() => searchHeight.value = searchRef.value!.offsetHeight)
 
 // 输入框内容
 const inputValue = ref<string>('')
@@ -34,7 +38,7 @@ const search = async (inputValue: string) => {
 </script>
 
 <template>
-  <div class="Search">
+  <div class="Search" ref="searchRef">
     <span class="iconfont icon-search"></span>
     <input v-model="inputValue" class='input' @keyup.enter.prevent="search(inputValue.trim())"
       @compositionend="compositionend" @compositionstart="compositionstart" type="text"
@@ -49,19 +53,23 @@ const search = async (inputValue: string) => {
   align-items: center;
   position: relative;
   height: 35px;
-  border-radius: 18px;
   font-size: 14px;
+  background-color: #eee;
+  border-radius: calc(v-bind(searchHeight) / 2 * 1px);
+  --search-color: #767676;
+  --clear-color: #767676;
+  --placeholder-color: #767676;
 }
 
 .iconfont {
   position: absolute;
   font-size: 14px;
   line-height: 35px;
-  color: #767676;
 }
 
 .icon-search {
   left: 14px;
+  color: var(--search-color);
 }
 
 .icon-clear {
@@ -69,25 +77,25 @@ const search = async (inputValue: string) => {
   right: 0;
   width: 35px;
   height: 35px;
+  color: var(--clear-color);
   cursor: pointer;
 }
 
 .input {
-  background-color: #eee;
   width: 100%;
   height: 100%;
-  border-radius: 20px;
+  background-color: transparent;
+  border-radius: calc(v-bind(searchHeight) / 2 * 1px);
   padding: 0 35px;
   font-size: inherit;
   font-weight: inherit;
-  color: inherit;
   caret-color: #3c86f6;
   transition: outline .2s ease;
 }
 
 .input::placeholder {
-  font-weight: 500;
-  color: #767676;
+  font-weight: 400;
+  color: var(--placeholder-color);
 }
 
 .input:focus {

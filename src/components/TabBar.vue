@@ -1,18 +1,43 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
+import Button from './Button.vue'
+import Search from './Search.vue'
+
 interface Props {
   /** 列表 */
   list: string[]
   /** 列表项点击事件 */
   onItemClick?: (item: string, index: number) => void
+  /** 是否启用搜索按钮 */
+  showSearch?: boolean
 }
 const props = defineProps<Props>()
 const listLength = computed(() => props.list.length)
+
+// 初始化
+const barRef = ref<HTMLElement | null>(null)
+const barWidth = ref<number>(0)
+const barHeight = ref<number>(0)
+const searchWidth = ref<number>(0)
+const borderRadius = ref<number>(0)
 const slideRef = ref<HTMLElement | null>(null)
 const containerRef = ref<HTMLElement | null>(null)
-const borderRadius = ref<number>(0)
-onMounted(() => borderRadius.value = containerRef.value!.offsetHeight / 2)
+const slideWidth = ref<number>(0)
+const maxDistance = ref<number>(0)
+const virtualLeft = ref<number>(0)
+const virtualRight = ref<number>(0)
+const barTransition = ref<string>('none')
+onMounted(() => {
+  barHeight.value = barRef.value!.offsetHeight
+  barWidth.value = props.showSearch ? barRef.value!.offsetWidth - barHeight.value - 5 : barRef.value!.offsetWidth - 5
+  searchWidth.value = barRef.value!.offsetWidth - barHeight.value * 0.8 - 5
+  borderRadius.value = barHeight.value / 2
+  slideWidth.value = (barWidth.value - 6) / listLength.value
+  virtualRight.value = slideWidth.value
+  maxDistance.value = (barWidth.value - 6) * (listLength.value - 1) / listLength.value
+  setTimeout(() => barTransition.value = 'width .3s, height .3s', 500)
+})
 
 // 定时器
 let virtualTimer1: number | undefined
@@ -38,23 +63,19 @@ const border = ref<string>('none')
 const scale = ref<number>(1)
 const transition = ref<string>('transform .5s, background .2s')
 const clip = ref<string>('0')
-
+const activeIndex = ref<number>(0)
 const realPos = ref<number>(0)
-const virtualLeft = ref<number>(0)
-const virtualRight = ref<number>(0)
-onMounted(() => virtualRight.value = slideRef.value!.offsetWidth)
-const maxDistance = computed(() => containerRef.value!.offsetWidth * (listLength.value - 1) / listLength.value)
 
 const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   if (!slideRef.value || !containerRef.value) return
   const clickX = e.clientX - containerRef.value.getBoundingClientRect().left
-  const clickLeft = clickX - slideRef.value!.offsetWidth / 2
+  const clickLeft = clickX - slideWidth.value / 2
   const realLeft = new DOMMatrix(window.getComputedStyle(slideRef.value).transform).m41
   const targetLeft = clickLeft < 0 ? 0 : clickLeft > (listLength.value - 1) * slideRef.value.offsetWidth ? (listLength.value - 1) * slideRef.value.offsetWidth : clickLeft
   if (type === 'start') {
     transition.value = `transform .5s, background .2s`
     realPos.value = targetLeft
-  } else if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 15)) {
+  } else if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 5)) {
     transition.value = `background .2s`
     realPos.value = targetLeft
   } else {
@@ -63,7 +84,7 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
     calculatePosTimer1 = setInterval(() => {
       const realLeft = new DOMMatrix(window.getComputedStyle(slideRef.value!).transform).m41
       if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 15)) {
-        transition.value = `none`
+        transition.value = `background .2s`
         realPos.value = targetLeft
         clearTimer(calculatePosTimer1, calculatePosTimer2)
       } else {
@@ -102,6 +123,7 @@ const startSlide = (e: PointerEvent) => {
 }
 const moveSlide = (e: PointerEvent) => {
   if (moveSlideTimer) return
+  if (searchIsActive.value) return searchIsActive.value = false
   clearTimer(calculatePosTimer1, calculatePosTimer2)
   calculateTargetPos(e, 'move')
   clearTimer(virtualTimer1, virtualTimer2)
@@ -116,54 +138,109 @@ const stopSlide = (e: PointerEvent) => {
   scale.value = 1
   clearTimer(clipTimer)
   clipTimer = setTimeout(() => clip.value = '0', Math.min(Date.now() - startTime, 500))
-  const x = e.clientX - containerRef.value!.getBoundingClientRect().left
-  const index = Math.floor(x / slideRef.value!.offsetWidth)
-  const activeIndex = index > listLength.value - 1 ? listLength.value - 1 : index < 0 ? 0 : index
+  if (searchIsActive.value) {
+    searchIsActive.value = false
+  } else {
+    const x = e.clientX - containerRef.value!.getBoundingClientRect().left
+    const index = Math.floor(x / slideWidth.value)
+    activeIndex.value = index > listLength.value - 1 ? listLength.value - 1 : index < 0 ? 0 : index
+  }
   clearTimer(calculatePosTimer1, calculatePosTimer2)
-  realPos.value = activeIndex * slideRef.value!.offsetWidth
+  realPos.value = activeIndex.value * slideWidth.value
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
-  props.onItemClick?.(props.list[activeIndex], activeIndex)
+  props.onItemClick?.(props.list[activeIndex.value], activeIndex.value)
   document.removeEventListener('pointermove', moveSlide)
   document.removeEventListener('pointerup', stopSlide)
 }
 
 // list改变归位
 watch(() => props.list.length, () => realPos.value = 0)
+
+// 模式切换
+const searchIsActive = ref<boolean>(false)
+const searchIsShow = ref<boolean>(false)
+const clickSearch = () => {
+  searchIsActive.value = true
+  realPos.value = 0
+}
+watch(searchIsActive, (newValue) => {
+  if (newValue) setTimeout(() => searchIsShow.value = true, 100)
+  else setTimeout(() => searchIsShow.value = false, 200)
+})
 </script>
 
 <template>
-  <div class="TabBar">
-    <ul class="container" ref="containerRef" @pointerdown="startSlide">
-      <li class="tab" v-for="(item, index) in props.list">
-        <slot name="bottom" :item="item" :index="index"></slot>
-        <span>{{ item }}</span>
-      </li>
-      <ul class="container top">
-        <div class="slide" ref="slideRef">
-        </div>
-        <li class="tab top" v-for="(item, index) in props.list">
-          <slot name="top" :item="item" :index="index"></slot>
+  <div class="TabBar" style="user-select: none;" ref="barRef">
+    <div class="bar" :class="{ active: !searchIsActive }" ref="leftRef">
+      <ul class="container" ref="containerRef" @pointerdown="startSlide">
+        <li class="tab button" v-show="searchIsActive">
+          <slot name="bottom" :index="activeIndex"></slot>
+        </li>
+        <li class="tab" v-for="(item, index) in props.list">
+          <slot name="bottom" :item="item" :index="index"></slot>
           <span>{{ item }}</span>
         </li>
+        <ul class="container top" v-show="!searchIsActive">
+          <div class="slide" ref="slideRef"></div>
+          <li class="tab top" v-for="(item, index) in props.list">
+            <slot name="top" :item="item" :index="index"></slot>
+            <span>{{ item }}</span>
+          </li>
+        </ul>
       </ul>
-    </ul>
+    </div>
+    <div class="search" :class="{ active: searchIsActive }" v-if="props.showSearch">
+      <Button type="search" v-show="!searchIsShow" :onClick="clickSearch" />
+      <Search v-if="searchIsShow" />
+    </div>
   </div>
+
 </template>
 
 <style scoped>
 .TabBar {
-  position: relative;
-  z-index: 1;
+  display: flex;
+  gap: 5px;
   height: 50px;
+  font-size: 8px;
+  isolation: isolate;
+  --top-color: #0067EC;
+}
+
+.bar {
+  width: calc(v-bind(barHeight) * 0.8px);
+  height: 80%;
   padding: 2px;
   background-color: rgba(248, 248, 248, 0.9);
   backdrop-filter: blur(10px) saturate(1.5);
   border: 1px solid rgba(255, 255, 255, 1);
-  border-radius: calc((v-bind(borderRadius) + 3) * 1px);
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-  font-size: 8px;
-  --top-color: #0067EC;
+  border-radius: calc(v-bind(borderRadius) * 1px);
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  overflow-x: hidden;
+  transition: v-bind(barTransition);
+}
+
+.bar:not(.active):hover {
+  background-color: #eee;
+}
+
+.bar.active {
+  width: calc(v-bind(barWidth) * 1px);
+  height: 100%;
+  overflow-x: visible;
+}
+
+.search {
+  width: calc(v-bind(barHeight) * 1px);
+  height: 100%;
+  transition: v-bind(barTransition);
+}
+
+.search.active {
+  width: calc(v-bind(searchWidth) * 1px);
+  height: 80%;
 }
 
 .container {
@@ -183,11 +260,19 @@ watch(() => props.list.length, () => realPos.value = 0)
 }
 
 .tab {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex: 1;
+  width: calc(v-bind(slideWidth) * 1px);
+  height: 100%;
+}
+
+.tab.button {
+  flex-shrink: 1;
+  height: 100%;
+  aspect-ratio: 1 /1;
 }
 
 .tab.top {
@@ -196,16 +281,30 @@ watch(() => props.list.length, () => realPos.value = 0)
   color: var(--top-color);
 }
 
+.search .Button {
+  width: 100%;
+  height: 100%;
+}
+
+.search .Search {
+  height: 100%;
+  background-color: rgba(248, 248, 248, 0.9);
+  border: 1px solid #fff;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+  --search-color: #19191a;
+  --placeholder-color: #544957;
+}
+
 .slide {
   position: absolute;
   left: 0;
   top: 0;
   z-index: 0;
-  width: calc(100% / v-bind(listLength));
+  width: calc(v-bind(slideWidth) * 1px);
   height: 100%;
   background: v-bind(backgroundColor);
   border: v-bind(border);
-  border-radius: calc(v-bind(borderRadius) * 1px);
+  border-radius: calc((v-bind(borderRadius) - 3) * 1px);
   transform: translateX(calc(v-bind(realPos) * 1px)) scale(v-bind(scale));
   transition: v-bind(transition);
 }

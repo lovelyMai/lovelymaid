@@ -26,7 +26,8 @@ const props = defineProps<Props>()
   height: 30px;
   border: 1px solid #fff;
   border-radius: 50%;
-  background-color: rgba(248, 248, 248, 1);
+  background-color: rgba(248, 248, 248, 0.9);
+  backdrop-filter: blur(10px) saturate(1.5);
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   cursor: pointer;
 }
