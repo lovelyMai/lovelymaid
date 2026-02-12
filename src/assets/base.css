@@ -12,12 +12,9 @@ html {
 }
 
 body {
-  width: 100%;
-  min-height: 100vh;
   font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
 }
 
 ul,

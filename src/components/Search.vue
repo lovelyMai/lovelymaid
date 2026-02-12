@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
+import watchRef from '../utils/watchRef'
+
 interface Props {
   /** 输入框提示词 */
   placeholder?: string
@@ -12,9 +14,10 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: '搜索...'
 });
 
+// 初始化
 const searchRef = ref<HTMLElement | null>(null)
 const searchHeight = ref<number>(0)
-onMounted(() => setTimeout(() => searchHeight.value = searchRef.value!.offsetHeight, 0))
+onMounted(() => watchRef(searchRef, () => searchHeight.value = searchRef.value!.offsetHeight, true))
 
 // 输入框内容
 const inputValue = ref<string>('')
@@ -40,7 +43,7 @@ const search = async (inputValue: string) => {
 <template>
   <div class="Search" ref="searchRef">
     <span class="iconfont icon-search"></span>
-    <input v-model="inputValue" class='input' @keyup.enter.prevent="search(inputValue.trim())"
+    <input v-model="inputValue" class='input' @keyup.enter.prevent="search(inputValue.trim())" enterkeyhint="search"
       @compositionend="compositionend" @compositionstart="compositionstart" type="text"
       :placeholder="props.placeholder" />
     <span v-if="inputValue" class="iconfont icon-clear" @click.stop="inputValue = ''"></span>
@@ -53,7 +56,7 @@ const search = async (inputValue: string) => {
   align-items: center;
   position: relative;
   height: 35px;
-  font-size: 14px;
+  font-size: 16px;
   background-color: #eee;
   border-radius: calc(v-bind(searchHeight) / 2 * 1px);
   --search-color: #767676;

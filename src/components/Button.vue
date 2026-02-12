@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import watchRef from '../utils/watchRef';
 
 interface Props {
   /** 按钮图标 */
@@ -14,7 +15,7 @@ const props = defineProps<Props>()
 // 计算字体大小
 const buttonRef = ref<HTMLElement | null>(null)
 const fontSize = ref<number>(0)
-onMounted(() => setTimeout(() => fontSize.value = buttonRef.value!.offsetWidth * 1 / 2, 0))
+onMounted(() => watchRef(buttonRef, () => fontSize.value = buttonRef.value!.offsetWidth * 1 / 2, true))
 </script>
 
 <template>
@@ -36,12 +37,14 @@ onMounted(() => setTimeout(() => fontSize.value = buttonRef.value!.offsetWidth *
   backdrop-filter: blur(10px) saturate(1.5);
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   cursor: pointer;
+  transition: transform .2s;
   --font-size: calc(v-bind(fontSize) * 1px);
   --transform: none;
 }
 
-.Button:hover {
+.Button:active {
   background-color: #eee;
+  transform: scale(1.1);
 }
 
 .iconfont {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch } from 'vue'
-import { getSlideCount } from '../utils/getSlideCount'
+import getSlideCount from '../utils/getSlideCount'
 
 interface Props {
   /** 要渲染的列表 */
@@ -62,8 +62,7 @@ watch(() => props.list, (newList) => {
       :style="{ height: isOpen ? `calc(0px + ${bodyHeight}px)` : '0px' }">
       <ul ref="bodyRef" class="body" :class="{ close: !isOpen }">
         <li v-for="(item, index) in props.list" :key="index" @click.stop="() => onItemClick?.(item, index)"
-          :style="{ '--translateY': `${slideCount[index] * 100}%` }"
-          @animationend="() => slideAnimating = false"
+          :style="{ '--translateY': `${slideCount[index] * 100}%` }" @animationend="() => slideAnimating = false"
           :class="{ active: index === props.activeIndex, slideAnimation: slideAnimating }">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>

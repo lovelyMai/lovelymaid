@@ -1,4 +1,4 @@
-export const getSlideCount = <T extends { id: number }>(
+const getSlideCount = <T extends { id: number }>(
   newList: T[],
   oldList: T[]
 ): number[] => {
@@ -43,3 +43,5 @@ export const getSlideCount = <T extends { id: number }>(
 
   return result;
 };
+
+export default getSlideCount

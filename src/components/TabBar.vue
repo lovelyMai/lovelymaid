@@ -4,6 +4,8 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import Button from './Button.vue'
 import Search from './Search.vue'
 
+import watchRef from '../utils/watchRef';
+
 interface Props {
   /** 列表 */
   list: string[]
@@ -11,8 +13,12 @@ interface Props {
   onItemClick?: (item: string, index: number) => void
   /** 是否启用搜索按钮 */
   showSearch?: boolean
+  /** 挂载时激活索引 */
+  index?: number
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  index: 0
+})
 const listLength = computed(() => props.list.length)
 
 // 初始化
@@ -28,17 +34,20 @@ const maxDistance = ref<number>(0)
 const virtualLeft = ref<number>(0)
 const virtualRight = ref<number>(0)
 const barTransition = ref<string>('none')
+const realPos = ref<number>(0)
 onMounted(() => {
-  setTimeout(() => {
+  cleanup = watchRef(barRef, () => {
     barHeight.value = barRef.value!.offsetHeight
     barWidth.value = props.showSearch ? barRef.value!.offsetWidth - barHeight.value - 5 : barRef.value!.offsetWidth - 5
     searchWidth.value = barRef.value!.offsetWidth - barHeight.value * 0.8 - 5
     borderRadius.value = barHeight.value / 2
     slideWidth.value = (barWidth.value - 6) / listLength.value
-    virtualRight.value = slideWidth.value
+    virtualLeft.value = activeIndex.value * slideWidth.value
+    virtualRight.value = virtualLeft.value + slideWidth.value
     maxDistance.value = (barWidth.value - 6) * (listLength.value - 1) / listLength.value
-  }, 0)
-  setTimeout(() => barTransition.value = 'width .3s, height .3s', 500)
+    realPos.value = activeIndex.value * slideWidth.value
+  }, true)
+  setTimeout(() => barTransition.value = 'width .3s, height .3s, transform .2s', 500)
 })
 
 // 定时器
@@ -49,6 +58,7 @@ let calculatePosTimer1: number | undefined
 let calculatePosTimer2: number | undefined
 let backgroundTimer: number | undefined
 let clipTimer: number | undefined
+let cleanup: () => void
 const clearTimer = (...args: (number | undefined)[]) => {
   args.forEach(timer => {
     if (timer) {
@@ -57,16 +67,18 @@ const clearTimer = (...args: (number | undefined)[]) => {
     }
   })
 }
-onUnmounted(() => clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, calculatePosTimer1, calculatePosTimer2, backgroundTimer, clipTimer))
+onUnmounted(() => {
+  clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, calculatePosTimer1, calculatePosTimer2, backgroundTimer, clipTimer)
+  cleanup()
+})
 
 // 滑块动画
-const backgroundColor = ref<string>('#eee')
+const backgroundColor = ref<string>('#e4e4e6')
 const border = ref<string>('none')
 const scale = ref<number>(1)
-const transition = ref<string>('transform .5s, background .2s')
+const transition = ref<string>('background .2s')
 const clip = ref<string>('0')
-const activeIndex = ref<number>(0)
-const realPos = ref<number>(0)
+const activeIndex = ref<number>(props.index)
 
 const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   if (!slideRef.value || !containerRef.value) return
@@ -97,11 +109,17 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   }
 }
 const updateVirtualPos = (duration: number | undefined) => {
-  virtualTimer1 = setInterval(() => {
-    virtualLeft.value = (slideRef.value?.getBoundingClientRect().left || 0) - (containerRef.value?.getBoundingClientRect().left || 0)
-    virtualRight.value = (slideRef.value?.getBoundingClientRect().right || 0) - (containerRef.value?.getBoundingClientRect().left || 0)
-  }, 16)
-  if (duration) virtualTimer2 = setTimeout(() => clearInterval(virtualTimer1), duration)
+  const containerLeft = containerRef.value!.getBoundingClientRect().left
+  if (duration) {
+    virtualTimer1 = setInterval(() => {
+      virtualLeft.value = slideRef.value!.getBoundingClientRect().left - containerLeft
+      virtualRight.value = slideRef.value!.getBoundingClientRect().right - containerLeft
+    }, 16)
+    virtualTimer2 = setTimeout(() => clearInterval(virtualTimer1), duration)
+  } else {
+    virtualLeft.value = slideRef.value!.getBoundingClientRect().left - containerLeft
+    virtualRight.value = slideRef.value!.getBoundingClientRect().right - containerLeft
+  }
 }
 
 let startTime: number
@@ -134,7 +152,7 @@ const moveSlide = (e: PointerEvent) => {
 }
 const stopSlide = (e: PointerEvent) => {
   if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
-  backgroundColor.value = '#eee'
+  backgroundColor.value = '#e4e4e6'
   border.value = 'none'
   transition.value = `transform .5s, background .2s`
   scale.value = 1
@@ -174,9 +192,9 @@ watch(searchIsActive, (newValue) => {
 
 <template>
   <div class="TabBar" style="user-select: none;" ref="barRef">
-    <div class="bar" :class="{ active: !searchIsActive }" ref="leftRef">
+    <div class="bar" :class="{ active: !searchIsActive }">
       <ul class="container" ref="containerRef" @pointerdown="startSlide">
-        <li class="tab button" v-show="searchIsActive">
+        <li class="tab small" v-show="searchIsActive">
           <slot name="bottom" :index="activeIndex"></slot>
         </li>
         <li class="tab" v-for="(item, index) in props.list">
@@ -224,8 +242,9 @@ watch(searchIsActive, (newValue) => {
   transition: v-bind(barTransition);
 }
 
-.bar:not(.active):hover {
+.bar:not(.active):active {
   background-color: #eee;
+  transform: scale(1.1);
 }
 
 .bar.active {
@@ -250,6 +269,7 @@ watch(searchIsActive, (newValue) => {
   display: flex;
   width: 100%;
   height: 100%;
+  touch-action: none;
 }
 
 .container.top {
@@ -257,6 +277,7 @@ watch(searchIsActive, (newValue) => {
   left: 0;
   top: 0;
   clip-path: inset(v-bind(clip) calc(100% - calc(v-bind(virtualRight) * 1px)) v-bind(clip) calc(v-bind(virtualLeft) * 1px) round 22px);
+  mask-composite: exclude;
   transform: translateZ(0);
   backface-visibility: hidden;
 }
@@ -271,7 +292,7 @@ watch(searchIsActive, (newValue) => {
   height: 100%;
 }
 
-.tab.button {
+.tab.small {
   flex-shrink: 1;
   height: 100%;
   aspect-ratio: 1 /1;
@@ -287,7 +308,7 @@ watch(searchIsActive, (newValue) => {
   width: 100%;
   height: 100%;
   --font-size: calc(v-bind(barHeight) * 1px / 3);
-  --transform: translateY(-2px);
+  --transform: translateY(-1px);
 }
 
 .search .Search {
