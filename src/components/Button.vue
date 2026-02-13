@@ -43,7 +43,7 @@ onMounted(() => watchRef(buttonRef, () => fontSize.value = buttonRef.value!.offs
 }
 
 .Button:active {
-  background-color: #eee;
+  background-color: #e4e4e6;
   transform: scale(1.1);
 }
 

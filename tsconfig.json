@@ -11,7 +11,13 @@
     "moduleResolution": "bundler",
     "types": [
       "vue"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
   },
   "include": [
     "**/*.vue",

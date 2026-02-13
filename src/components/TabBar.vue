@@ -5,6 +5,7 @@ import Button from './Button.vue'
 import Search from './Search.vue'
 
 import watchRef from '../utils/watchRef';
+import { getLayoutLeftInViewport } from '../utils/getLayoutLeft';
 
 interface Props {
   /** 列表 */
@@ -75,30 +76,30 @@ onUnmounted(() => {
 // 滑块动画
 const backgroundColor = ref<string>('#e4e4e6')
 const border = ref<string>('none')
-const scale = ref<number>(1)
-const transition = ref<string>('background .2s')
-const clip = ref<string>('0')
+const boxShadow = ref<string>('none')
+const slideScale = ref<number>(1)
+const slideTransition = ref<string>('background-color .1s')
 const activeIndex = ref<number>(props.index)
 
 const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   if (!slideRef.value || !containerRef.value) return
-  const clickX = e.clientX - containerRef.value.getBoundingClientRect().left
+  const clickX = e.clientX - getLayoutLeftInViewport(containerRef.value)
   const clickLeft = clickX - slideWidth.value / 2
   const realLeft = new DOMMatrix(window.getComputedStyle(slideRef.value).transform).m41
   const targetLeft = clickLeft < 0 ? 0 : clickLeft > (listLength.value - 1) * slideRef.value.offsetWidth ? (listLength.value - 1) * slideRef.value.offsetWidth : clickLeft
   if (type === 'start') {
-    transition.value = `transform .5s, background .2s`
+    slideTransition.value = `transform .5s, background-color .1s`
     realPos.value = targetLeft
   } else if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 5)) {
-    transition.value = `background .2s`
+    slideTransition.value = `background-color .1s`
     realPos.value = targetLeft
   } else {
-    transition.value = `background .2s`
+    slideTransition.value = `background-color .1s`
     realPos.value = realLeft
     calculatePosTimer1 = setInterval(() => {
       const realLeft = new DOMMatrix(window.getComputedStyle(slideRef.value!).transform).m41
       if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 15)) {
-        transition.value = `background .2s`
+        slideTransition.value = `background-color .1s`
         realPos.value = targetLeft
         clearTimer(calculatePosTimer1, calculatePosTimer2)
       } else {
@@ -125,15 +126,10 @@ const updateVirtualPos = (duration: number | undefined) => {
 let startTime: number
 const startSlide = (e: PointerEvent) => {
   startTime = Date.now()
-  backgroundTimer = setTimeout(() => backgroundColor.value = `linear-gradient(
-    to bottom,
-    transparent 10%,
-    rgba(248, 248, 248, 0.9) 10% calc(100% - 10%),
-    transparent calc(100% - 10%)
-  )`, 100)
-  border.value = '1px solid #fff'
-  scale.value = 1.4
-  clip.value = '-50%'
+  backgroundTimer = setTimeout(() => backgroundColor.value = `transparent`, 10)
+  border.value = '1px solid rgba(255, 255, 255, 0.5)'
+  boxShadow.value = '0 0 10px 0 rgba(0, 0, 0, 0.1)'
+  slideScale.value = 1.4
   clearTimer(clipTimer)
   calculateTargetPos(e, 'start')
   clearTimer(virtualTimer1, virtualTimer2)
@@ -151,18 +147,18 @@ const moveSlide = (e: PointerEvent) => {
   moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 16)
 }
 const stopSlide = (e: PointerEvent) => {
-  if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
+  if ((Date.now() - startTime) < 10) clearTimer(backgroundTimer)
   backgroundColor.value = '#e4e4e6'
   border.value = 'none'
-  transition.value = `transform .5s, background .2s`
-  scale.value = 1
+  boxShadow.value = 'none'
+  slideTransition.value = `transform .5s, background-color .1s`
+  slideScale.value = 1
   clearTimer(clipTimer)
-  clipTimer = setTimeout(() => clip.value = '0', Math.min(Date.now() - startTime, 500))
   if (searchIsActive.value) {
     searchIsActive.value = false
   } else {
-    const x = e.clientX - containerRef.value!.getBoundingClientRect().left
-    const index = Math.floor(x / slideWidth.value)
+    const clickX = e.clientX - getLayoutLeftInViewport(containerRef.value)
+    const index = Math.floor(clickX / slideWidth.value)
     activeIndex.value = index > listLength.value - 1 ? listLength.value - 1 : index < 0 ? 0 : index
   }
   clearTimer(calculatePosTimer1, calculatePosTimer2)
@@ -201,8 +197,8 @@ watch(searchIsActive, (newValue) => {
           <slot name="bottom" :item="item" :index="index"></slot>
           <span>{{ item }}</span>
         </li>
+        <div class="slide" ref="slideRef" v-show="!searchIsActive"></div>
         <ul class="container top" v-show="!searchIsActive">
-          <div class="slide" ref="slideRef"></div>
           <li class="tab top" v-for="(item, index) in props.list">
             <slot name="top" :item="item" :index="index"></slot>
             <span>{{ item }}</span>
@@ -243,7 +239,7 @@ watch(searchIsActive, (newValue) => {
 }
 
 .bar:not(.active):active {
-  background-color: #eee;
+  background-color: #e4e4e6;
   transform: scale(1.1);
 }
 
@@ -251,6 +247,10 @@ watch(searchIsActive, (newValue) => {
   width: calc(v-bind(barWidth) * 1px);
   height: 100%;
   overflow-x: visible;
+}
+
+.bar.active:active {
+  background-color: #fff;
 }
 
 .search {
@@ -276,7 +276,8 @@ watch(searchIsActive, (newValue) => {
   position: absolute;
   left: 0;
   top: 0;
-  clip-path: inset(v-bind(clip) calc(100% - calc(v-bind(virtualRight) * 1px)) v-bind(clip) calc(v-bind(virtualLeft) * 1px) round 22px);
+  z-index: 1;
+  clip-path: inset(0 calc(100% - v-bind(virtualRight) * 1px) 0 calc(v-bind(virtualLeft) * 1px) round 22px);
   mask-composite: exclude;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -299,8 +300,6 @@ watch(searchIsActive, (newValue) => {
 }
 
 .tab.top {
-  position: relative;
-  z-index: 1;
   color: var(--top-color);
 }
 
@@ -327,10 +326,11 @@ watch(searchIsActive, (newValue) => {
   z-index: 0;
   width: calc(v-bind(slideWidth) * 1px);
   height: 100%;
-  background: v-bind(backgroundColor);
+  background-color: v-bind(backgroundColor);
   border: v-bind(border);
   border-radius: calc((v-bind(borderRadius) - 3) * 1px);
-  transform: translateX(calc(v-bind(realPos) * 1px)) scale(v-bind(scale));
-  transition: v-bind(transition);
+  box-shadow: v-bind(boxShadow);
+  transform: translateX(calc(v-bind(realPos) * 1px)) scale(v-bind(slideScale));
+  transition: v-bind(slideTransition);
 }
 </style>
