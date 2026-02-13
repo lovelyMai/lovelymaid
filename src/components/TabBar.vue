@@ -55,8 +55,7 @@ onMounted(() => {
 let virtualTimer1: number | undefined
 let virtualTimer2: number | undefined
 let moveSlideTimer: number | undefined
-let calculatePosTimer1: number | undefined
-let calculatePosTimer2: number | undefined
+let calculatePosTimer: number | undefined
 let backgroundTimer: number | undefined
 let clipTimer: number | undefined
 let cleanup: () => void
@@ -69,7 +68,7 @@ const clearTimer = (...args: (number | undefined)[]) => {
   })
 }
 onUnmounted(() => {
-  clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, calculatePosTimer1, calculatePosTimer2, backgroundTimer, clipTimer)
+  clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, calculatePosTimer, backgroundTimer, clipTimer)
   cleanup()
 })
 
@@ -81,6 +80,7 @@ const slideScale = ref<number>(1)
 const slideTransition = ref<string>('background-color .1s')
 const activeIndex = ref<number>(props.index)
 
+let followed = false
 const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   if (!slideRef.value || !containerRef.value) return
   const clickX = e.clientX - getLayoutLeftInViewport(containerRef.value)
@@ -90,23 +90,24 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   if (type === 'start') {
     slideTransition.value = `transform .5s, background-color .1s`
     realPos.value = targetLeft
-  } else if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 5)) {
+  } else if (followed || Math.abs(targetLeft - realLeft) < (maxDistance.value / 5)) {
     slideTransition.value = `background-color .1s`
     realPos.value = targetLeft
+    followed = true
   } else {
     slideTransition.value = `background-color .1s`
     realPos.value = realLeft
-    calculatePosTimer1 = setInterval(() => {
+    calculatePosTimer = setInterval(() => {
       const realLeft = new DOMMatrix(window.getComputedStyle(slideRef.value!).transform).m41
-      if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 15)) {
+      if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 5)) {
         slideTransition.value = `background-color .1s`
         realPos.value = targetLeft
-        clearTimer(calculatePosTimer1, calculatePosTimer2)
+        followed = true
+        clearTimer(calculatePosTimer)
       } else {
-        realPos.value += (targetLeft - realLeft) > 0 ? maxDistance.value / 15 : -maxDistance.value / 15
+        realPos.value += (targetLeft - realLeft) > 0 ? maxDistance.value / 5 : -maxDistance.value / 5
       }
     }, 16)
-    calculatePosTimer2 = setTimeout(() => clearTimer(calculatePosTimer1), 500)
   }
 }
 const updateVirtualPos = (duration: number | undefined) => {
@@ -140,7 +141,7 @@ const startSlide = (e: PointerEvent) => {
 const moveSlide = (e: PointerEvent) => {
   if (moveSlideTimer) return
   if (searchIsActive.value) return searchIsActive.value = false
-  clearTimer(calculatePosTimer1, calculatePosTimer2)
+  clearTimer(calculatePosTimer)
   calculateTargetPos(e, 'move')
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(undefined)
@@ -161,8 +162,9 @@ const stopSlide = (e: PointerEvent) => {
     const index = Math.floor(clickX / slideWidth.value)
     activeIndex.value = index > listLength.value - 1 ? listLength.value - 1 : index < 0 ? 0 : index
   }
-  clearTimer(calculatePosTimer1, calculatePosTimer2)
+  clearTimer(calculatePosTimer)
   realPos.value = activeIndex.value * slideWidth.value
+  followed = false
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
   props.onItemClick?.(props.list[activeIndex.value], activeIndex.value)
@@ -277,8 +279,8 @@ watch(searchIsActive, (newValue) => {
   left: 0;
   top: 0;
   z-index: 1;
+  /* background-color: #fff; */
   clip-path: inset(0 calc(100% - v-bind(virtualRight) * 1px) 0 calc(v-bind(virtualLeft) * 1px) round 22px);
-  mask-composite: exclude;
   transform: translateZ(0);
   backface-visibility: hidden;
 }
