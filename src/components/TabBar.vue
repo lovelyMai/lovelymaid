@@ -74,6 +74,7 @@ onUnmounted(() => {
 
 // 滑块动画
 const backgroundColor = ref<string>('#e4e4e6')
+const barBackgroundColor = ref<string>('rgba(248, 248, 248, 0.9)')
 const border = ref<string>('none')
 const boxShadow = ref<string>('none')
 const slideScale = ref<number>(1)
@@ -127,7 +128,10 @@ const updateVirtualPos = (duration: number | undefined) => {
 let startTime: number
 const startSlide = (e: PointerEvent) => {
   startTime = Date.now()
-  backgroundTimer = setTimeout(() => backgroundColor.value = `transparent`, 100)
+  backgroundTimer = setTimeout(() => {
+    backgroundColor.value = `transparent`
+  }, 100)
+  barBackgroundColor.value = '#fff'
   border.value = '1px solid rgba(255, 255, 255, 0.5)'
   boxShadow.value = '0 0 10px 0 rgba(0, 0, 0, 0.1)'
   slideScale.value = 1.4
@@ -150,6 +154,7 @@ const moveSlide = (e: PointerEvent) => {
 const stopSlide = (e: PointerEvent) => {
   if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
   backgroundColor.value = '#e4e4e6'
+  barBackgroundColor.value = 'rgba(248, 248, 248, 0.9)'
   border.value = 'none'
   boxShadow.value = 'none'
   slideTransition.value = `transform .5s, background-color .1s`
@@ -230,7 +235,7 @@ watch(searchIsActive, (newValue) => {
   width: calc(v-bind(barHeight) * 0.8px);
   height: 80%;
   padding: 2px;
-  background-color: rgba(248, 248, 248, 0.9);
+  background-color: v-bind(barBackgroundColor);
   backdrop-filter: blur(10px) saturate(1.5);
   border: 1px solid rgba(255, 255, 255, 1);
   border-radius: calc(v-bind(borderRadius) * 1px);
@@ -241,7 +246,6 @@ watch(searchIsActive, (newValue) => {
 }
 
 .bar:not(.active):active {
-  background-color: #e4e4e6;
   transform: scale(1.1);
 }
 
@@ -249,10 +253,6 @@ watch(searchIsActive, (newValue) => {
   width: calc(v-bind(barWidth) * 1px);
   height: 100%;
   overflow-x: visible;
-}
-
-.bar.active:active {
-  background-color: #fff;
 }
 
 .search {
@@ -279,7 +279,6 @@ watch(searchIsActive, (newValue) => {
   left: 0;
   top: 0;
   z-index: 1;
-  /* background-color: #fff; */
   clip-path: inset(0 calc(100% - v-bind(virtualRight) * 1px) 0 calc(v-bind(virtualLeft) * 1px) round 22px);
   transform: translateZ(0);
   backface-visibility: hidden;
