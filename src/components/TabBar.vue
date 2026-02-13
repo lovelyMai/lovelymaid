@@ -127,7 +127,7 @@ const updateVirtualPos = (duration: number | undefined) => {
 let startTime: number
 const startSlide = (e: PointerEvent) => {
   startTime = Date.now()
-  backgroundTimer = setTimeout(() => backgroundColor.value = `transparent`, 10)
+  backgroundTimer = setTimeout(() => backgroundColor.value = `transparent`, 100)
   border.value = '1px solid rgba(255, 255, 255, 0.5)'
   boxShadow.value = '0 0 10px 0 rgba(0, 0, 0, 0.1)'
   slideScale.value = 1.4
@@ -148,7 +148,7 @@ const moveSlide = (e: PointerEvent) => {
   moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 16)
 }
 const stopSlide = (e: PointerEvent) => {
-  if ((Date.now() - startTime) < 10) clearTimer(backgroundTimer)
+  if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
   backgroundColor.value = '#e4e4e6'
   border.value = 'none'
   boxShadow.value = 'none'
