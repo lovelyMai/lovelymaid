@@ -39,6 +39,7 @@ onMounted(() => watchRef(buttonRef, () => fontSize.value = buttonRef.value!.offs
   cursor: pointer;
   transition: transform .2s;
   --font-size: calc(v-bind(fontSize) * 1px);
+  --font-weight: 500;
   --transform: none;
 }
 
@@ -49,6 +50,7 @@ onMounted(() => watchRef(buttonRef, () => fontSize.value = buttonRef.value!.offs
 
 .iconfont {
   font-size: var(--font-size);
+  font-weight: var(--font-weight);
   color: #19191a;
   transform: var(--transform);
 }

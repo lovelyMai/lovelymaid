@@ -35,6 +35,7 @@ const maxDistance = ref<number>(0)
 const virtualLeft = ref<number>(0)
 const virtualRight = ref<number>(0)
 const barTransition = ref<string>('none')
+const activeIndex = ref<number>(props.index)
 const realPos = ref<number>(0)
 onMounted(() => {
   cleanup = watchRef(barRef, () => {
@@ -57,7 +58,6 @@ let virtualTimer2: number | undefined
 let moveSlideTimer: number | undefined
 let calculatePosTimer: number | undefined
 let backgroundTimer: number | undefined
-let clipTimer: number | undefined
 let cleanup: () => void
 const clearTimer = (...args: (number | undefined)[]) => {
   args.forEach(timer => {
@@ -68,7 +68,7 @@ const clearTimer = (...args: (number | undefined)[]) => {
   })
 }
 onUnmounted(() => {
-  clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, calculatePosTimer, backgroundTimer, clipTimer)
+  clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, calculatePosTimer, backgroundTimer)
   cleanup()
 })
 
@@ -79,7 +79,6 @@ const border = ref<string>('none')
 const boxShadow = ref<string>('none')
 const slideScale = ref<number>(1)
 const slideTransition = ref<string>('background-color .1s')
-const activeIndex = ref<number>(props.index)
 
 let followed = false
 const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
@@ -112,7 +111,7 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   }
 }
 const updateVirtualPos = (duration: number | undefined) => {
-  const containerLeft = containerRef.value!.getBoundingClientRect().left
+  const containerLeft = getLayoutLeftInViewport(containerRef.value)
   if (duration) {
     virtualTimer1 = setInterval(() => {
       virtualLeft.value = slideRef.value!.getBoundingClientRect().left - containerLeft
@@ -135,7 +134,6 @@ const startSlide = (e: PointerEvent) => {
   border.value = '1px solid rgba(255, 255, 255, 0.5)'
   boxShadow.value = '0 0 10px 0 rgba(0, 0, 0, 0.1)'
   slideScale.value = 1.4
-  clearTimer(clipTimer)
   calculateTargetPos(e, 'start')
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
@@ -143,6 +141,7 @@ const startSlide = (e: PointerEvent) => {
   document.addEventListener('pointerup', stopSlide)
 }
 const moveSlide = (e: PointerEvent) => {
+  e.preventDefault()
   if (moveSlideTimer) return
   if (searchIsActive.value) return searchIsActive.value = false
   clearTimer(calculatePosTimer)
@@ -152,6 +151,7 @@ const moveSlide = (e: PointerEvent) => {
   moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 16)
 }
 const stopSlide = (e: PointerEvent) => {
+  e.preventDefault()
   if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
   backgroundColor.value = '#e4e4e6'
   barBackgroundColor.value = 'rgba(248, 248, 248, 0.9)'
@@ -159,7 +159,6 @@ const stopSlide = (e: PointerEvent) => {
   boxShadow.value = 'none'
   slideTransition.value = `transform .5s, background-color .1s`
   slideScale.value = 1
-  clearTimer(clipTimer)
   if (searchIsActive.value) {
     searchIsActive.value = false
   } else {
@@ -191,12 +190,24 @@ watch(searchIsActive, (newValue) => {
   if (newValue) setTimeout(() => searchIsShow.value = true, 100)
   else setTimeout(() => searchIsShow.value = false, 200)
 })
+
+// 暴露内部方法
+defineExpose({
+  clickTab: (index: number) => {
+    activeIndex.value = index
+    clearTimer(calculatePosTimer)
+    realPos.value = index * slideWidth.value
+    clearTimer(virtualTimer1, virtualTimer2)
+    updateVirtualPos(500)
+    props.onItemClick?.(props.list[index], index)
+  }
+})
 </script>
 
 <template>
-  <div class="TabBar" style="user-select: none;" ref="barRef">
+  <div class="TabBar" :style="{ userSelect: 'none' }" ref="barRef">
     <div class="bar" :class="{ active: !searchIsActive }">
-      <ul class="container" ref="containerRef" @pointerdown="startSlide">
+      <ul class="container" ref="containerRef" @pointerdown.stop="startSlide">
         <li class="tab small" v-show="searchIsActive">
           <slot name="bottom" :index="activeIndex"></slot>
         </li>
@@ -215,7 +226,7 @@ watch(searchIsActive, (newValue) => {
     </div>
     <div class="search" :class="{ active: searchIsActive }" v-if="props.showSearch">
       <Button type="search" v-show="!searchIsShow" :onClick="clickSearch" />
-      <Search v-if="searchIsShow" />
+      <Search v-show="searchIsShow" />
     </div>
   </div>
 
