@@ -243,6 +243,7 @@ defineExpose({
 }
 
 .bar {
+  z-index: 1;
   width: calc(v-bind(barHeight) * 0.8px);
   height: 80%;
   padding: 2px;
