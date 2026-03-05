@@ -27,28 +27,27 @@ const bodyRef = ref<HTMLElement | null>(null)
 const enableTransition = ref(false)
 const calculateHeight = async () => {
   await nextTick()
-  if (bodyRef.value) {
-    bodyHeight.value = bodyRef.value.offsetHeight
-  }
+  if (bodyRef.value) bodyHeight.value = bodyRef.value!.offsetHeight
 }
 const initialize = async () => {
-  enableTransition.value = false
   await calculateHeight()
   setTimeout(() => enableTransition.value = true, 100)
 }
 onMounted(() => {
   initialize()
 })
-watch(() => props.list.length, calculateHeight)
+watch(() => props.list.length, async () => await calculateHeight())
 
 // 列表项动画
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
 const oldList = ref<{ id: number, name: string }[]>([...props.list])
 watch(() => props.list, (newList) => {
-  slideCount.value = getSlideCount(newList, oldList.value)
-  slideAnimating.value = true
-  oldList.value = [...newList]
+  if (enableTransition.value) {
+    slideCount.value = getSlideCount(newList, oldList.value)
+    slideAnimating.value = true
+    oldList.value = [...newList]
+  }
 }, { deep: true })
 </script>
 
