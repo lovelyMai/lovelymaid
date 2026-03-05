@@ -3,6 +3,8 @@ import { ref, nextTick, onMounted, watch } from 'vue'
 import getSlideCount from '../utils/getSlideCount'
 
 interface Props {
+  /** 标题 */
+  title?: string
   /** 要渲染的列表 */
   list?: { id: number, name: string }[]
   /** 激活项索引 */
@@ -13,6 +15,7 @@ interface Props {
   onItemClick?: (item: { id: number, name: string }, index: number) => void
 }
 const props = withDefaults(defineProps<Props>(), {
+  title: '标题2',
   list: () => [],
   activeIndex: -1
 });
@@ -53,7 +56,7 @@ watch(() => props.list, (newList) => {
   <div style="user-select: none;">
     <div class="header" @click.stop="onHeaderClick">
       <div class="title">
-        <slot name="title">标题</slot>
+        {{ props.title }}
       </div>
       <span class="iconfont icon-right-arrow" :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
         :title="isOpen ? '收起列表' : '展开列表'" @click.stop="isOpen = !isOpen"></span>

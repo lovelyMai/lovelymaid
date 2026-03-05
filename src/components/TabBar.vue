@@ -141,7 +141,6 @@ const startSlide = (e: PointerEvent) => {
   document.addEventListener('pointerup', stopSlide)
 }
 const moveSlide = (e: PointerEvent) => {
-  e.preventDefault()
   if (moveSlideTimer) return
   if (searchIsActive.value) return searchIsActive.value = false
   clearTimer(calculatePosTimer)
@@ -151,7 +150,6 @@ const moveSlide = (e: PointerEvent) => {
   moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 16)
 }
 const stopSlide = (e: PointerEvent) => {
-  e.preventDefault()
   if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
   backgroundColor.value = '#e4e4e6'
   barBackgroundColor.value = 'rgba(248, 248, 248, 0.9)'
@@ -205,34 +203,33 @@ defineExpose({
 </script>
 
 <template>
-  <div class="TabBar" :style="{ userSelect: 'none' }" ref="barRef">
-    <div class="bar" :class="{ active: !searchIsActive }">
-      <ul class="container" ref="containerRef" @pointerdown.stop="startSlide">
-        <li class="tab small" v-show="searchIsActive">
+  <div :class="$style.TabBar" :style="{ userSelect: 'none' }" ref="barRef">
+    <div :class="[$style.bar, { [$style.active]: !searchIsActive }]">
+      <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
+        <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
           <slot name="bottom" :index="activeIndex"></slot>
         </li>
-        <li class="tab" v-for="(item, index) in props.list">
+        <li :class="$style.tab" v-for="(item, index) in props.list" :key="index">
           <slot name="bottom" :item="item" :index="index"></slot>
           <span>{{ item }}</span>
         </li>
-        <div class="slide" ref="slideRef" v-show="!searchIsActive"></div>
-        <ul class="container top" v-show="!searchIsActive">
-          <li class="tab top" v-for="(item, index) in props.list">
+        <div :class="$style.slide" ref="slideRef" v-show="!searchIsActive"></div>
+        <ul :class="[$style.container, $style.top]" v-show="!searchIsActive">
+          <li :class="[$style.tab, $style.top]" v-for="(item, index) in props.list" :key="'top-' + index">
             <slot name="top" :item="item" :index="index"></slot>
             <span>{{ item }}</span>
           </li>
         </ul>
       </ul>
     </div>
-    <div class="search" :class="{ active: searchIsActive }" v-if="props.showSearch">
-      <Button type="search" v-show="!searchIsShow" :onClick="clickSearch" />
-      <Search v-show="searchIsShow" />
+    <div :class="[$style.search, { [$style.active]: searchIsActive }]" v-if="props.showSearch">
+      <Button type="search" :class="$style.Button" v-show="!searchIsShow" :onClick="clickSearch" />
+      <Search :class="$style.Search" v-show="searchIsShow" />
     </div>
   </div>
-
 </template>
 
-<style scoped>
+<style module>
 .TabBar {
   display: flex;
   gap: 5px;
@@ -258,7 +255,7 @@ defineExpose({
 }
 
 .bar:not(.active):active {
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 
 .bar.active {
@@ -326,6 +323,7 @@ defineExpose({
 .search .Search {
   height: 100%;
   background-color: rgba(248, 248, 248, 0.9);
+  backdrop-filter: blur(10px) saturate(1.5);
   border: 1px solid #fff;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
   --search-color: #19191a;

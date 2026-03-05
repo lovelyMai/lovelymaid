@@ -56,7 +56,7 @@ const search = async (inputValue: string) => {
   align-items: center;
   position: relative;
   height: 35px;
-  font-size: 16px;
+  font-size: 14px;
   background-color: #eee;
   border-radius: calc(v-bind(searchHeight) / 2 * 1px);
   --search-color: #767676;
@@ -93,6 +93,7 @@ const search = async (inputValue: string) => {
 }
 
 .input::placeholder {
+  font-size: inherit;
   font-weight: 400;
   color: var(--placeholder-color);
 }

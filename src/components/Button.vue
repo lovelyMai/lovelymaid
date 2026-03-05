@@ -37,6 +37,7 @@ onMounted(() => watchRef(buttonRef, () => fontSize.value = buttonRef.value!.offs
   backdrop-filter: blur(10px) saturate(1.5);
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   cursor: pointer;
+  touch-action: none; 
   transition: transform .2s;
   --font-size: calc(v-bind(fontSize) * 1px);
   --font-weight: 500;
@@ -45,7 +46,7 @@ onMounted(() => watchRef(buttonRef, () => fontSize.value = buttonRef.value!.offs
 
 .Button:active {
   background-color: #fff;
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 
 .iconfont {

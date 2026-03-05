@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import Button from './Button.vue';
 
 interface Props {
   /** 是否显示 */
   visible?: boolean;
   /** 是否展开 */
-  open?: boolean;
+  isOpen?: boolean;
   /** 标题 */
   title?: string;
   /** 关闭按钮点击事件 */
@@ -33,9 +33,15 @@ const calculateTransform = () => {
   }
   const width = container.offsetWidth
   transformDistance.value = left + width + 10
-  setTimeout(() => transition.value = 'transform .5s, opacity .5s', 100)
 }
-const translateX = computed<string>(() => `${props.open ? 0 : -transformDistance.value}px`)
+const translateX = computed<string>(() => `${props.isOpen ? 0 : -transformDistance.value}px`)
+watch(() => props.visible, (newVisible) => {
+  if (newVisible) {
+    setTimeout(() => transition.value = 'transform .5s, opacity .3s', 300)
+  } else {
+    transition.value = 'transform .3s, opacity .3s'
+  }
+})
 
 let timer: number;
 const delayCalculateTransform = () => {
@@ -44,11 +50,13 @@ const delayCalculateTransform = () => {
 }
 onMounted(() => {
   calculateTransform()
+  setTimeout(() => transition.value = 'transform .5s, opacity .3s', 100)
   window.addEventListener('resize', delayCalculateTransform)
 })
 onUnmounted(() => {
   window.removeEventListener('resize', delayCalculateTransform)
 })
+
 </script>
 
 <template>
@@ -56,7 +64,7 @@ onUnmounted(() => {
     <div class="ContentBar" v-if="props.visible" ref="containerRef" :style="{ userSelect: 'none' }">
       <div class="header">
         <div class="title" :title="props.title">{{ props.title }}</div>
-        <Button type="close" :onClick="props.onCloseClick" title="收起内容栏"/>
+        <Button type="close" :onClick="props.onCloseClick" title="收起内容栏" />
       </div>
       <slot>这是内容</slot>
     </div>
@@ -83,7 +91,7 @@ onUnmounted(() => {
   z-index: var(--header-z-index);
   top: 0;
   height: 0;
-  margin-bottom: 35px;
+  margin-bottom: 40px;
   padding: 0 5px 0 10px;
   box-shadow: 0 0px 20px 35px rgba(248, 248, 248, .95);
 }

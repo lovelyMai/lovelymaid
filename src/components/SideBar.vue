@@ -21,6 +21,7 @@ const switchSidebar = () => {
 // 计算侧边栏平移距离
 const containerRef = ref<HTMLElement | null>(null)
 const containerWidth = ref<number>(0)
+const transition = ref<string>('none')
 const transformDistance = ref<number>(0)
 const calculateTransform = () => {
   const container = containerRef.value
@@ -34,6 +35,14 @@ const calculateTransform = () => {
   containerWidth.value = container.offsetWidth
   transformDistance.value = left + containerWidth.value + 10
 }
+watch(() => props.visible, (newVisible) => {
+  if (newVisible) {
+    setTimeout(() => transition.value = 'transform .5s, opacity .3s', 300)
+  } else {
+    transition.value = 'transform .3s, opacity .3s'
+  }
+})
+
 let timer: number
 const delayCalculateTransform = () => {
   clearTimeout(timer)
@@ -41,6 +50,7 @@ const delayCalculateTransform = () => {
 }
 onMounted(() => {
   calculateTransform()
+  setTimeout(() => transition.value = 'transform .5s, opacity .3s', 100)
   window.addEventListener('resize', delayCalculateTransform)
 })
 onUnmounted(() => {
@@ -73,7 +83,7 @@ onUnmounted(() => {
   border-radius: 20px;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   transform: translateX(var(--translateX));
-  transition: transform .5s ease, opacity .5s ease;
+  transition: v-bind(transition);
 }
 
 .header {
