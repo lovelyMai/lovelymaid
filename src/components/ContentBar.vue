@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+
 import Button from './Button.vue';
+
+import debounce from '@/utils/debounce';
 
 interface Props {
   /** 是否显示 */
@@ -37,20 +40,15 @@ const calculateTransform = () => {
 }
 watch(() => props.visible, (newVisible) => {
   if (newVisible) {
-    setTimeout(() => transition.value = 'transform .5s, opacity .3s', 300)
+    setTimeout(() => transition.value = 'transform .5s', 300)
   } else {
-    transition.value = 'transform .3s, opacity .3s'
+    transition.value = 'transform .3s'
   }
 })
-
-let timer: number;
-const delayCalculateTransform = () => {
-  clearTimeout(timer)
-  timer = setTimeout(() => calculateTransform(), 100)
-}
+const delayCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
   calculateTransform()
-  setTimeout(() => transition.value = 'transform .5s, opacity .3s', 100)
+  setTimeout(() => transition.value = 'transform .5s', 100)
   window.addEventListener('resize', delayCalculateTransform)
 })
 onUnmounted(() => {
@@ -61,7 +59,7 @@ onUnmounted(() => {
 
 <template>
   <transition name="pop">
-    <div class="ContentBar" v-if="props.visible" ref="containerRef">
+    <div class="ContentBar" v-show="props.visible" ref="containerRef">
       <div class="header">
         <div class="title" :title="props.title">{{ props.title }}</div>
         <Button type="close" :onClick="props.onCloseClick" title="收起内容栏" />
@@ -117,6 +115,5 @@ onUnmounted(() => {
 .pop-enter-from,
 .pop-leave-to {
   transform: translateX(v-bind(translateX)) scale(0);
-  opacity: 0;
 }
 </style>

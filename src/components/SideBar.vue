@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 
+import debounce from '@/utils/debounce';
+
 interface Props {
   /** 是否显示 */
   visible?: boolean;
@@ -13,19 +15,19 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 侧边栏开关状态
 const isOpen = ref<boolean>(true);
-const switchSidebar = () => {
+const switchSideBar = () => {
   isOpen.value = !isOpen.value;
   props.onSwitch?.(isOpen.value);
 }
 
 // 计算侧边栏平移距离
-const containerRef = ref<HTMLElement | null>(null)
+const ContainerRef = ref<HTMLElement | null>(null)
 const containerWidth = ref<number>(0)
 const transition = ref<string>('none')
 const transformDistance = ref<number>(0)
 const translateX = computed<string>(() => isOpen.value ? '0' : `${-transformDistance.value}px`)
 const calculateTransform = () => {
-  const container = containerRef.value
+  const container = ContainerRef.value
   if (!container) return
   let left = 0
   let el: HTMLElement | null = container
@@ -36,35 +38,37 @@ const calculateTransform = () => {
   containerWidth.value = container.offsetWidth
   transformDistance.value = left + containerWidth.value + 10
 }
-watch(() => props.visible, (newVisible) => {
-  if (newVisible) {
-    setTimeout(() => transition.value = 'transform .5s, opacity .3s', 300)
-  } else {
-    transition.value = 'transform .3s, opacity .3s'
-  }
-})
-
-let timer: number
-const delayCalculateTransform = () => {
-  clearTimeout(timer)
-  timer = setTimeout(() => calculateTransform(), 100)
-}
+const delayCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
   calculateTransform()
-  setTimeout(() => transition.value = 'transform .5s, opacity .3s', 100)
+  setTimeout(() => transition.value = 'transform .5s', 100)
   window.addEventListener('resize', delayCalculateTransform)
 })
 onUnmounted(() => {
   window.removeEventListener('resize', delayCalculateTransform)
 })
 
+// 添加动画钩子
+const beforeEnter = () => {
+  transition.value = isOpen.value ? 'transform .3s' : 'transform .5s'
+}
+const afterEnter = () => {
+  transition.value = 'transform .5s'
+}
+const beforeLeave = () => {
+  transition.value = isOpen.value ? 'transform .3s' : 'transform .5s'
+}
+const afterLeave = () => {
+  transition.value = 'transform .5s'
+}
 </script>
 
 <template>
-  <transition name="pop">
-    <div v-if="visible" class="SideBar" ref="containerRef">
+  <transition name="pop" @before-enter="beforeEnter" @after-enter="afterEnter" @before-leave="beforeLeave"
+    @after-leave="afterLeave">
+    <div v-show="props.visible" class="SideBar" ref="ContainerRef">
       <div class="header">
-        <div class="switchButton" :class="{ close: !isOpen }" @click="switchSidebar"
+        <div class="switchButton" :class="{ close: !isOpen }" @click="switchSideBar"
           :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${transformDistance - containerWidth + 45}px)` }"
           :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
           <span class="iconfont icon-sidebar_left"></span>
@@ -105,9 +109,9 @@ onUnmounted(() => {
   border-radius: 15px;
   background-color: rgba(248, 248, 248, 0.9);
   transition:
-    transform .5s ease,
-    border 0s ease .5s,
-    box-shadow .5s ease;
+    transform .5s,
+    border 0s .5s,
+    box-shadow .5s;
   cursor: pointer;
   will-change: transform;
 }
@@ -129,6 +133,5 @@ onUnmounted(() => {
 .pop-enter-from,
 .pop-leave-to {
   transform: translateX(v-bind(translateX)) scale(0);
-  opacity: 0;
 }
 </style>
