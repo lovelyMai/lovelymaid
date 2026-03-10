@@ -10,16 +10,18 @@ interface Props {
   /** 悬停提示 */
   title?: string
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  title: ''
+});
 
 // 计算字体大小
-const buttonRef = ref<HTMLElement | null>(null)
-const fontSize = ref<number>(0)
-onMounted(() => watchRef(buttonRef, () => fontSize.value = buttonRef.value!.offsetWidth * 1 / 2, true))
+const ButtonRef = ref<HTMLElement | null>(null)
+const fontSize = ref<string>('0')
+onMounted(() => watchRef(ButtonRef, () => fontSize.value = `${ButtonRef.value!.offsetWidth * 1 / 2}px`, true))
 </script>
 
 <template>
-  <div class="Button" @click="props.onClick" :title="props.title ? props.title : ''" ref="buttonRef">
+  <div class="Button" @click="props.onClick" :title="props.title" ref="ButtonRef">
     <span :class="['iconfont', `icon-${props.type}`]"></span>
   </div>
 </template>
@@ -37,8 +39,10 @@ onMounted(() => watchRef(buttonRef, () => fontSize.value = buttonRef.value!.offs
   backdrop-filter: blur(10px) saturate(1.5);
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   cursor: pointer;
-  touch-action: none; 
+  touch-action: none;
   transition: transform .2s;
+  user-select: none;
+  -webkit-user-select: none;
   --font-size: calc(v-bind(fontSize) * 1px);
   --font-weight: 500;
   --transform: none;

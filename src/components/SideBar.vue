@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 
 interface Props {
   /** 是否显示 */
@@ -23,6 +23,7 @@ const containerRef = ref<HTMLElement | null>(null)
 const containerWidth = ref<number>(0)
 const transition = ref<string>('none')
 const transformDistance = ref<number>(0)
+const translateX = computed<string>(() => isOpen.value ? '0' : `${-transformDistance.value}px`)
 const calculateTransform = () => {
   const container = containerRef.value
   if (!container) return
@@ -61,8 +62,7 @@ onUnmounted(() => {
 
 <template>
   <transition name="pop">
-    <div v-if="visible" class="SideBar" ref="containerRef"
-      :style="{ '--translateX': `${isOpen ? 0 : -transformDistance}px`, userSelect: 'none' }">
+    <div v-if="visible" class="SideBar" ref="containerRef">
       <div class="header">
         <div class="switchButton" :class="{ close: !isOpen }" @click="switchSidebar"
           :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${transformDistance - containerWidth + 45}px)` }"
@@ -82,8 +82,10 @@ onUnmounted(() => {
   border: 1px solid #fff;
   border-radius: 20px;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
-  transform: translateX(var(--translateX));
+  transform: translateX(v-bind(translateX));
   transition: v-bind(transition);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .header {
@@ -126,7 +128,7 @@ onUnmounted(() => {
 
 .pop-enter-from,
 .pop-leave-to {
-  transform: translateX(var(--translateX)) scale(0);
+  transform: translateX(v-bind(translateX)) scale(0);
   opacity: 0;
 }
 </style>

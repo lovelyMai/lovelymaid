@@ -29,7 +29,7 @@ const clickIcon = (e: any) => {
 </script>
 
 <template>
-  <span class="iconfont icon-info ActionButton" @click.stop="clickIcon" style="user-select: none;">
+  <span class="iconfont icon-info ActionButton" @click.stop="clickIcon">
     <ul v-if="isPop" :style="{ left: `${popX}px`, top: `${popY}px` }">
       <li v-for="(item, index) in props.list" :key="index" @click="props.onItemClick?.(index)">
         <slot :item="item" :index="index"></slot>
@@ -46,6 +46,8 @@ const clickIcon = (e: any) => {
   font-size: 20px;
   color: #3b86f7;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
   --list-z-index: 2;
   --list-font-size: 10px
 }

@@ -203,7 +203,7 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="$style.TabBar" :style="{ userSelect: 'none' }" ref="barRef">
+  <div :class="$style.TabBar" ref="barRef">
     <div :class="[$style.bar, { [$style.active]: !searchIsActive }]">
       <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
@@ -236,6 +236,8 @@ defineExpose({
   height: 50px;
   font-size: 8px;
   isolation: isolate;
+  user-select: none;
+  -webkit-user-select: none;
   --top-color: #0067EC;
 }
 

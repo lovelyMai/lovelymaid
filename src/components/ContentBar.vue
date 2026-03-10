@@ -20,8 +20,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 计算侧边栏平移距离
 const containerRef = ref<HTMLElement | null>(null)
-const transformDistance = ref<number>(0)
 const transition = ref<string>('none')
+const transformDistance = ref<number>(0)
+const translateX = computed<string>(() => props.isOpen ? '0' : `${-transformDistance.value}px`)
 const calculateTransform = () => {
   const container = containerRef.value
   if (!container) return
@@ -34,7 +35,6 @@ const calculateTransform = () => {
   const width = container.offsetWidth
   transformDistance.value = left + width + 10
 }
-const translateX = computed<string>(() => `${props.isOpen ? 0 : -transformDistance.value}px`)
 watch(() => props.visible, (newVisible) => {
   if (newVisible) {
     setTimeout(() => transition.value = 'transform .5s, opacity .3s', 300)
@@ -61,7 +61,7 @@ onUnmounted(() => {
 
 <template>
   <transition name="pop">
-    <div class="ContentBar" v-if="props.visible" ref="containerRef" :style="{ userSelect: 'none' }">
+    <div class="ContentBar" v-if="props.visible" ref="containerRef">
       <div class="header">
         <div class="title" :title="props.title">{{ props.title }}</div>
         <Button type="close" :onClick="props.onCloseClick" title="收起内容栏" />
@@ -81,6 +81,8 @@ onUnmounted(() => {
   transition: v-bind(transition);
   transform: translateX(v-bind(translateX));
   overflow: auto;
+  user-select: none;
+  -webkit-user-select: none;
   --header-z-index: 3;
 }
 

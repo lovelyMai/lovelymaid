@@ -15,7 +15,7 @@ interface Props {
   onItemClick?: (item: { id: number, name: string }, index: number) => void
 }
 const props = withDefaults(defineProps<Props>(), {
-  title: '标题2',
+  title: '标题',
   list: () => [],
   activeIndex: -1
 });
@@ -52,7 +52,7 @@ watch(() => props.list, (newList) => {
 </script>
 
 <template>
-  <div style="user-select: none;">
+  <div class="FoldList">
     <div class="header" @click.stop="onHeaderClick">
       <div class="title">
         {{ props.title }}
@@ -61,7 +61,7 @@ watch(() => props.list, (newList) => {
         :title="isOpen ? '收起列表' : '展开列表'" @click.stop="isOpen = !isOpen"></span>
     </div>
     <div class="body-container" :class="{ 'enable-transition': enableTransition }"
-      :style="{ height: isOpen ? `calc(0px + ${bodyHeight}px)` : '0px' }">
+      :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
       <ul ref="bodyRef" class="body" :class="{ close: !isOpen }">
         <li v-for="(item, index) in props.list" :key="index" @click.stop="() => onItemClick?.(item, index)"
           :style="{ '--translateY': `${slideCount[index] * 100}%` }" @animationend="() => slideAnimating = false"
@@ -74,6 +74,11 @@ watch(() => props.list, (newList) => {
 </template>
 
 <style scoped>
+.FoldList {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
