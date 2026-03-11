@@ -45,6 +45,7 @@ onMounted(() => watchRef(ButtonRef, () => fontSize.value = `${ButtonRef.value!.o
   -webkit-user-select: none;
   --font-size: calc(v-bind(fontSize) * 1px);
   --font-weight: 500;
+  --color: #19191a;
   --transform: none;
 }
 
@@ -56,7 +57,7 @@ onMounted(() => watchRef(ButtonRef, () => fontSize.value = `${ButtonRef.value!.o
 .iconfont {
   font-size: var(--font-size);
   font-weight: var(--font-weight);
-  color: #19191a;
+  color: var(--color);
   transform: var(--transform);
 }
 </style>
