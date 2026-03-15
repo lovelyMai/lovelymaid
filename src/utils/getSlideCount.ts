@@ -1,12 +1,12 @@
-const getSlideCount = <T extends { id: number }>(
+const getSlideCount = <T extends { id: string }>(
   newList: T[],
   oldList: T[]
 ): number[] => {
   const result: number[] = new Array(newList.length);
 
   // 创建映射
-  const oldIdSet = new Set<number>();
-  const oldIndexMap = new Map<number, number>();
+  const oldIdSet = new Set<string>();
+  const oldIndexMap = new Map<string, number>();
   for (let i = 0; i < oldList.length; i++) {
     const id = oldList[i].id;
     oldIdSet.add(id);
@@ -44,4 +44,4 @@ const getSlideCount = <T extends { id: number }>(
   return result;
 };
 
-export default getSlideCount
+export default getSlideCount;

@@ -6,13 +6,13 @@ interface Props {
   /** 标题 */
   title?: string
   /** 要渲染的列表 */
-  list?: { id: number, name: string }[]
+  list?: { id: string, name: string }[]
   /** 激活项索引 */
   activeIndex?: number
   /** 头部点击事件 */
   onHeaderClick?: () => void
   /** 列表项点击事件 */
-  onItemClick?: (item: { id: number, name: string }, index: number) => void
+  onItemClick?: (item: { id: string, name: string }, index: number) => void
 }
 const props = withDefaults(defineProps<Props>(), {
   title: '标题',
@@ -41,7 +41,7 @@ watch(() => props.list.length, async () => await calculateHeight())
 // 列表项动画
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
-const oldList = ref<{ id: number, name: string }[]>([...props.list])
+const oldList = ref<{ id: string, name: string }[]>([...props.list])
 watch(() => props.list, (newList) => {
   if (enableTransition.value) {
     slideCount.value = getSlideCount(newList, oldList.value)

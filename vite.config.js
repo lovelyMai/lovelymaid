@@ -23,8 +23,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: 'LovelyMaid',
-      fileName: (format) => `lovelymaid.${format}.js`,
+      fileName: () => `lovelymaid.js`,
       formats: ['es']
     },
     rollupOptions: {
