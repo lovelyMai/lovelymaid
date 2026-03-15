@@ -25,15 +25,10 @@ export default defineConfig({
       entry: 'src/index.ts',
       name: 'LovelyMaid',
       fileName: (format) => `lovelymaid.${format}.js`,
-      formats: ['es', 'umd']
+      formats: ['es']
     },
     rollupOptions: {
       external: ['vue'],
-      output: {
-        globals: {
-          vue: 'Vue'
-        },
-      }
     },
   },
 })
