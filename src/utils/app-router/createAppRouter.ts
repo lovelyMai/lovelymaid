@@ -19,8 +19,8 @@ export interface RouteLocation {
 }
 
 export interface MultiHistoryOptions {
-  defaultTab?: string
   tabs: string[]
+  defaultTab?: string
   routes: Record<string, RouteConfig>
 }
 

@@ -107,7 +107,7 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
       } else {
         realPos.value += (targetLeft - realLeft) > 0 ? maxDistance.value / 5 : -maxDistance.value / 5
       }
-    }, 16)
+    }, 8)
   }
 }
 const updateVirtualPos = (duration: number | undefined) => {
@@ -116,7 +116,7 @@ const updateVirtualPos = (duration: number | undefined) => {
     virtualTimer1 = setInterval(() => {
       virtualLeft.value = slideRef.value!.getBoundingClientRect().left - containerLeft
       virtualRight.value = slideRef.value!.getBoundingClientRect().right - containerLeft
-    }, 16)
+    }, 8)
     virtualTimer2 = setTimeout(() => clearInterval(virtualTimer1), duration)
   } else {
     virtualLeft.value = slideRef.value!.getBoundingClientRect().left - containerLeft
@@ -147,7 +147,7 @@ const moveSlide = (e: PointerEvent) => {
   calculateTargetPos(e, 'move')
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(undefined)
-  moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 16)
+  moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 8)
 }
 const stopSlide = (e: PointerEvent) => {
   if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)

@@ -77,9 +77,10 @@ watch(isTouching, async (newTouching) => {
     setTimeout(() => document.documentElement.scrollTop = scrollPositions.value[router.currentPath] || 0, 300)
   }
 })
-watch(isClickLeaving, (newClickLeaving) => {
+watch(isClickLeaving, async (newClickLeaving) => {
   if (newClickLeaving) {
     scrollPositions.value[router.currentPath] = document.documentElement.scrollTop
+    await nextTick()
     document.documentElement.scrollTop = bottomPath.value ? scrollPositions.value[bottomPath.value] : 0
     isClickLeaving.value = false
   }
@@ -93,7 +94,7 @@ watch(isClickLeaving, (newClickLeaving) => {
     v-show="component.path === router.currentPath || ((isPushing || isPopping) && component.path === router.currentStack[router.currentStack.length - 2]?.path)"
     :style="component.path === router.currentPath && component.path !== router.currentStack[0].path ? {
       position: isPopping ? 'fixed' : undefined,
-      top: isPopping ? `${-scrollPositions[router.currentPath] || 0}px` : undefined,
+      top: isPopping ? `${-scrollPositions[router.currentPath]}px` : undefined,
       boxShadow: '0 0 20px 0 rgba(0, 0, 0, .1)',
       transition: !isTouching && (isReturning || isLeaving || isLeaving) ? 'transform .3s' : 'none',
       transform: isTouching ? `translateX(${slideDistance}px) translateZ(0)` : isReturning ? `translateX(0) translateZ(0)` : isLeaving || isLeaving ? `translateX(100dvw) translateZ(0)` : undefined
