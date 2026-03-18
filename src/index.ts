@@ -6,6 +6,8 @@ import Search from './components/Search.vue'
 import SideBar from './components/SideBar.vue'
 import TabBar from './components/TabBar.vue'
 
+import createAppRouter from './utils/app-router/createAppRouter'
+
 import '@/assets/reset.css'
 import '@/assets/main.css'
 import '@/assets/icons/iconfont.css'
@@ -17,5 +19,6 @@ export {
   FoldList,
   Search,
   SideBar,
-  TabBar
+  TabBar,
+  createAppRouter
 }
