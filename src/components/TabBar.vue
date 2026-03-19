@@ -73,7 +73,7 @@ onUnmounted(() => {
 })
 
 // 滑块动画
-const backgroundColor = ref<string>('#e4e4e6')
+const background = ref<string>('#e4e4e6')
 const barBackgroundColor = ref<string>('rgba(248, 248, 248, 0.9)')
 const border = ref<string>('none')
 const boxShadow = ref<string>('none')
@@ -128,7 +128,7 @@ let startTime: number
 const startSlide = (e: PointerEvent) => {
   startTime = Date.now()
   backgroundTimer = setTimeout(() => {
-    backgroundColor.value = `transparent`
+    background.value = `transparent`
   }, 100)
   barBackgroundColor.value = '#fff'
   border.value = '1px solid rgba(255, 255, 255, 0.5)'
@@ -151,7 +151,7 @@ const moveSlide = (e: PointerEvent) => {
 }
 const stopSlide = (e: PointerEvent) => {
   if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
-  backgroundColor.value = '#e4e4e6'
+  background.value = '#e4e4e6'
   barBackgroundColor.value = 'rgba(248, 248, 248, 0.9)'
   border.value = 'none'
   boxShadow.value = 'none'
@@ -339,7 +339,7 @@ defineExpose({
   z-index: 0;
   width: calc(v-bind(slideWidth) * 1px);
   height: 100%;
-  background-color: v-bind(backgroundColor);
+  background: v-bind(background);
   border: v-bind(border);
   border-radius: calc((v-bind(borderRadius) - 3) * 1px);
   box-shadow: v-bind(boxShadow);
