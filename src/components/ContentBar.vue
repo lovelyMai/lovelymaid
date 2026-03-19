@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 
 import Button from './Button.vue';
 
-import debounce from '@/utils/debounce';
+import debounce from '@/utils/common/debounce';
 
 interface Props {
   /** 是否显示 */

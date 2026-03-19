@@ -3,7 +3,7 @@ import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from '
 
 import checkSrcoll from '@/utils/app-router/checkScroll'
 import { HistoryStack } from '@/utils/app-router/createAppRouter';
-import debounce from '../debounce';
+import debounce from '../common/debounce';
 
 const router = inject('router') as HistoryStack
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 
-import debounce from '@/utils/debounce';
+import debounce from '@/utils/common/debounce';
 
 interface Props {
   /** 是否显示 */
