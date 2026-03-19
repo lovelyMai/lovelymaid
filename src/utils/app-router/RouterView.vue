@@ -2,8 +2,8 @@
 import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import checkSrcoll from '@/utils/app-router/checkScroll'
-
 import { HistoryStack } from '@/utils/app-router/createAppRouter';
+import debounce from '../debounce';
 
 const router = inject('router') as HistoryStack
 
@@ -13,10 +13,11 @@ router.onPush(() => isPushing.value = true)
 
 // 移除页面
 const isClickLeaving = ref<boolean>(false)
+const delayRecoverIsLeaving = debounce(() => isLeaving.value = false, 300)
 router.onPop(() => {
   isLeaving.value = true
   isClickLeaving.value = true
-  setTimeout(() => isLeaving.value = false, 300)
+  delayRecoverIsLeaving()
 })
 
 // 右滑返回手势
@@ -25,7 +26,7 @@ const slideSpeed = ref<number>(0)
 const isTouching = ref<boolean>(false)
 const isReturning = ref<boolean>(false)
 const isLeaving = ref<boolean>(false)
-const isPopping = computed<boolean>(() => (isTouching.value || isReturning.value || isLeaving.value || isLeaving.value))
+const isPopping = computed<boolean>(() => (isTouching.value || isReturning.value || isLeaving.value))
 let cleanup: () => void
 onMounted(() => {
   cleanup = checkSrcoll(10, async (distance, speed, scrolling) => {
@@ -96,8 +97,8 @@ watch(isClickLeaving, async (newClickLeaving) => {
       position: isPopping ? 'fixed' : undefined,
       top: isPopping ? `${-scrollPositions[router.currentPath]}px` : undefined,
       boxShadow: '0 0 20px 0 rgba(0, 0, 0, .1)',
-      transition: !isTouching && (isReturning || isLeaving || isLeaving) ? 'transform .3s' : 'none',
-      transform: isTouching ? `translateX(${slideDistance}px) translateZ(0)` : isReturning ? `translateX(0) translateZ(0)` : isLeaving || isLeaving ? `translateX(100dvw) translateZ(0)` : undefined
+      transition: !isTouching && (isReturning || isLeaving) ? 'transform .3s' : 'none',
+      transform: isTouching ? `translateX(${slideDistance}px) translateZ(0)` : isReturning ? `translateX(0) translateZ(0)` : isLeaving ? `translateX(100dvw) translateZ(0)` : undefined
     } : undefined" :class="{ pushAnimation: isPushing && component.path === router.currentPath }"
     @animationend="() => isPushing = false" />
 </template>

@@ -169,7 +169,7 @@ function flattenRoutes(routes: Record<string, RouteConfig>) {
    核心函数
 ============================= */
 
-export default function createMultiHistory(options: MultiHistoryOptions): HistoryStack {
+export default function createAppRouter(options: MultiHistoryOptions): HistoryStack {
   const { tabs, routes, defaultTab = tabs[0] } = options
   const flatRoutes = flattenRoutes(routes)
 
@@ -395,15 +395,16 @@ export default function createMultiHistory(options: MultiHistoryOptions): Histor
     triggerPushCallbacks()  // 触发回调
   }
 
+  let count: number = 1
   function pop(): void {
     const stack = stacks.value[activeTab.value]
-    if (stack.length <= 1) return
-
+    if (count >= stack.length) return
     // 立即执行所有 onPop 回调
     triggerPopCallbacks()
-
-    // 延迟 300ms 真正 pop，确保动画结束
+    count++
+    // 延迟 300ms 真正 pop
     setTimeout(() => {
+      count--
       stack.pop()
       syncUrl(stack[stack.length - 1].fullPath)
       updateAllComponents()
