@@ -1,6 +1,6 @@
 import { ref, computed, watch, markRaw, reactive, App } from 'vue'
-
 import RouterView from './RouterView.vue'
+import throttle from '@/utils/common/throttle'
 
 /* =============================
    类型定义
@@ -65,14 +65,12 @@ function parseFullPath(fullPath: string): { path: string, query: Record<string, 
 // 将 path 和 query 组合成完整路径
 function buildFullPath(path: string, query?: Record<string, any>): string {
   if (!query || Object.keys(query).length === 0) return path
-
   const params = new URLSearchParams()
   Object.entries(query).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       params.set(key, String(value))
     }
   })
-
   const queryString = params.toString()
   return queryString ? `${path}?${queryString}` : path
 }
@@ -80,37 +78,28 @@ function buildFullPath(path: string, query?: Record<string, any>): string {
 // 标准化路径（处理空格、自动补全标签页前缀）
 function normalizePath(input: string, activeTab: string, currentPath: string): string {
   let path: string
-
   if (input.startsWith('/')) {
     path = input
   } else {
     const basePath = currentPath || '/' + activeTab
     const segments = basePath.split('/').filter(s => s)
-
     const inputSegments = input.split('/').filter(s => s)
 
     for (const seg of inputSegments) {
       if (seg === '..') {
-        if (segments.length > 0) {
-          segments.pop()
-        }
+        if (segments.length > 0) segments.pop()
       } else if (seg === '.') {
         continue
       } else {
         segments.push(seg)
       }
     }
-
     path = '/' + segments.join('/')
   }
-
   return path.replace(/\s+/g, '-')
 }
 
-/* =============================
-   组件缓存
-============================= */
-
+// 组件缓存
 const componentCache = new Map<string, any>()
 
 async function resolveComponent(component: any | (() => Promise<any>)) {
@@ -125,10 +114,7 @@ async function resolveComponent(component: any | (() => Promise<any>)) {
   return markRaw(component)
 }
 
-/* =============================
-   路径匹配器
-============================= */
-
+// 路径匹配器
 function compilePath(path: string) {
   const keys: string[] = []
   const pattern = path.replace(/\/$/, '').replace(/:([^/]+)/g, (_, key) => {
@@ -149,31 +135,69 @@ type FlatRouteRecord = {
 
 function flattenRoutes(routes: Record<string, RouteConfig>) {
   const list: FlatRouteRecord[] = []
-
-  function walk(route: RouteConfig, parentPath = '', parent: RouteConfig | null = null, tab?: string) {
+  function walk(route: RouteConfig, parentPath = '', tab?: string) {
     const full = (parentPath + '/' + route.path).replace(/\/+/g, '/')
     const { regex, keys } = compilePath(full)
-      ; (route as any)._parent = parent
-
     const currentTab = tab || full.split('/')[1]
     list.push({ fullPath: full, config: route, regex, keys, tab: currentTab })
-
-    route.children?.forEach(child => walk(child, full, route, currentTab))
+    route.children?.forEach(child => walk(child, full, currentTab))
   }
-
-  Object.entries(routes).forEach(([tab, r]) => walk(r, '', null, tab))
+  Object.entries(routes).forEach(([tab, r]) => walk(r, '', tab))
   return list
 }
 
+// 全局引用，供外部 popNow 使用
+let globalPopNow: (() => void) | undefined
+
 /* =============================
-   核心函数
+   核心工厂函数
 ============================= */
 
 export default function createAppRouter(options: MultiHistoryOptions): HistoryStack {
   const { tabs, routes, defaultTab = tabs[0] } = options
   const flatRoutes = flattenRoutes(routes)
 
-  // 回调函数
+  // ========== 锁状态管理 ==========
+  let popLock = false
+  let pushLock = false
+  let popTimer: ReturnType<typeof setTimeout> | null = null
+  let pushTimer: ReturnType<typeof setTimeout> | null = null
+
+  function clearPopLock() {
+    popLock = false
+    if (popTimer) {
+      clearTimeout(popTimer)
+      popTimer = null
+    }
+  }
+
+  function clearPushLock() {
+    pushLock = false
+    if (pushTimer) {
+      clearTimeout(pushTimer)
+      pushTimer = null
+    }
+  }
+
+  function setPopLock() {
+    popLock = true
+    if (popTimer) clearTimeout(popTimer)
+    popTimer = setTimeout(() => {
+      popLock = false
+      popTimer = null
+    }, 300)
+  }
+
+  function setPushLock() {
+    pushLock = true
+    if (pushTimer) clearTimeout(pushTimer)
+    pushTimer = setTimeout(() => {
+      pushLock = false
+      pushTimer = null
+    }, 300)
+  }
+
+  // ========== 回调管理 ==========
   const pushCallbacks: (() => void)[] = []
   const popCallbacks: (() => void)[] = []
 
@@ -193,6 +217,7 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     popCallbacks.forEach(cb => cb())
   }
 
+  // ========== 路由匹配 ==========
   function match(pathWithoutQuery: string) {
     for (const r of flatRoutes) {
       const m = r.regex.exec(pathWithoutQuery)
@@ -204,7 +229,7 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     return null
   }
 
-  // 状态定义
+  // ========== 状态定义 ==========
   type HistoryEntry = { fullPath: string, params: Record<string, string> }
   const stacks = ref<Record<string, HistoryEntry[]>>(
     Object.fromEntries(tabs.map(t => [t, []]))
@@ -245,10 +270,10 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     return allComponents.value.filter(c => stackPaths.has(c.path))
   })
 
-  // 同步更新 allComponents（从缓存中取）
+  // ========== 组件管理 ==========
   function updateAllComponents() {
     const result: CachedComponent[] = []
-    for (const [tab, stack] of Object.entries(stacks.value)) {
+    for (const stack of Object.values(stacks.value)) {
       for (const entry of stack) {
         const { path: routePath, query: entryQuery } = parseFullPath(entry.fullPath)
         const m = match(routePath)
@@ -256,8 +281,6 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
 
         const key = m.route.component.toString()
         const comp = componentCache.get(key)
-
-        // 如果组件还没加载完，先跳过
         if (!comp) continue
 
         const props = m.route.props
@@ -266,22 +289,17 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
             : m.route.props
           : {}
 
-        result.push({
-          value: comp,
-          path: routePath,
-          props
-        })
+        result.push({ value: comp, path: routePath, props })
       }
     }
     allComponents.value = result
   }
 
-  // 辅助函数
   function syncUrl(fullPath: string) {
     window.history.replaceState(null, '', fullPath)
   }
 
-  // 初始化
+  // ========== 初始化 ==========
   const rawFullPath = window.location.pathname + window.location.search
   const initialFullPath = rawFullPath.replace(/\s+/g, '-')
   const { path: initialPathWithoutQuery } = parseFullPath(initialFullPath)
@@ -290,30 +308,19 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
 
   if (!hitRecord) {
     const rootPath = '/' + defaultTab
-    stacks.value[defaultTab] = [
-      { fullPath: rootPath, params: {} }
-    ]
+    stacks.value[defaultTab] = [{ fullPath: rootPath, params: {} }]
     activeTab.value = defaultTab
     syncUrl(rootPath)
   } else {
     const rootPath = '/' + hitRecord.tab
-
-    const chain: HistoryEntry[] = []
-
-    chain.push({
-      fullPath: rootPath,
-      params: {}
-    })
+    const chain: HistoryEntry[] = [{ fullPath: rootPath, params: {} }]
 
     const normalizedInitial = parseFullPath(initialFullPath).path === rootPath
       ? rootPath
       : initialFullPath
 
     if (normalizedInitial !== rootPath) {
-      chain.push({
-        fullPath: initialFullPath,
-        params: {}
-      })
+      chain.push({ fullPath: initialFullPath, params: {} })
     }
 
     stacks.value[hitRecord.tab] = chain
@@ -321,35 +328,27 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     syncUrl(initialFullPath)
   }
 
-  // ========== 初始化时异步加载所有组件 ==========
+  // 异步加载所有组件
   ; (async () => {
-    // 收集所有需要加载的组件（去重）
     const componentSet = new Set<any>()
-    flatRoutes.forEach(route => {
-      componentSet.add(route.config.component)
-    })
-
-    // 并行加载所有组件
+    flatRoutes.forEach(route => componentSet.add(route.config.component))
     await Promise.all([...componentSet].map(comp => resolveComponent(comp)))
-
-    // 加载完成后更新 allComponents
     updateAllComponents()
   })()
 
-  // 监听路径变化，只更新组件列表（不加载）
+  // 监听路径变化
   watch(currentPath, () => {
     updateAllComponents()
   }, { immediate: true })
 
-  // 导航方法 - 全部同步
+  // ========== 导航方法 ==========
   function switchTab(tab: string) {
     if (!tabs.includes(tab)) return
     activeTab.value = tab
 
     const stack = stacks.value[tab]
     if (!stack.length) {
-      const rootPath = '/' + tab
-      stack.push({ fullPath: rootPath, params: {} })
+      stack.push({ fullPath: '/' + tab, params: {} })
     }
 
     syncUrl(stack[stack.length - 1].fullPath)
@@ -357,6 +356,14 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
   }
 
   function push(location: string | RouteLocation): void {
+    // 检查是否处于 pop 锁定状态
+    if (popLock) {
+      console.warn('[router.push] pop 操作后 300ms 内不能执行 push')
+      return
+    }
+
+    setPushLock()
+
     const path = typeof location === 'string' ? location : location.path
     const query = typeof location === 'string' ? undefined : location.query
 
@@ -365,10 +372,8 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     const entryParams = {}
 
     const stack = stacks.value[activeTab.value]
-    const exists = stack.some(e => {
-      const { path } = parseFullPath(e.fullPath)
-      return path === pathWithoutQuery
-    })
+    const exists = stack.some(e => parseFullPath(e.fullPath).path === pathWithoutQuery)
+
     if (exists) {
       console.warn('[router.push] 当前栈中已存在该路由，push 已忽略:', pathWithoutQuery)
       return
@@ -379,7 +384,7 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
       stacks.value[activeTab.value].push({ fullPath: rootPath, params: entryParams })
       syncUrl(rootPath)
       updateAllComponents()
-      triggerPushCallbacks()  // 触发回调
+      triggerPushCallbacks()
       return
     }
 
@@ -392,24 +397,43 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     stacks.value[activeTab.value].push({ fullPath, params: entryParams })
     syncUrl(fullPath)
     updateAllComponents()
-    triggerPushCallbacks()  // 触发回调
+    triggerPushCallbacks()
   }
 
-  let count: number = 1
-  function pop(): void {
+  const savePop = throttle(() => {
+    if (pushLock) {
+      console.warn('[router.pop] push 操作后 300ms 内不能执行 pop')
+      return
+    }
+
     const stack = stacks.value[activeTab.value]
-    if (count >= stack.length) return
-    // 立即执行所有 onPop 回调
+    if (stack.length <= 1) return
+
+    setPopLock()
     triggerPopCallbacks()
-    count++
-    // 延迟 300ms 真正 pop
+
     setTimeout(() => {
-      count--
       stack.pop()
       syncUrl(stack[stack.length - 1].fullPath)
       updateAllComponents()
     }, 300)
+  }, 300)
+
+  function pop(): void {
+    savePop()
   }
+
+  // 立即执行 pop（供外部使用）
+  function popNow(): void {
+    const stack = stacks.value[activeTab.value]
+    if (stack.length <= 1) return
+    stack.pop()
+    syncUrl(stack[stack.length - 1].fullPath)
+    updateAllComponents()
+  }
+
+  // 设置全局引用
+  globalPopNow = popNow
 
   function nav(location: string | RouteLocation): boolean {
     const path = typeof location === 'string' ? location : location.path
@@ -418,10 +442,7 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     const targetPathWithoutQuery = normalizePath(parseFullPath(path).path, activeTab.value, currentPath.value)
     const stack = stacks.value[activeTab.value]
 
-    const index = stack.findIndex(e => {
-      const { path } = parseFullPath(e.fullPath)
-      return path === targetPathWithoutQuery
-    })
+    const index = stack.findIndex(e => parseFullPath(e.fullPath).path === targetPathWithoutQuery)
     if (index === -1) {
       console.warn('[router.nav] 路径不在当前标签页历史中:', targetPathWithoutQuery)
       return false
@@ -462,13 +483,17 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     )
   }
 
+  // ========== 返回路由器对象 ==========
   const router = {
+    // 响应式属性
     activeTab: activeTab,
     currentPath: currentPath,
     allComponents: allComponents,
     currentStack: currentStack,
     params: params,
     query: query,
+
+    // 方法
     switchTab,
     push,
     pop,
@@ -477,6 +502,8 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     pathIn,
     onPush,
     onPop,
+
+    // 安装函数
     install(app: any) {
       app.provide('router', reactive(this))
       app.component('RouterView', RouterView)
@@ -484,4 +511,13 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
   }
 
   return reactive(router)
+}
+
+// 导出立即执行 pop 的函数（供外部使用）
+export function popNow() {
+  if (!globalPopNow) {
+    console.warn('Router not initialized yet')
+    return
+  }
+  globalPopNow()
 }

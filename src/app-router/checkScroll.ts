@@ -10,9 +10,13 @@ import { HistoryStack } from './createAppRouter';
  */
 export default function checkSrcoll(
   threshold: number,
-  callback: (distance: number | undefined, speed: number, isScrolling: boolean) => void
+  callback: (distance: number | undefined, speed: number, isTouching: boolean) => void
 ): () => void {
   const router = inject('router') as HistoryStack
+
+  // 添加锁状态
+  let isLocked = false
+  let lockTimer: ReturnType<typeof setTimeout> | null = null
 
   // 使用计算属性实时判断是否在根路径
   const isRootPath = computed(() =>
@@ -60,6 +64,9 @@ export default function checkSrcoll(
     // 如果在根路径，直接返回
     if (isRootPath.value) return;
 
+    // 如果处于锁定状态，直接返回
+    if (isLocked) return;
+
     // 只在第一个触摸点开始跟踪
     if (e.touches.length !== 1) return;
 
@@ -98,6 +105,9 @@ export default function checkSrcoll(
   const handleTouchMove = (e: TouchEvent) => {
     // 如果在根路径，直接返回
     if (isRootPath.value) return;
+
+    // 如果处于锁定状态，直接返回
+    if (isLocked) return;
 
     if (!isTracking || e.touches.length !== 1) return;
 
@@ -199,6 +209,16 @@ export default function checkSrcoll(
     // 使用最后一次计算的速度值
     callback(finalDistance, lastSpeed, false);
     callback(undefined, lastSpeed, false);
+
+    // 设置锁定状态，300ms后解锁
+    isLocked = true;
+    if (lockTimer) {
+      clearTimeout(lockTimer);
+    }
+    lockTimer = setTimeout(() => {
+      isLocked = false;
+      lockTimer = null;
+    }, 300);
   };
 
   document.addEventListener('touchstart', handleTouchStart, { passive: true });
@@ -209,5 +229,10 @@ export default function checkSrcoll(
     document.removeEventListener('touchstart', handleTouchStart);
     document.removeEventListener('touchmove', handleTouchMove);
     document.removeEventListener('touchend', handleTouchEnd);
+    // 清理定时器
+    if (lockTimer) {
+      clearTimeout(lockTimer);
+      lockTimer = null;
+    }
   };
 }

@@ -2,6 +2,7 @@
 import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import checkSrcoll from '@/app-router/checkScroll'
+import { popNow } from '@/app-router/createAppRouter';
 import { HistoryStack } from '@/app-router/createAppRouter';
 import debounce from '../utils/common/debounce';
 
@@ -11,12 +12,10 @@ const router = inject('router') as HistoryStack
 const isPushing = ref<boolean>(false)
 router.onPush(() => isPushing.value = true)
 
-// 移除页面
-const isClickLeaving = ref<boolean>(false)
+// Pop 以移除页面
 const delayRecoverIsLeaving = debounce(() => isLeaving.value = false, 300)
 router.onPop(() => {
   isLeaving.value = true
-  isClickLeaving.value = true
   delayRecoverIsLeaving()
 })
 
@@ -29,12 +28,11 @@ const isLeaving = ref<boolean>(false)
 const isPopping = computed<boolean>(() => (isTouching.value || isReturning.value || isLeaving.value))
 let cleanup: () => void
 onMounted(() => {
-  cleanup = checkSrcoll(10, async (distance, speed, scrolling) => {
+  cleanup = checkSrcoll(10, async (distance, speed, touching) => {
     if (router.currentPath === router.currentStack[0].path) return
-    isPushing.value = false
     slideDistance.value = distance
     slideSpeed.value = speed
-    isTouching.value = scrolling
+    isTouching.value = touching
   })
 })
 watch(slideDistance, (newDistance, oldDistance) => {
@@ -42,7 +40,7 @@ watch(slideDistance, (newDistance, oldDistance) => {
     if (slideSpeed.value > 0.1 || (oldDistance as number > 200 && slideSpeed.value > -0.1)) {
       isLeaving.value = true
       setTimeout(() => {
-        router.pop()
+        popNow()
         isLeaving.value = false
       }, 300)
     } else {
@@ -59,32 +57,37 @@ onUnmounted(() => {
 const scrollPositions = ref<Record<string, number>>({})
 const bottomPath = computed(() => router.currentStack.length - 2 >= 0 ? router.currentStack[router.currentStack.length - 2].path : undefined)
 watch(() => router.currentPath, (newPath, oldPath) => {
+  const oldPathIsInStack = router.pathIn(oldPath)
   if (oldPath) {
-    const oldPathIsInStack = router.pathIn(oldPath)
     scrollPositions.value[oldPath] = oldPathIsInStack
       ? document.documentElement.scrollTop
       : 0
   }
-  const delay = isPushing.value ? 300 : 0
-  setTimeout(() => document.documentElement.scrollTop = scrollPositions.value[newPath] || 0, delay)
+  if (oldPathIsInStack) {
+    const delay = isPushing.value ? 300 : 0
+    setTimeout(() => {
+      if (!isTouching.value) {
+        document.documentElement.scrollTop = scrollPositions.value[newPath] || 0
+      }
+    }, delay)
+  }
 })
 watch(isTouching, async (newTouching) => {
   if (newTouching) {
-    scrollPositions.value[router.currentPath] = document.documentElement.scrollTop
-    document.documentElement.scrollTop = bottomPath.value ? scrollPositions.value[bottomPath.value] : 0
+    scrollPositions.value[router.currentPath] = isPushing.value ? 0 : document.documentElement.scrollTop
+    await nextTick()
+    document.documentElement.scrollTop = scrollPositions.value[bottomPath.value!]
+    isPushing.value = false
   } else {
     await nextTick()
     if (isLeaving.value) return
     setTimeout(() => document.documentElement.scrollTop = scrollPositions.value[router.currentPath] || 0, 300)
   }
 })
-watch(isClickLeaving, async (newClickLeaving) => {
-  if (newClickLeaving) {
-    scrollPositions.value[router.currentPath] = document.documentElement.scrollTop
-    await nextTick()
-    document.documentElement.scrollTop = bottomPath.value ? scrollPositions.value[bottomPath.value] : 0
-    isClickLeaving.value = false
-  }
+router.onPop(async () => {
+  scrollPositions.value[router.currentPath] = document.documentElement.scrollTop
+  await nextTick()
+  document.documentElement.scrollTop = bottomPath.value ? scrollPositions.value[bottomPath.value] : 0
 })
 
 </script>
