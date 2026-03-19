@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch } from 'vue'
-import getSlideCount from '../utils/getSlideCount'
+import getSlideCount from '../utils/calculateOffsets'
 
 interface Props {
   /** 标题 */

@@ -1,4 +1,4 @@
-const getSlideCount = <T extends { id: string }>(
+const calculateOffsets = <T extends { id: string }>(
   newList: T[],
   oldList: T[]
 ): number[] => {
@@ -44,4 +44,4 @@ const getSlideCount = <T extends { id: string }>(
   return result;
 };
 
-export default getSlideCount;
+export default calculateOffsets;

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import checkSrcoll from '@/utils/app-router/checkScroll'
-import { HistoryStack } from '@/utils/app-router/createAppRouter';
-import debounce from '../common/debounce';
+import checkSrcoll from '@/app-router/checkScroll'
+import { HistoryStack } from '@/app-router/createAppRouter';
+import debounce from '../utils/common/debounce';
 
 const router = inject('router') as HistoryStack
 
