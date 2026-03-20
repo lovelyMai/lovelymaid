@@ -79,6 +79,7 @@ const background = ref<string>('#e4e4e6')
 const barBackgroundColor = ref<string>('rgba(248, 248, 248, 0.9)')
 const border = ref<string>('none')
 const boxShadow = ref<string>('none')
+const barScale = ref<number>(1)
 const slideScale = ref<number>(1)
 const textScale = computed<number>(() => slideScale.value === 1.2 ? 1.1 : 1)
 const slideTransition = ref<string>('background .1s')
@@ -148,6 +149,7 @@ const startSlide = (e: PointerEvent) => {
   barBackgroundColor.value = '#fff'
   border.value = '1px solid rgba(255, 255, 255, 0.5)'
   boxShadow.value = '0 0 10px 0 rgba(0, 0, 0, 0.1)'
+  barScale.value = 1.05
   slideScale.value = 1.2
   calculateTargetPos(e, 'start')
   clearTimer(virtualTimer1, virtualTimer2)
@@ -171,6 +173,7 @@ const stopSlide = (e: PointerEvent) => {
   border.value = 'none'
   boxShadow.value = 'none'
   slideTransition.value = `transform .5s, background .1s`
+  barScale.value = 1
   slideScale.value = 1
   if (searchIsActive.value) {
     searchIsActive.value = false
@@ -271,8 +274,8 @@ defineExpose({
   transition: v-bind(barTransition);
 }
 
-.bar:active {
-  transform: scale(1.05);
+.bar.active {
+  transform: scale(v-bind(barScale));
 }
 
 .bar:not(.active):active {
