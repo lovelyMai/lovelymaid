@@ -1,10 +1,19 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, inject, nextTick, onMounted, onUnmounted, ref, toRefs, watch } from 'vue'
 
 import checkSrcoll from '@/app-router/checkScroll'
 import { popNow } from '@/app-router/createAppRouter';
 import { HistoryStack } from '@/app-router/createAppRouter';
 import debounce from '../utils/common/debounce';
+
+interface Props {
+  /** 动画期间的 z-index */
+  animatingZIndex?: number | string
+}
+const props = withDefaults(defineProps<Props>(), {
+  animatingZIndex: 1
+})
+const { animatingZIndex } = toRefs(props)
 
 const router = inject('router') as HistoryStack
 
@@ -93,15 +102,16 @@ router.onPop(async () => {
 </script>
 
 <template>
-  <component v-for="component in router.allComponents" :is="component.value" v-bind="component.props"
+  <component v-for="(component, index) in router.allComponents" :is="component.value" v-bind="component.props"
     :key="component.path"
     v-show="component.path === router.currentPath || ((isPushing || isPopping) && component.path === router.currentStack[router.currentStack.length - 2]?.path)"
     :style="component.path === router.currentPath && component.path !== router.currentStack[0].path ? {
-      position: isPopping ? 'fixed' : undefined,
+      position: isPopping ? 'fixed' : 'relative',
       top: isPopping ? `${-scrollPositions[router.currentPath]}px` : undefined,
+      zIndex: isPopping ? animatingZIndex : undefined,
       boxShadow: '0 0 20px 0 rgba(0, 0, 0, .1)',
       transition: !isTouching && (isReturning || isLeaving) ? 'transform .3s' : 'none',
-      transform: isTouching ? `translateX(${slideDistance}px) translateZ(0)` : isReturning ? `translateX(0) translateZ(0)` : isLeaving ? `translateX(100dvw) translateZ(0)` : undefined
+      transform: isTouching ? `translateX(${slideDistance}px) translateZ(0)` : isReturning ? `translateX(0) translateZ(0)` : isLeaving ? `translateX(100dvw) translateZ(0)` : undefined,
     } : undefined" :class="{ pushAnimation: isPushing && component.path === router.currentPath }"
     @animationend="() => isPushing = false" />
 </template>
@@ -111,12 +121,14 @@ router.onPop(async () => {
   from {
     position: fixed;
     top: 0;
+    z-index: v-bind(animatingZIndex);
     transform: translateX(100dvw);
   }
 
   to {
     position: fixed;
     top: 0;
+    z-index: v-bind(animatingZIndex);
     transform: translateX(0);
   }
 }

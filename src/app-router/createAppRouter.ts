@@ -260,21 +260,42 @@ export default function createAppRouter(options: MultiHistoryOptions): HistorySt
     return result
   })
 
-  // 所有标签页栈中的所有组件
+  // 所有标签页栈中的所有组件（栈顶 → 栈底）
   const allComponents = ref<CachedComponent[]>([])
 
-  // 当前标签页的历史栈组件（按顺序排列）
+  // 当前标签页的历史栈组件（栈底 → 栈顶）
   const currentStack = computed(() => {
     const stack = stacks.value[activeTab.value]
-    const stackPaths = new Set(stack.map(entry => parseFullPath(entry.fullPath).path))
-    return allComponents.value.filter(c => stackPaths.has(c.path))
+    const result: CachedComponent[] = []
+
+    for (const entry of stack) {
+      const { path: routePath, query: entryQuery } = parseFullPath(entry.fullPath)
+      const m = match(routePath)
+      if (!m) continue
+
+      const key = m.route.component.toString()
+      const comp = componentCache.get(key)
+      if (!comp) continue
+
+      const props = m.route.props
+        ? typeof m.route.props === 'function'
+          ? m.route.props({ params: m.params, query: entryQuery })
+          : m.route.props
+        : {}
+
+      result.push({ value: comp, path: routePath, props })
+    }
+
+    return result
   })
 
   // ========== 组件管理 ==========
   function updateAllComponents() {
     const result: CachedComponent[] = []
     for (const stack of Object.values(stacks.value)) {
-      for (const entry of stack) {
+      // 从栈顶到栈底遍历
+      for (let i = stack.length - 1; i >= 0; i--) {
+        const entry = stack[i]
         const { path: routePath, query: entryQuery } = parseFullPath(entry.fullPath)
         const m = match(routePath)
         if (!m) continue
