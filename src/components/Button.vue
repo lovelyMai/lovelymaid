@@ -15,9 +15,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 计算字体大小
-const ButtonRef = ref<HTMLElement | null>(null)
-const fontSize = ref<string>('0')
-onMounted(() => watchRef(ButtonRef, () => fontSize.value = `${ButtonRef.value!.offsetWidth * 1 / 2}px`, true))
+const ButtonRef = ref<any>(null)
+const FontSize = ref<string>('0')
+onMounted(() => watchRef(ButtonRef, () => FontSize.value = `${ButtonRef.value.offsetWidth * 1 / 2}px`, true))
 </script>
 
 <template>
@@ -41,7 +41,7 @@ onMounted(() => watchRef(ButtonRef, () => fontSize.value = `${ButtonRef.value!.o
   cursor: pointer;
   touch-action: none;
   transition: transform .2s;
-  --font-size: calc(v-bind(fontSize) * 1px);
+  --font-size: calc(v-bind(FontSize) * 1px);
   --font-weight: 500;
   --color: #19191a;
   --transform: none;

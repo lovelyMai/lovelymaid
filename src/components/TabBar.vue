@@ -5,7 +5,7 @@ import Button from './Button.vue'
 import Search from './Search.vue'
 
 import watchRef from '../utils/common/watchRef';
-import { getLayoutLeftInViewport } from '../utils/common/getLayoutLeft';
+import { getLayoutLeftInViewport } from '../utils/common/getLayoutDistance';
 
 interface Props {
   /** 列表 */

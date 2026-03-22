@@ -4,6 +4,7 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import Button from './Button.vue';
 
 import debounce from '@/utils/common/debounce';
+import { getLayoutLeftInViewport } from '@/utils/common/getLayoutDistance';
 
 interface Props {
   /** 是否显示 */
@@ -22,21 +23,13 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 计算侧边栏平移距离
-const containerRef = ref<HTMLElement | null>(null)
+const ContainerRef = ref<any>(null)
 const transition = ref<string>('none')
 const transformDistance = ref<number>(0)
 const translateX = computed<string>(() => props.isOpen ? '0' : `${-transformDistance.value}px`)
 const calculateTransform = () => {
-  const container = containerRef.value
-  if (!container) return
-  let left = 0
-  let el: HTMLElement | null = container
-  while (el) {
-    left += el.offsetLeft
-    el = el.offsetParent as HTMLElement | null
-  }
-  const width = container.offsetWidth
-  transformDistance.value = left + width + 10
+  if (!ContainerRef.value) return
+  transformDistance.value = getLayoutLeftInViewport(ContainerRef.value) + ContainerRef.value.offsetWidth + 10
 }
 watch(() => props.visible, (newVisible) => {
   if (newVisible) {
@@ -59,32 +52,33 @@ onUnmounted(() => {
 
 <template>
   <transition name="pop">
-    <div class="ContentBar lovelymaid-container" v-show="props.visible" ref="containerRef">
+    <div class="ContentBar lovelymaid-container" v-show="props.visible" ref="ContainerRef">
       <div class="header">
         <div class="title" :title="props.title">{{ props.title }}</div>
         <Button type="close" :onClick="props.onCloseClick" title="收起内容栏" />
       </div>
-      <slot>这是内容</slot>
+      <div class="content">
+        <slot>这是内容</slot>
+      </div>
     </div>
   </transition>
 </template>
 
 <style scoped>
 .ContentBar {
-  transition: v-bind(transition);
+  border-radius: 20px;
   transform: translateX(v-bind(translateX));
+  transition: v-bind(transition);
   overflow: auto;
-  user-select: none;
-  -webkit-user-select: none;
-  --header-z-index: 3;
+  scrollbar-width: thin;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   position: sticky;
-  z-index: var(--header-z-index);
   top: 0;
+  z-index: 1;
   height: 0;
   margin-bottom: 40px;
   padding: 0 5px 0 10px;
@@ -105,6 +99,11 @@ onUnmounted(() => {
 .Button {
   margin-top: 5px;
   --font-size: 20px;
+}
+
+.content {
+  position: relative;
+  z-index: 0;
 }
 
 .pop-enter-from,

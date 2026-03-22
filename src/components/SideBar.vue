@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 
 import debounce from '@/utils/common/debounce';
+import { getLayoutLeftInViewport } from '@/utils/common/getLayoutDistance';
 
 interface Props {
   /** 是否显示 */
@@ -22,21 +23,15 @@ const switchSideBar = () => {
 
 // 计算侧边栏平移距离
 const ContainerRef = ref<HTMLElement | null>(null)
-const containerWidth = ref<number>(0)
+const ContainerWidth = ref<number>(0)
 const transition = ref<string>('none')
-const transformDistance = ref<number>(0)
-const translateX = computed<string>(() => isOpen.value ? '0' : `${-transformDistance.value}px`)
+const TransformDistance = ref<number>(0)
+const translateX = computed<string>(() => isOpen.value ? '0' : `${-TransformDistance.value}px`)
 const calculateTransform = () => {
-  const container = ContainerRef.value
-  if (!container) return
-  let left = 0
-  let el: HTMLElement | null = container
-  while (el) {
-    left += el.offsetLeft
-    el = el.offsetParent as HTMLElement | null
-  }
-  containerWidth.value = container.offsetWidth
-  transformDistance.value = left + containerWidth.value + 10
+  if (!ContainerRef.value) return
+  ContainerWidth.value = ContainerRef.value.offsetWidth
+  TransformDistance.value = getLayoutLeftInViewport(ContainerRef.value) + ContainerWidth.value + 10
+  console.log(getLayoutLeftInViewport(ContainerRef.value), ContainerWidth.value);
 }
 const delayCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
@@ -68,8 +63,8 @@ const afterLeave = () => {
     @after-leave="afterLeave">
     <div v-show="props.visible" class="SideBar lovelymaid-container" ref="ContainerRef">
       <div class="header">
-        <div class="switchButton" :class="{ close: !isOpen }" @click="switchSideBar"
-          :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${transformDistance - containerWidth + 45}px)` }"
+        <div class="SwitchButton" :class="{ close: !isOpen }" @click="switchSideBar"
+          :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${TransformDistance - ContainerWidth + 45}px)` }"
           :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
           <span class="iconfont icon-sidebar_left"></span>
         </div>
@@ -81,6 +76,7 @@ const afterLeave = () => {
 
 <style scoped>
 .SideBar {
+  border-radius: 20px;
   transform: translateX(v-bind(translateX));
   transition: v-bind(transition);
 }
@@ -90,7 +86,7 @@ const afterLeave = () => {
   height: 40px;
 }
 
-.switchButton {
+.SwitchButton {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -109,12 +105,12 @@ const afterLeave = () => {
   will-change: transform;
 }
 
-.switchButton.close {
+.SwitchButton.close {
   border: 1px solid #fff;
   box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.1);
 }
 
-.switchButton:hover {
+.SwitchButton:hover {
   background-color: #eee;
 }
 

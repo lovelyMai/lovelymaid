@@ -1,6 +1,7 @@
 import ActionButton from './components/ActionButton.vue'
 import Button from './components/Button.vue'
 import ContentBar from './components/ContentBar.vue'
+import Drawer from './components/Drawer.vue'
 import FoldList from './components/FoldList.vue'
 import Search from './components/Search.vue'
 import SideBar from './components/SideBar.vue'
@@ -16,6 +17,7 @@ export {
   ActionButton,
   Button,
   ContentBar,
+  Drawer,
   FoldList,
   Search,
   SideBar,
