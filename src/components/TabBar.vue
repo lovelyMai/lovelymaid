@@ -254,8 +254,6 @@ defineExpose({
   height: 50px;
   font-size: 8px;
   isolation: isolate;
-  user-select: none;
-  -webkit-user-select: none;
   --top-color: #0067EC;
 }
 
@@ -352,6 +350,7 @@ defineExpose({
   backdrop-filter: blur(10px) saturate(1.5);
   border: 1px solid #fff;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+  font-size: 18px;
   --search-color: #19191a;
   --placeholder-color: #544957;
 }

@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
   <transition name="slide-up">
-    
+    <div class="Drawer lovelymaid-container"></div>
   </transition>
 </template>
 

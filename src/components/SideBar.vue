@@ -66,7 +66,7 @@ const afterLeave = () => {
 <template>
   <transition name="pop" @before-enter="beforeEnter" @after-enter="afterEnter" @before-leave="beforeLeave"
     @after-leave="afterLeave">
-    <div v-show="props.visible" class="SideBar" ref="ContainerRef">
+    <div v-show="props.visible" class="SideBar lovelymaid-container" ref="ContainerRef">
       <div class="header">
         <div class="switchButton" :class="{ close: !isOpen }" @click="switchSideBar"
           :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${transformDistance - containerWidth + 45}px)` }"
@@ -81,15 +81,8 @@ const afterLeave = () => {
 
 <style scoped>
 .SideBar {
-  background-color: rgba(248, 248, 248, 0.9);
-  backdrop-filter: blur(10px) saturate(1.5);
-  border: 1px solid #fff;
-  border-radius: 20px;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   transform: translateX(v-bind(translateX));
   transition: v-bind(transition);
-  user-select: none;
-  -webkit-user-select: none;
 }
 
 .header {

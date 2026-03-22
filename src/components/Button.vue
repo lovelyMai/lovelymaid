@@ -41,8 +41,6 @@ onMounted(() => watchRef(ButtonRef, () => fontSize.value = `${ButtonRef.value!.o
   cursor: pointer;
   touch-action: none;
   transition: transform .2s;
-  user-select: none;
-  -webkit-user-select: none;
   --font-size: calc(v-bind(fontSize) * 1px);
   --font-weight: 500;
   --color: #19191a;

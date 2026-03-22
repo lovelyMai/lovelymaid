@@ -46,8 +46,6 @@ const clickIcon = (e: any) => {
   font-size: 20px;
   color: #3b86f7;
   cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
   --list-z-index: 2;
   --list-font-size: 10px
 }

@@ -74,11 +74,6 @@ watch(() => props.list, (newList) => {
 </template>
 
 <style scoped>
-.FoldList {
-  user-select: none;
-  -webkit-user-select: none;
-}
-
 .header {
   display: flex;
   justify-content: space-between;

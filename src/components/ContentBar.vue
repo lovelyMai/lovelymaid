@@ -59,7 +59,7 @@ onUnmounted(() => {
 
 <template>
   <transition name="pop">
-    <div class="ContentBar" v-show="props.visible" ref="containerRef">
+    <div class="ContentBar lovelymaid-container" v-show="props.visible" ref="containerRef">
       <div class="header">
         <div class="title" :title="props.title">{{ props.title }}</div>
         <Button type="close" :onClick="props.onCloseClick" title="收起内容栏" />
@@ -71,11 +71,6 @@ onUnmounted(() => {
 
 <style scoped>
 .ContentBar {
-  background-color: rgba(248, 248, 248, 0.9);
-  backdrop-filter: blur(10px) saturate(1.5);
-  border: 1px solid #fff;
-  border-radius: 20px;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
   transition: v-bind(transition);
   transform: translateX(v-bind(translateX));
   overflow: auto;
