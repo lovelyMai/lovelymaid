@@ -1,6 +1,6 @@
 import { ref, computed, watch, markRaw, reactive, App } from 'vue'
 import RouterView from './RouterView.vue'
-import throttle from '@/utils/common/throttle'
+import { throttle } from '@/utils/common'
 
 /* =============================
    类型定义

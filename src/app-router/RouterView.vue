@@ -4,7 +4,7 @@ import { computed, inject, nextTick, onMounted, onUnmounted, ref, toRefs, watch 
 import checkSrcoll from '@/app-router/checkScroll'
 import { popNow } from '@/app-router/createAppRouter';
 import { HistoryStack } from '@/app-router/createAppRouter';
-import debounce from '../utils/common/debounce';
+import { debounce } from '../utils/common';
 
 interface Props {
   /** 动画期间的 z-index */

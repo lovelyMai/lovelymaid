@@ -3,8 +3,8 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 
 import Button from './Button.vue';
 
-import debounce from '@/utils/common/debounce';
-import { getLayoutLeftInViewport } from '@/utils/common/getLayoutDistance';
+import { debounce } from '@/utils/common';
+import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
 
 interface Props {
   /** 是否显示 */

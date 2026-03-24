@@ -4,8 +4,8 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import Button from './Button.vue'
 import Search from './Search.vue'
 
-import watchRef from '../utils/common/watchRef';
-import { getLayoutLeftInViewport } from '../utils/common/getLayoutDistance';
+import { watchRef } from '../utils/common';
+import { getLayoutLeftInViewport } from '../utils/getOffsetInViewport';
 
 interface Props {
   /** 列表 */

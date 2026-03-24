@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import watchRef from '../utils/common/watchRef';
+import { watchRef } from '../utils/common';
 
 interface Props {
   /** 按钮图标 */
