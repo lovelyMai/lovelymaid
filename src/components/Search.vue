@@ -43,16 +43,16 @@ const search = async (inputValue: string) => {
 </script>
 
 <template>
-  <div class="lovelymaid-glass-container Search" ref="SearchRef">
+  <div :class="['lovelymaid-glass-container', $style.Search]" ref="SearchRef">
     <span class="iconfont icon-search"></span>
-    <input v-model="inputValue" class='input' @keyup.enter.prevent="search(inputValue.trim())" enterkeyhint="search"
+    <input v-model="inputValue" @keyup.enter.prevent="search(inputValue.trim())" enterkeyhint="search"
       @compositionend="compositionend" @compositionstart="compositionstart" type="text"
       :placeholder="props.placeholder" />
     <span v-if="inputValue" class="iconfont icon-clear" @click.stop="inputValue = ''"></span>
   </div>
 </template>
 
-<style scoped>
+<style module>
 .Search {
   display: flex;
   align-items: center;
@@ -63,6 +63,29 @@ const search = async (inputValue: string) => {
   --search-color: #19191a;
   --clear-color: #767676;
   --placeholder-color: #544957;
+}
+</style>
+<style scoped>
+input {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  border-radius: calc(v-bind(searchHeight) / 2);
+  padding: 0 v-bind(searchHeight);
+  font-size: inherit;
+  font-weight: inherit;
+  caret-color: #3c86f6;
+  transition: outline .2s ease;
+}
+
+input::placeholder {
+  font-size: inherit;
+  font-weight: 400;
+  color: var(--placeholder-color);
+}
+
+input:focus {
+  outline: 3px solid #94bbf0;
 }
 
 .iconfont {
@@ -79,27 +102,5 @@ const search = async (inputValue: string) => {
   right: calc(v-bind(searchHeight) / 3);
   color: var(--clear-color);
   cursor: pointer;
-}
-
-.input {
-  width: 100%;
-  height: 100%;
-  background-color: transparent;
-  border-radius: calc(v-bind(searchHeight) / 2);
-  padding: 0 v-bind(searchHeight);
-  font-size: inherit;
-  font-weight: inherit;
-  caret-color: #3c86f6;
-  transition: outline .2s ease;
-}
-
-.input::placeholder {
-  font-size: inherit;
-  font-weight: 400;
-  color: var(--placeholder-color);
-}
-
-.input:focus {
-  outline: 3px solid #94bbf0;
 }
 </style>

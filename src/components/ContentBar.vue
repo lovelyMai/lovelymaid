@@ -51,20 +51,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <transition name="pop">
-    <div class="ContentBar lovelymaid-glass-container" v-show="props.visible" ref="ContainerRef">
-      <div class="header">
-        <div class="title" :title="props.title">{{ props.title }}</div>
-        <Button type="close" :onClick="props.onCloseClick" title="收起内容栏" />
+  <transition name="lovelymaid-pop">
+    <div :class="['lovelymaid-glass-container', $style.ContentBar]" v-show="props.visible" ref="ContainerRef">
+      <div :class="$style.header">
+        <div :class="$style.title" :title="props.title">{{ props.title }}</div>
+        <Button type="close" :class="$style.Button" :onClick="props.onCloseClick" title="收起内容栏" />
       </div>
-      <div class="content">
+      <div :class="$style.content">
         <slot>这是内容</slot>
       </div>
     </div>
   </transition>
 </template>
 
-<style scoped>
+<style module>
 .ContentBar {
   border-radius: 20px;
   transform: translateX(v-bind(translateX));
@@ -105,9 +105,10 @@ onUnmounted(() => {
   position: relative;
   z-index: 0;
 }
-
-.pop-enter-from,
-.pop-leave-to {
+</style>
+<style>
+.lovelymaid-pop-enter-from,
+.lovelymaid-pop-leave-to {
   transform: translateX(v-bind(translateX)) scale(0);
 }
 </style>

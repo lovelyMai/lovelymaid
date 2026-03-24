@@ -22,17 +22,17 @@ const height = toRef(props.height)
 </script>
 
 <template>
-  <div class="Drawer">
+  <div :class="$style.Drawer">
     <transition name="lovelymaid-fade">
-      <div class="mask" v-if="props.isOpen"></div>
+      <div :class="$style.mask" v-if="props.isOpen"></div>
     </transition>
     <transition name="lovelymaid-slide-up">
-      <div class="drawer-container lovelymaid-common-container" v-if="props.isOpen">
-        <div class="header">
-          <div class="title">{{ props.title }}</div>
-          <Button type="close" :onClick="props.onCloseClick" title="关闭弹窗" />
+      <div :class="['lovelymaid-common-container', $style.DrawerContainer]" v-if="props.isOpen">
+        <div :class="$style.header">
+          <div :class="$style.title">{{ props.title }}</div>
+          <Button type="close" :class="$style.Button" :onClick="props.onCloseClick" title="关闭弹窗" />
         </div>
-        <div class="content">
+        <div :class="$style.content">
           <slot>这是内容</slot>
         </div>
       </div>
@@ -40,11 +40,11 @@ const height = toRef(props.height)
   </div>
 </template>
 
-<style scoped>
+<style module>
 .Drawer {
   position: relative;
   z-index: 10;
-  --height: 90dvh;
+  --height: v-bind(height);
 }
 
 .mask {
@@ -57,7 +57,7 @@ const height = toRef(props.height)
   transition: opacity .3s;
 }
 
-.drawer-container {
+.DrawerContainer {
   position: fixed;
   bottom: 0;
   z-index: 1;
@@ -109,6 +109,7 @@ const height = toRef(props.height)
   z-index: 0;
 }
 </style>
+
 <style>
 .lovelymaid-fade-enter-from,
 .lovelymaid-fade-leave-to {

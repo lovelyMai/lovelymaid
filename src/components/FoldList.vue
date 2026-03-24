@@ -17,7 +17,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   title: '标题',
   list: () => [],
-  activeIndex: -1
 });
 
 // 标准流高度动画
@@ -52,20 +51,20 @@ watch(() => props.list, (newList) => {
 </script>
 
 <template>
-  <div class="FoldList">
-    <div class="header" @click.stop="onHeaderClick">
-      <div class="title">
+  <div :class="$style.FoldList">
+    <div :class="$style.header" @click.stop="onHeaderClick">
+      <div :class="$style.title">
         {{ props.title }}
       </div>
-      <span class="iconfont icon-right-arrow" :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
+      <span :class="['iconfont', 'icon-right-arrow']" :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
         :title="isOpen ? '收起列表' : '展开列表'" @click.stop="isOpen = !isOpen"></span>
     </div>
-    <div class="body-container" :class="{ 'enable-transition': enableTransition }"
+    <div :class="[$style.BodyContainer, { [$style.EnableTransition]: enableTransition }]"
       :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
-      <ul ref="bodyRef" class="body" :class="{ close: !isOpen }">
+      <ul ref="bodyRef" :class="[$style.body, { [$style.close]: !isOpen }]">
         <li v-for="(item, index) in props.list" :key="index" @click.stop="() => onItemClick?.(item, index)"
           :style="{ '--translateY': `${slideCount[index] * 100}%` }" @animationend="() => slideAnimating = false"
-          :class="{ active: index === props.activeIndex, slideAnimation: slideAnimating }">
+          :class="{ [$style.active]: index === props.activeIndex, [$style.slideAnimation]: slideAnimating }">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>
       </ul>
@@ -73,7 +72,7 @@ watch(() => props.list, (newList) => {
   </div>
 </template>
 
-<style scoped>
+<style module>
 .header {
   display: flex;
   justify-content: space-between;
@@ -81,26 +80,17 @@ watch(() => props.list, (newList) => {
   height: 30px;
 }
 
-.header .title {
+.title {
   font-size: 12px;
   color: #767676;
   font-weight: 500;
 }
 
-.header .iconfont {
-  font-size: 16px;
-  color: #767676;
-  font-weight: 700;
-  transition: transform .3s;
-  cursor: pointer;
-  will-change: transform;
-}
-
-.body-container {
+.BodyContainer {
   overflow: hidden;
 }
 
-.body-container.enable-transition {
+.EnableTransition {
   transition: height .5s ease;
 }
 
@@ -110,7 +100,7 @@ watch(() => props.list, (newList) => {
   transition-delay: 0.032s;
 }
 
-.body.close {
+.close {
   transform: translateY(-100%);
 }
 
@@ -126,7 +116,7 @@ watch(() => props.list, (newList) => {
   transition: all .2s;
 }
 
-.body li.active {
+.active {
   background-color: rgba(228, 228, 228, 1);
   color: #3b86f7;
 }
@@ -143,5 +133,16 @@ watch(() => props.list, (newList) => {
 
 .slideAnimation {
   animation: slideAnimation .5s;
+}
+</style>
+
+<style scoped>
+.iconfont {
+  font-size: 16px;
+  color: #767676;
+  font-weight: 700;
+  transition: transform .3s;
+  cursor: pointer;
+  will-change: transform;
 }
 </style>

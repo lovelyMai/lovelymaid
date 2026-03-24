@@ -23,12 +23,13 @@ onMounted(() => watchRef(ButtonRef, () => {
 </script>
 
 <template>
-  <div class="Button lovelymaid-glass-container" @click="props.onClick" :title="props.title" ref="ButtonRef">
+  <div :class="['lovelymaid-glass-container', $style.Button]" @click="props.onClick" :title="props.title"
+    ref="ButtonRef">
     <span :class="['iconfont', `icon-${props.type}`]"></span>
   </div>
 </template>
 
-<style scoped>
+<style module>
 .Button {
   display: flex;
   justify-content: center;
@@ -49,7 +50,8 @@ onMounted(() => watchRef(ButtonRef, () => {
   background-color: #fff;
   transform: scale(1.2);
 }
-
+</style>
+<style scoped>
 .iconfont {
   font-size: var(--font-size);
   font-weight: var(--font-weight);

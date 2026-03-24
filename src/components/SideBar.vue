@@ -59,11 +59,11 @@ const afterLeave = () => {
 </script>
 
 <template>
-  <transition name="pop" @before-enter="beforeEnter" @after-enter="afterEnter" @before-leave="beforeLeave"
+  <transition name="lovelymaid-pop" @before-enter="beforeEnter" @after-enter="afterEnter" @before-leave="beforeLeave"
     @after-leave="afterLeave">
-    <div v-show="props.visible" class="SideBar lovelymaid-glass-container" ref="ContainerRef">
-      <div class="header">
-        <div class="SwitchButton" :class="{ close: !isOpen }" @click="switchSideBar"
+    <div v-show="props.visible" :class="['lovelymaid-glass-container', $style.SideBar]" ref="ContainerRef">
+      <div :class="$style.header">
+        <div :class="[$style.SwitchButton, { [$style.close]: !isOpen }]" @click="switchSideBar"
           :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${TransformDistance - ContainerWidth + 45}px)` }"
           :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
           <span class="iconfont icon-sidebar_left"></span>
@@ -74,7 +74,7 @@ const afterLeave = () => {
   </transition>
 </template>
 
-<style scoped>
+<style module>
 .SideBar {
   border-radius: 20px;
   transform: translateX(v-bind(translateX));
@@ -113,14 +113,16 @@ const afterLeave = () => {
 .SwitchButton:hover {
   background-color: #eee;
 }
-
+</style>
+<style scoped>
 .icon-sidebar_left {
   font-size: 20px;
   color: #19191a;
 }
-
-.pop-enter-from,
-.pop-leave-to {
+</style>
+<style>
+.lovelymaid-pop-enter-from,
+.lovelymaid-pop-leave-to {
   transform: translateX(v-bind(translateX)) scale(0);
 }
 </style>
