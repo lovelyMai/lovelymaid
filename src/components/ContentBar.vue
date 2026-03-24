@@ -52,7 +52,7 @@ onUnmounted(() => {
 
 <template>
   <transition name="pop">
-    <div class="ContentBar lovelymaid-pc-container" v-show="props.visible" ref="ContainerRef">
+    <div class="ContentBar lovelymaid-glass-container" v-show="props.visible" ref="ContainerRef">
       <div class="header">
         <div class="title" :title="props.title">{{ props.title }}</div>
         <Button type="close" :onClick="props.onCloseClick" title="收起内容栏" />

@@ -222,7 +222,7 @@ defineExpose({
 
 <template>
   <div :class="$style.TabBar" ref="barRef">
-    <div :class="[$style.bar, { [$style.active]: !searchIsActive }]">
+    <div :class="['lovelymaid-glass-container', $style.bar, { [$style.active]: !searchIsActive }]">
       <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
           <slot name="bottom" :index="activeIndex"></slot>
@@ -242,7 +242,7 @@ defineExpose({
     </div>
     <div :class="[$style.search, { [$style.active]: searchIsActive }]" v-if="props.showSearch">
       <Button type="search" :class="$style.Button" v-show="!searchIsShow" :onClick="clickSearch" />
-      <Search :class="$style.Search" v-show="searchIsShow" />
+      <Search :class="[$style.Search, 'lovelymaid-glass-container']" v-show="searchIsShow" />
     </div>
   </div>
 </template>
@@ -253,7 +253,6 @@ defineExpose({
   gap: 5px;
   height: 50px;
   font-size: 8px;
-  isolation: isolate;
   --top-color: #0067EC;
 }
 
@@ -262,28 +261,22 @@ defineExpose({
   width: calc(v-bind(barHeight) * 0.8px);
   height: 80%;
   padding: 2px;
-  background-color: v-bind(barBackgroundColor);
-  backdrop-filter: blur(10px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 1);
+  background-color: v-bind(barBackgroundColor) !important;
   border-radius: calc(v-bind(borderRadius) * 1px);
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  overflow-x: hidden;
+  overflow: hidden;
   transition: v-bind(barTransition);
-}
-
-.bar.active {
-  transform: scale(v-bind(barScale));
-}
-
-.bar:not(.active):active {
-  transform: scale(1.2);
 }
 
 .bar.active {
   width: calc(v-bind(barWidth) * 1px);
   height: 100%;
-  overflow-x: visible;
+  overflow: visible;
+  transform: scale(v-bind(barScale));
+}
+
+.bar:not(.active):active {
+  transform: scale(1.2);
 }
 
 .search {
@@ -346,13 +339,6 @@ defineExpose({
 
 .search .Search {
   height: 100%;
-  background-color: rgba(248, 248, 248, 0.9);
-  backdrop-filter: blur(10px) saturate(1.5);
-  border: 1px solid #fff;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
-  font-size: 18px;
-  --search-color: #19191a;
-  --placeholder-color: #544957;
 }
 
 .slide {

@@ -15,9 +15,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 初始化
-const searchRef = ref<HTMLElement | null>(null)
-const searchHeight = ref<number>(0)
-onMounted(() => watchRef(searchRef, () => searchHeight.value = searchRef.value!.offsetHeight, true))
+const SearchRef = ref<HTMLElement | null>(null)
+const searchHeight = ref<string>('0')
+onMounted(() => watchRef(SearchRef, () => {
+  searchHeight.value = `${SearchRef.value!.offsetHeight}px`
+}, true))
 
 // 输入框内容
 const inputValue = ref<string>('')
@@ -41,7 +43,7 @@ const search = async (inputValue: string) => {
 </script>
 
 <template>
-  <div class="Search" ref="searchRef">
+  <div class="lovelymaid-glass-container Search" ref="SearchRef">
     <span class="iconfont icon-search"></span>
     <input v-model="inputValue" class='input' @keyup.enter.prevent="search(inputValue.trim())" enterkeyhint="search"
       @compositionend="compositionend" @compositionstart="compositionstart" type="text"
@@ -56,26 +58,25 @@ const search = async (inputValue: string) => {
   align-items: center;
   position: relative;
   height: 35px;
-  font-size: 14px;
-  background-color: #eee;
-  border-radius: calc(v-bind(searchHeight) / 2 * 1px);
-  --search-color: #767676;
+  font-size: calc(v-bind(searchHeight) / 3);
+  border-radius: calc(v-bind(searchHeight) / 2);
+  --search-color: #19191a;
   --clear-color: #767676;
-  --placeholder-color: #767676;
+  --placeholder-color: #544957;
 }
 
 .iconfont {
   position: absolute;
-  font-size: 14px;
+  font-size: calc(v-bind(searchHeight) / 3);
 }
 
 .icon-search {
-  left: calc((v-bind(searchHeight) / 2 - 7) * 1px);
+  left: calc(v-bind(searchHeight) / 3);
   color: var(--search-color);
 }
 
 .icon-clear {
-  right: calc((v-bind(searchHeight) / 2 - 7) * 1px);
+  right: calc(v-bind(searchHeight) / 3);
   color: var(--clear-color);
   cursor: pointer;
 }
@@ -84,8 +85,8 @@ const search = async (inputValue: string) => {
   width: 100%;
   height: 100%;
   background-color: transparent;
-  border-radius: calc(v-bind(searchHeight) / 2 * 1px);
-  padding: 0 calc(v-bind(searchHeight) * 1px);
+  border-radius: calc(v-bind(searchHeight) / 2);
+  padding: 0 v-bind(searchHeight);
   font-size: inherit;
   font-weight: inherit;
   caret-color: #3c86f6;

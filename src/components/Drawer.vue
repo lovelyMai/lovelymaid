@@ -27,7 +27,7 @@ const height = toRef(props.height)
       <div class="mask" v-if="props.isOpen"></div>
     </transition>
     <transition name="lovelymaid-slide-up">
-      <div class="drawer-container lovelymaid-mobile-container" v-if="props.isOpen">
+      <div class="drawer-container lovelymaid-common-container" v-if="props.isOpen">
         <div class="header">
           <div class="title">{{ props.title }}</div>
           <Button type="close" :onClick="props.onCloseClick" title="关闭弹窗" />
@@ -44,6 +44,7 @@ const height = toRef(props.height)
 .Drawer {
   position: relative;
   z-index: 10;
+  --height: 90dvh;
 }
 
 .mask {
@@ -61,7 +62,7 @@ const height = toRef(props.height)
   bottom: 0;
   z-index: 1;
   width: 100dvw;
-  height: v-bind(height);
+  height: var(--height);
   border-top-left-radius: 38px;
   border-top-right-radius: 38px;
   transition: transform .5s cubic-bezier(0.2, 0.9, 0.4, 1);
