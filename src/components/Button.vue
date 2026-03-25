@@ -23,7 +23,7 @@ onMounted(() => watchRef(ButtonRef, () => {
 </script>
 
 <template>
-  <div :class="['lovelymaid-glass-container', $style.Button]" @click="props.onClick" :title="props.title"
+  <div :class="[$style.Button, 'lovelymaid-glass-container']" @click="props.onClick" :title="props.title"
     ref="ButtonRef">
     <span :class="['iconfont', `icon-${props.type}`]"></span>
   </div>

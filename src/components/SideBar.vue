@@ -61,7 +61,7 @@ const afterLeave = () => {
 <template>
   <transition name="lovelymaid-pop" @before-enter="beforeEnter" @after-enter="afterEnter" @before-leave="beforeLeave"
     @after-leave="afterLeave">
-    <div v-show="props.visible" :class="['lovelymaid-glass-container', $style.SideBar]" ref="ContainerRef">
+    <div v-show="props.visible" :class="[$style.SideBar, 'lovelymaid-glass-container']" ref="ContainerRef">
       <div :class="$style.header">
         <div :class="[$style.SwitchButton, { [$style.close]: !isOpen }]" @click="switchSideBar"
           :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${TransformDistance - ContainerWidth + 45}px)` }"

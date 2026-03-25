@@ -222,7 +222,7 @@ defineExpose({
 
 <template>
   <div :class="$style.TabBar" ref="barRef">
-    <div :class="['lovelymaid-glass-container', $style.bar, { [$style.active]: !searchIsActive }]">
+    <div :class="[$style.bar, 'lovelymaid-glass-container', { [$style.active]: !searchIsActive }]">
       <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
           <slot name="bottom" :index="activeIndex"></slot>

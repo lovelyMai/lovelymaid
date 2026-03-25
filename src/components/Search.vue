@@ -43,7 +43,7 @@ const search = async (inputValue: string) => {
 </script>
 
 <template>
-  <div :class="['lovelymaid-glass-container', $style.Search]" ref="SearchRef">
+  <div :class="[$style.Search, 'lovelymaid-glass-container']" ref="SearchRef">
     <span class="iconfont icon-search"></span>
     <input v-model="inputValue" @keyup.enter.prevent="search(inputValue.trim())" enterkeyhint="search"
       @compositionend="compositionend" @compositionstart="compositionstart" type="text"

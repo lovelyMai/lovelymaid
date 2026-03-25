@@ -27,7 +27,7 @@ const height = toRef(props.height)
       <div :class="$style.mask" v-if="props.isOpen"></div>
     </transition>
     <transition name="lovelymaid-slide-up">
-      <div :class="['lovelymaid-common-container', $style.DrawerContainer]" v-if="props.isOpen">
+      <div :class="[$style.DrawerContainer, 'lovelymaid-common-container']" v-if="props.isOpen">
         <div :class="$style.header">
           <div :class="$style.title">{{ props.title }}</div>
           <Button type="close" :class="$style.Button" :onClick="props.onCloseClick" title="关闭弹窗" />
