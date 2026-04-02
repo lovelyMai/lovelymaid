@@ -23,12 +23,12 @@ const props = withDefaults(defineProps<Props>(), {
 const listLength = computed(() => props.list.length)
 
 // 初始化
-const barRef = ref<HTMLElement | null>(null)
+const BarRef = ref<HTMLElement | null>(null)
 const barWidth = ref<number>(0)
 const barHeight = ref<number>(0)
 const searchWidth = ref<number>(0)
 const borderRadius = ref<number>(0)
-const slideRef = ref<HTMLElement | null>(null)
+const SlideRef = ref<HTMLElement | null>(null)
 const containerRef = ref<HTMLElement | null>(null)
 const slideWidth = ref<number>(0)
 const maxDistance = ref<number>(0)
@@ -39,10 +39,10 @@ const activeIndex = ref<number>(props.initialIndex)
 const targetPos = ref<number>(0)
 let slideCenter: number
 onMounted(() => {
-  cleanup = watchRef(barRef, () => {
-    barHeight.value = barRef.value!.offsetHeight
-    barWidth.value = props.showSearch ? barRef.value!.offsetWidth - barHeight.value - 5 : barRef.value!.offsetWidth - 5
-    searchWidth.value = barRef.value!.offsetWidth - barHeight.value * 0.8 - 5
+  cleanup = watchRef(BarRef, () => {
+    barHeight.value = BarRef.value!.offsetHeight
+    barWidth.value = props.showSearch ? BarRef.value!.offsetWidth - barHeight.value - 5 : BarRef.value!.offsetWidth - 5
+    searchWidth.value = BarRef.value!.offsetWidth - barHeight.value * 0.8 - 5
     borderRadius.value = barHeight.value / 2
     slideWidth.value = (barWidth.value - 6) / listLength.value
     virtualLeft.value = activeIndex.value * slideWidth.value
@@ -86,11 +86,11 @@ const slideTransition = ref<string>('background .1s')
 
 let followed = false
 const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
-  if (!slideRef.value || !containerRef.value) return
+  if (!SlideRef.value || !containerRef.value) return
   const clickX = e.clientX - getLayoutLeftInViewport(containerRef.value)
   const clickLeft = clickX - slideWidth.value / 2
-  const realLeft = new DOMMatrix(window.getComputedStyle(slideRef.value).transform).m41
-  const targetLeft = clickLeft < 0 ? 0 : clickLeft > (listLength.value - 1) * slideRef.value.offsetWidth ? (listLength.value - 1) * slideRef.value.offsetWidth : clickLeft
+  const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value).transform).m41
+  const targetLeft = clickLeft < 0 ? 0 : clickLeft > (listLength.value - 1) * slideWidth.value ? (listLength.value - 1) * slideWidth.value : clickLeft
   if (type === 'start') {
     slideTransition.value = `transform .5s, background .1s`
     targetPos.value = targetLeft
@@ -102,7 +102,7 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
     slideTransition.value = `background .1s`
     targetPos.value = realLeft
     calculatePosTimer = setInterval(() => {
-      const realLeft = new DOMMatrix(window.getComputedStyle(slideRef.value!).transform).m41
+      const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
       if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 5)) {
         slideTransition.value = `background .1s`
         targetPos.value = targetLeft
@@ -116,7 +116,7 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
 }
 const updateVirtualPos = (duration: number | undefined) => {
   const calc = () => {
-    const realLeft = new DOMMatrix(window.getComputedStyle(slideRef.value!).transform).m41
+    const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
     slideCenter = realLeft + slideWidth.value / 2
     const virtualWidth = slideWidth.value * 1.2 / 1.1
     virtualLeft.value = slideCenter - virtualWidth / 2
@@ -221,7 +221,7 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="$style.TabBar" ref="barRef">
+  <div :class="$style.TabBar" ref="BarRef">
     <div :class="[$style.bar, 'lovelymaid-glass-container', { [$style.active]: !searchIsActive }]">
       <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
@@ -231,7 +231,7 @@ defineExpose({
           <slot name="bottom" :item="item" :index="index"></slot>
           <span>{{ item }}</span>
         </li>
-        <div :class="$style.slide" ref="slideRef" v-show="!searchIsActive"></div>
+        <div :class="$style.slide" ref="SlideRef" v-show="!searchIsActive"></div>
         <ul :class="[$style.container, $style.top]" v-show="!searchIsActive">
           <li :class="[$style.tab, $style.top]" v-for="(item, index) in props.list" :key="'top-' + index">
             <slot name="top" :item="item" :index="index"></slot>
