@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { toRef } from 'vue';
 
 import Button from './Button.vue';
 
@@ -10,15 +9,11 @@ interface Props {
   title?: string;
   /** 关闭按钮点击事件 */
   onCloseClick?: () => void;
-  /** 抽屉高度 */
-  height?: string
 }
 const props = withDefaults(defineProps<Props>(), {
   isOpen: true,
   title: '标题',
-  height: '90dvh'
 });
-const height = toRef(props.height)
 </script>
 
 <template>
@@ -44,7 +39,7 @@ const height = toRef(props.height)
 .Drawer {
   position: relative;
   z-index: 10;
-  --height: v-bind(height);
+  --height: 90dvh;
 }
 
 .mask {
