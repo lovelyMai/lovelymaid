@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 
 import { debounce } from '@/utils/common';
 import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
@@ -43,41 +43,42 @@ onUnmounted(() => {
   window.removeEventListener('resize', delayCalculateTransform)
 })
 
-// 添加动画钩子
-const beforeEnter = () => {
-  transition.value = isOpen.value ? 'transform .3s' : 'transform .5s'
-}
-const afterEnter = () => {
-  transition.value = 'transform .5s'
-}
-const beforeLeave = () => {
-  transition.value = isOpen.value ? 'transform .3s' : 'transform .5s'
-}
-const afterLeave = () => {
-  transition.value = 'transform .5s'
-}
+// 切换 visilble
+const display = ref<string>('block')
+const scale = ref<string>('1')
+watch(() => props.visible, (newVisible) => {
+  transition.value = 'transform .3s'
+  setTimeout(() => transition.value = 'transform .5s', 300)
+  if (newVisible) {
+    display.value = 'block'
+    requestAnimationFrame(() => {
+      scale.value = '1'
+    })
+  } else {
+    setTimeout(() => display.value = 'none', 300)
+    scale.value = '0'
+  }
+})
 </script>
 
 <template>
-  <transition name="lovelymaid-pop" @before-enter="beforeEnter" @after-enter="afterEnter" @before-leave="beforeLeave"
-    @after-leave="afterLeave">
-    <div v-show="props.visible" :class="[$style.SideBar, 'lovelymaid-glass-container']" ref="ContainerRef">
-      <div :class="$style.header">
-        <div :class="[$style.SwitchButton, { [$style.close]: !isOpen }]" @click="switchSideBar"
-          :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${TransformDistance - ContainerWidth + 45}px)` }"
-          :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
-          <span class="iconfont icon-sidebar_left"></span>
-        </div>
+  <div ref="ContainerRef" :class="[$style.SideBar, 'lovelymaid-glass-container']">
+    <div :class="$style.header">
+      <div :class="[$style.SwitchButton, { [$style.close]: !isOpen }]" @click="switchSideBar"
+        :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${TransformDistance - ContainerWidth + 45}px)` }"
+        :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
+        <span class="iconfont icon-sidebar_left"></span>
       </div>
-      <slot>这是内容</slot>
     </div>
-  </transition>
+    <slot>这是内容</slot>
+  </div>
 </template>
 
 <style module>
 .SideBar {
+  display: v-bind(display);
   border-radius: 20px;
-  transform: translateX(v-bind(translateX));
+  transform: translateX(v-bind(translateX)) scale(v-bind(scale));
   transition: v-bind(transition);
 }
 
@@ -95,11 +96,11 @@ const afterLeave = () => {
   right: 5px;
   width: 35px;
   height: 30px;
+  border: none;
   border-radius: 15px;
   background-color: rgba(248, 248, 248, 0.9);
   transition:
     transform .5s,
-    border 0s .5s,
     box-shadow .5s;
   cursor: pointer;
   will-change: transform;
@@ -118,11 +119,5 @@ const afterLeave = () => {
 .icon-sidebar_left {
   font-size: 20px;
   color: #19191a;
-}
-</style>
-<style>
-.lovelymaid-pop-enter-from,
-.lovelymaid-pop-leave-to {
-  transform: translateX(v-bind(translateX)) scale(0);
 }
 </style>

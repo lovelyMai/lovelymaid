@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 计算侧边栏平移距离
-const ContainerRef = ref<any>(null)
+const ContainerRef = ref<HTMLElement | null>(null)
 const transition = ref<string>('none')
 const transformDistance = ref<number>(0)
 const translateX = computed<string>(() => props.isOpen ? '0' : `${-transformDistance.value}px`)
@@ -31,13 +31,6 @@ const calculateTransform = () => {
   if (!ContainerRef.value) return
   transformDistance.value = getLayoutLeftInViewport(ContainerRef.value) + ContainerRef.value.offsetWidth + 10
 }
-watch(() => props.visible, (newVisible) => {
-  if (newVisible) {
-    setTimeout(() => transition.value = 'transform .5s', 300)
-  } else {
-    transition.value = 'transform .3s'
-  }
-})
 const delayCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
   calculateTransform()
@@ -48,26 +41,41 @@ onUnmounted(() => {
   window.removeEventListener('resize', delayCalculateTransform)
 })
 
+// 切换 visilble
+const display = ref<string>('block')
+const scale = ref<string>('1')
+watch(() => props.visible, (newVisible) => {
+  transition.value = 'transform .3s'
+  setTimeout(() => transition.value = 'transform .5s', 300)
+  if (newVisible) {
+    display.value = 'block'
+    requestAnimationFrame(() => {
+      scale.value = '1'
+    })
+  } else {
+    setTimeout(() => display.value = 'none', 300)
+    scale.value = '0'
+  }
+})
 </script>
 
 <template>
-  <transition name="lovelymaid-pop">
-    <div :class="[$style.ContentBar, 'lovelymaid-glass-container']" v-show="props.visible" ref="ContainerRef">
-      <div :class="$style.header">
-        <div :class="$style.title" :title="props.title">{{ props.title }}</div>
-        <Button type="close" :class="$style.Button" :onClick="props.onCloseClick" title="收起内容栏" />
-      </div>
-      <div :class="$style.content">
-        <slot>这是内容</slot>
-      </div>
+  <div :class="[$style.ContentBar, 'lovelymaid-glass-container']" ref="ContainerRef">
+    <div :class="$style.header">
+      <div :class="$style.title" :title="props.title">{{ props.title }}</div>
+      <Button type="close" :class="$style.Button" :onClick="props.onCloseClick" title="收起内容栏" />
     </div>
-  </transition>
+    <div :class="$style.content">
+      <slot>这是内容</slot>
+    </div>
+  </div>
 </template>
 
 <style module>
 .ContentBar {
+  display: v-bind(display);
   border-radius: 20px;
-  transform: translateX(v-bind(translateX));
+  transform: translateX(v-bind(translateX)) scale(v-bind(scale));
   transition: v-bind(transition);
   overflow: auto;
   scrollbar-width: thin;
@@ -104,11 +112,5 @@ onUnmounted(() => {
 .content {
   position: relative;
   z-index: 0;
-}
-</style>
-<style>
-.lovelymaid-pop-enter-from,
-.lovelymaid-pop-leave-to {
-  transform: translateX(v-bind(translateX)) scale(0);
 }
 </style>
