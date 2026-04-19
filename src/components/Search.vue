@@ -75,6 +75,7 @@ input {
   font-size: inherit;
   font-weight: inherit;
   caret-color: #3c86f6;
+  outline: 0px solid transparent;
   transition: outline .2s ease;
 }
 

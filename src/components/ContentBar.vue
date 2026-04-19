@@ -42,7 +42,7 @@ onUnmounted(() => {
 })
 
 // 切换 visilble
-const display = ref<string>('block')
+const display = ref<string>(props.visible ? 'block' : 'none')
 const scale = ref<string>('1')
 watch(() => props.visible, (newVisible) => {
   transition.value = 'transform .3s'

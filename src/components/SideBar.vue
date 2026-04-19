@@ -43,6 +43,9 @@ onUnmounted(() => {
   window.removeEventListener('resize', delayCalculateTransform)
 })
 
+// 计算侧边栏按钮平移距离
+const buttonTransformDistance = computed<string>(() => isOpen.value ? '0' : `${TransformDistance.value - ContainerWidth.value + 45}px`)
+
 // 切换 visilble
 const display = ref<string>('block')
 const scale = ref<string>('1')
@@ -65,7 +68,6 @@ watch(() => props.visible, (newVisible) => {
   <div ref="ContainerRef" :class="[$style.SideBar, 'lovelymaid-glass-container']">
     <div :class="$style.header">
       <div :class="[$style.SwitchButton, { [$style.close]: !isOpen }]" @click="switchSideBar"
-        :style="{ transform: isOpen ? 'translateX(0)' : `translateX(${TransformDistance - ContainerWidth + 45}px)` }"
         :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
         <span class="iconfont icon-sidebar_left"></span>
       </div>
@@ -99,6 +101,7 @@ watch(() => props.visible, (newVisible) => {
   border: none;
   border-radius: 15px;
   background-color: rgba(248, 248, 248, 0.9);
+  transform: translateX(v-bind(buttonTransformDistance));
   transition:
     transform .5s,
     box-shadow .5s;
