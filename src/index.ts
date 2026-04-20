@@ -3,14 +3,14 @@ import Button from './components/Button.vue'
 import ContentBar from './components/ContentBar.vue'
 import Drawer from './components/Drawer.vue'
 import FoldList from './components/FoldList.vue'
-import Search from './components/Search.vue'
+import Input from './components/Input.vue'
 import SideBar from './components/SideBar.vue'
 import TabBar from './components/TabBar.vue'
 
 import createAppRouter from './app-router/createAppRouter'
 
-import '@/assets/reset.css'
-import '@/assets/main.css'
+import '@/assets/styles/reset.css'
+import '@/assets/styles/main.css'
 import '@/assets/icons/iconfont.css'
 
 export {
@@ -19,7 +19,7 @@ export {
   ContentBar,
   Drawer,
   FoldList,
-  Search,
+  Input,
   SideBar,
   TabBar,
   createAppRouter

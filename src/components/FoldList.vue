@@ -56,7 +56,7 @@ watch(() => props.list, (newList) => {
       <div :class="$style.title">
         {{ props.title }}
       </div>
-      <span :class="['iconfont', 'icon-right-arrow']" :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
+      <span :class="['lovelymaid', 'lovelymaid-right-arrow']" :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
         :title="isOpen ? '收起列表' : '展开列表'" @click.stop="isOpen = !isOpen"></span>
     </div>
     <div :class="[$style.BodyContainer, { [$style.EnableTransition]: enableTransition }]"
@@ -137,7 +137,7 @@ watch(() => props.list, (newList) => {
 </style>
 
 <style scoped>
-.iconfont {
+.lovelymaid {
   font-size: 16px;
   color: #767676;
   font-weight: 700;

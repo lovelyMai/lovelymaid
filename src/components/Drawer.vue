@@ -25,7 +25,9 @@ const props = withDefaults(defineProps<Props>(), {
       <div :class="[$style.DrawerContainer, 'lovelymaid-common-container']" v-if="props.isOpen">
         <div :class="$style.header">
           <div :class="$style.title">{{ props.title }}</div>
-          <Button type="close" :class="$style.Button" :onClick="props.onCloseClick" title="关闭弹窗" />
+          <Button type="glass" :class="$style.Button" :onClick="props.onCloseClick" title="关闭弹窗" >
+            <span class="lovelymaid lovelymaid-close"></span>
+          </Button>
         </div>
         <div :class="$style.content">
           <slot>这是内容</slot>
@@ -95,8 +97,8 @@ const props = withDefaults(defineProps<Props>(), {
   right: 15px;
   width: 45px;
   height: 45px;
-  --font-size: 28px;
-  --font-weight: 600;
+  font-size: 28px;
+  font-weight: 600;
 }
 
 .content {

@@ -1,45 +1,44 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 5124876 */
-  src: url('iconfont.ttf?t=1770992826638') format('truetype');
+  font-family: "lovelymaid"; /* Project id 5124876 */
+  src: url('iconfont.ttf?t=1776689481987') format('truetype');
 }
 
-.iconfont {
-  font-family: "iconfont" !important;
-  font-size: 16px;
+.lovelymaid {
+  font-family: "lovelymaid" !important;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-search:before {
-  content: "\e6f8";
+.lovelymaid-search:before {
+  content: "\e64e";
 }
 
-.icon-info:before {
+.lovelymaid-info:before {
   content: "\e6de";
 }
 
-.icon-sidebar_left:before {
+.lovelymaid-sidebar_left:before {
   content: "\e898";
 }
 
-.icon-right-arrow:before {
+.lovelymaid-right-arrow:before {
   content: "\e629";
 }
 
-.icon-clear:before {
+.lovelymaid-clear:before {
   content: "\e600";
 }
 
-.icon-left-arrow:before {
+.lovelymaid-left-arrow:before {
   content: "\e899";
 }
 
-.icon-gou:before {
+.lovelymaid-gou:before {
   content: "\e630";
 }
 
-.icon-close:before {
+.lovelymaid-close:before {
   content: "\e62d";
 }
 

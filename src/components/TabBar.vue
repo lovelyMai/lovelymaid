@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 import Button from './Button.vue'
-import Search from './Search.vue'
+import Input from './Input.vue'
 
 import { watchRef } from '../utils/common';
 import { getLayoutLeftInViewport } from '../utils/getOffsetInViewport';
@@ -241,8 +241,12 @@ defineExpose({
       </ul>
     </div>
     <div :class="[$style.search, { [$style.active]: searchIsActive }]" v-if="props.showSearch">
-      <Button type="search" :class="$style.Button" v-show="!searchIsShow" :onClick="clickSearch" />
-      <Search :class="[$style.Search, 'lovelymaid-glass-container']" v-show="searchIsShow" />
+      <Button type="glass" :class="$style.Button" v-show="!searchIsShow" :onClick="clickSearch">
+        <span class="lovelymaid lovelymaid-search button"></span>
+      </Button>
+      <Input :class="$style.Search" v-show="searchIsShow" enterkeyhint="search">
+        <span class="lovelymaid lovelymaid-search input"></span>
+      </Input>
     </div>
   </div>
 </template>
@@ -333,12 +337,11 @@ defineExpose({
 .search .Button {
   width: 100%;
   height: 100%;
-  --font-size: calc(v-bind(barHeight) * 1px / 3);
-  --transform: translateY(-1px);
 }
 
 .search .Search {
   height: 100%;
+  --font-size: 18px;
 }
 
 .slide {
@@ -354,5 +357,14 @@ defineExpose({
   box-shadow: v-bind(boxShadow);
   transform: translateX(calc(v-bind(targetPos) * 1px)) scale(v-bind(slideScale));
   transition: v-bind(slideTransition);
+}
+</style>
+<style scoped>
+.button.lovelymaid-search {
+  font-size: calc(v-bind(barHeight) * 0.4px);
+}
+
+.input.lovelymaid-search {
+  font-size: 24px;
 }
 </style>

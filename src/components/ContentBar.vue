@@ -63,7 +63,9 @@ watch(() => props.visible, (newVisible) => {
   <div :class="[$style.ContentBar, 'lovelymaid-glass-container']" ref="ContainerRef">
     <div :class="$style.header">
       <div :class="$style.title" :title="props.title">{{ props.title }}</div>
-      <Button type="close" :class="$style.Button" :onClick="props.onCloseClick" title="收起内容栏" />
+      <Button type="glass" :class="$style.Button" :onClick="props.onCloseClick" title="收起内容栏">
+        <span class="lovelymaid lovelymaid-close"></span>
+      </Button>
     </div>
     <div :class="$style.content">
       <slot>这是内容</slot>
@@ -106,7 +108,7 @@ watch(() => props.visible, (newVisible) => {
 
 .Button {
   margin-top: 5px;
-  --font-size: 20px;
+  font-size: 20px;
 }
 
 .content {

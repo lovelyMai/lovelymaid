@@ -69,7 +69,7 @@ watch(() => props.visible, (newVisible) => {
     <div :class="$style.header">
       <div :class="[$style.SwitchButton, { [$style.close]: !isOpen }]" @click="switchSideBar"
         :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
-        <span class="iconfont icon-sidebar_left"></span>
+        <span class="lovelymaid lovelymaid-sidebar_left"></span>
       </div>
     </div>
     <slot>这是内容</slot>
@@ -119,7 +119,7 @@ watch(() => props.visible, (newVisible) => {
 }
 </style>
 <style scoped>
-.icon-sidebar_left {
+.lovelymaid-sidebar_left {
   font-size: 20px;
   color: #19191a;
 }

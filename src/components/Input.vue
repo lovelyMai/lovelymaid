@@ -1,0 +1,132 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+
+import { watchRef } from '../utils/common'
+
+interface Props {
+  /** 输入框提示词 */
+  placeholder?: string
+  /** 移动端键盘回车图标 */
+  enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send" | undefined
+  /** 获得当前输入值 */
+  onChange?: (inputValue: string) => void
+  /** 回车搜索事件 */
+  onEnter?: (inputValue: string) => void
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  placeholder: '搜索...'
+});
+
+// 初始化
+const ContainerRef = ref<HTMLElement | null>(null)
+const searchHeight = ref<string>('0')
+onMounted(() => watchRef(ContainerRef, () => {
+  searchHeight.value = `${ContainerRef.value!.offsetHeight}px`
+}, true))
+
+// 输入值改变事件
+const InputRef = ref<HTMLElement | null>(null)
+const inputValue = ref<string>('')
+const onInputChange = (e: Event) => {
+  inputValue.value = (e.target as HTMLInputElement).value
+  props.onChange?.(inputValue.value)
+}
+const onInputClear = () => {
+  inputValue.value = ''
+  props.onChange?.(inputValue.value)
+  InputRef.value?.focus()
+}
+
+// 中文输入法下回车防止搜索
+let isComposing = false;
+const compositionend = async () => {
+  await new Promise(resolve => setTimeout(resolve, 100))
+  isComposing = false;
+};
+const compositionstart = () => {
+  isComposing = true;
+};
+
+// 回车搜索事件
+const enter = async (inputValue: string) => {
+  if (isComposing) return
+  props.onEnter?.(inputValue)
+}
+
+// 暴露方法
+defineExpose({
+  focus: () => InputRef.value?.focus(),
+  blur: () => InputRef.value?.blur(),
+})
+</script>
+
+<template>
+  <div :class="[$style.Input, 'lovelymaid-glass-container']" ref="ContainerRef">
+    <div :class="$style.icon">
+      <slot></slot>
+    </div>
+    <input ref="InputRef" :value="inputValue" @input="onInputChange" @keyup.enter.prevent="enter(inputValue)" :enterkeyhint="props.enterkeyhint"
+      @compositionend="compositionend" @compositionstart="compositionstart" type="text"
+      :placeholder="props.placeholder" />
+    <span v-if="inputValue" class="lovelymaid lovelymaid-clear" @click.stop="onInputClear"></span>
+  </div>
+</template>
+
+<style module>
+.Input {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 35px;
+  border-radius: calc(v-bind(searchHeight) / 2);
+  --font-size: 14px;
+  --font-weight: 400;
+  --clear-color: #767676;
+  --placeholder-color: #544957;
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  width: v-bind(searchHeight);
+  height: 100%;
+  font-size: calc(v-bind(searchHeight) / 3);
+  color: #19191a;
+}
+</style>
+<style scoped>
+input {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  border-radius: calc(v-bind(searchHeight) / 2);
+  padding: 0 v-bind(searchHeight);
+  font-size: var(--font-size);
+  font-weight: var(--font-weight);
+  caret-color: #3c86f6;
+  outline: 0px solid transparent;
+  transition: outline .2s ease;
+}
+
+input::placeholder {
+  font-size: var(--font-size);
+  font-weight: var(--font-weight);
+  color: var(--placeholder-color);
+}
+
+input:focus {
+  outline: 3px solid #94bbf0;
+}
+
+.lovelymaid-clear {
+  position: absolute;
+  right: calc(v-bind(searchHeight) / 3);
+  font-size: calc(v-bind(searchHeight) / 3);
+  color: var(--clear-color);
+  cursor: pointer;
+}
+</style>
