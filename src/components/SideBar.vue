@@ -31,7 +31,6 @@ const calculateTransform = () => {
   if (!ContainerRef.value) return
   ContainerWidth.value = ContainerRef.value.offsetWidth
   TransformDistance.value = getLayoutLeftInViewport(ContainerRef.value) + ContainerWidth.value + 10
-  console.log(getLayoutLeftInViewport(ContainerRef.value), ContainerWidth.value);
 }
 const delayCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
@@ -44,7 +43,7 @@ onUnmounted(() => {
 })
 
 // 计算侧边栏按钮平移距离
-const buttonTransformDistance = computed<string>(() => isOpen.value ? '0' : `${TransformDistance.value - ContainerWidth.value + 45}px`)
+const buttonTransformDistance = computed<string>(() => isOpen.value ? '0' : `${TransformDistance.value - ContainerWidth.value + 55}px`)
 
 // 切换 visilble
 const display = ref<string>('block')
@@ -86,7 +85,7 @@ watch(() => props.visible, (newVisible) => {
 
 .header {
   position: relative;
-  height: 40px;
+  height: 50px;
 }
 
 .SwitchButton {
@@ -94,8 +93,8 @@ watch(() => props.visible, (newVisible) => {
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 10px;
+  right: 10px;
   width: 35px;
   height: 30px;
   border: none;
