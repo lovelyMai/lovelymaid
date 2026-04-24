@@ -62,7 +62,7 @@ watch(() => props.list, (newList) => {
     <div :class="[$style.BodyContainer, { [$style.EnableTransition]: enableTransition }]"
       :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
       <ul ref="bodyRef" :class="[$style.body, { [$style.close]: !isOpen }]">
-        <li v-for="(item, index) in props.list" :key="index" @click.stop="() => onItemClick?.(item, index)"
+        <li v-for="(item, index) in props.list" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
           :style="{ '--translateY': `${slideCount[index] * 100}%` }" @animationend="() => slideAnimating = false"
           :class="{ [$style.active]: index === props.activeIndex, [$style.slideAnimation]: slideAnimating }">
           <slot :item="item" :index="index">{{ item.name }}</slot>
@@ -85,7 +85,7 @@ watch(() => props.list, (newList) => {
   color: #767676;
   font-weight: 500;
 }
-
+ 
 .BodyContainer {
   overflow: hidden;
 }

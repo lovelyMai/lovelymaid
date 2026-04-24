@@ -4,44 +4,33 @@ const calculateOffsets = <T extends { id: string }>(
 ): number[] => {
   const result: number[] = new Array(newList.length);
 
-  // 创建映射
-  const oldIdSet = new Set<string>();
   const oldIndexMap = new Map<string, number>();
   for (let i = 0; i < oldList.length; i++) {
-    const id = oldList[i].id;
-    oldIdSet.add(id);
-    oldIndexMap.set(id, i);
+    oldIndexMap.set(oldList[i].id, i);
   }
 
-  // 跟踪oldList中哪些位置已处理
-  const processedOld = new Array(oldList.length).fill(false);
-  let addedCount = 0;
+  let lastExistingOldIndex = -1;
 
   for (let i = 0; i < newList.length; i++) {
     const id = newList[i].id;
+    const oldIndex = oldIndexMap.get(id);
 
-    if (!oldIdSet.has(id)) {
-      // 新增项
-      addedCount++;
-      result[i] = -addedCount;
+    if (oldIndex !== undefined) {
+      // 已存在的元素
+      result[i] = oldIndex - i;
+      lastExistingOldIndex = oldIndex;
     } else {
-      // 已存在项
-      const oldIdx = oldIndexMap.get(id)!;
-      processedOld[oldIdx] = true;
-
-      // 计算删除数量：统计oldIdx之前未处理的项
-      let deletedCount = 0;
-      for (let j = 0; j < oldIdx; j++) {
-        if (!processedOld[j]) {
-          deletedCount++;
-        }
+      // 新增元素
+      if (lastExistingOldIndex === -1) {
+        // 前面没有任何原数组元素，使用 -1 作为虚拟索引
+        result[i] = -1 - i;
+      } else {
+        result[i] = lastExistingOldIndex - i;
       }
-
-      result[i] = deletedCount - addedCount;
     }
   }
 
   return result;
 };
 
-export default calculateOffsets;
+export default calculateOffsets
