@@ -26,16 +26,22 @@ const bodyRef = ref<HTMLElement | null>(null)
 const enableTransition = ref(false)
 const calculateHeight = async () => {
   await nextTick()
-  if (bodyRef.value) bodyHeight.value = bodyRef.value!.offsetHeight
+  if (bodyRef.value) {
+    bodyHeight.value = bodyRef.value!.offsetHeight
+  }
 }
 const initialize = async () => {
   await calculateHeight()
-  setTimeout(() => enableTransition.value = true, 100)
+  setTimeout(() => {
+    enableTransition.value = true
+  }, 100)
 }
 onMounted(() => {
   initialize()
 })
-watch(() => props.list.length, async () => await calculateHeight())
+watch(() => props.list.length, async () => {
+  await calculateHeight()
+})
 
 // 列表项动画
 const slideCount = ref<number[]>([])
@@ -56,8 +62,9 @@ watch(() => props.list, (newList) => {
       <div :class="$style.title">
         {{ props.title }}
       </div>
-      <span :class="['lovelymaid', 'lovelymaid-right-arrow']" :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
-        :title="isOpen ? '收起列表' : '展开列表'" @click.stop="isOpen = !isOpen"></span>
+      <span :class="['lovelymaid', 'lovelymaid-right-arrow']"
+        :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }" :title="isOpen ? '收起列表' : '展开列表'"
+        @click.stop="isOpen = !isOpen"></span>
     </div>
     <div :class="[$style.BodyContainer, { [$style.EnableTransition]: enableTransition }]"
       :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
@@ -85,7 +92,7 @@ watch(() => props.list, (newList) => {
   color: #767676;
   font-weight: 500;
 }
- 
+
 .BodyContainer {
   overflow: hidden;
 }

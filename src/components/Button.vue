@@ -26,7 +26,8 @@ onMounted(() => watchRef(ButtonRef, () => {
 </script>
 
 <template>
-  <div ref="ButtonRef" :class="[$style.Button, { 'lovelymaid-glass-container': props.type === 'glass' }]"
+  <div ref="ButtonRef"
+    :class="[$style.Button, { 'common': props.type === 'common', 'lovelymaid-glass-container': props.type === 'glass' }]"
     @click="props.onClick" :title="props.title">
     <slot></slot>
   </div>
@@ -39,7 +40,6 @@ onMounted(() => watchRef(ButtonRef, () => {
   align-items: center;
   width: 30px;
   height: 30px;
-  background-color: #3b86f7;
   border-radius: calc(v-bind(ButtonHeight) / 2);
   cursor: pointer;
   touch-action: none;
@@ -47,6 +47,10 @@ onMounted(() => watchRef(ButtonRef, () => {
   font-size: v-bind(fontSize);
   font-weight: 500;
   color: #19191a;
+}
+
+.Button.common {
+  background-color: #3b86f7;
 }
 
 .Button:active {
