@@ -8,7 +8,7 @@ interface Props {
   /** 要渲染的列表 */
   list?: { id: string, name: string }[]
   /** 激活项索引 */
-  activeIndex?: number
+  activeId?: string
   /** 头部点击事件 */
   onHeaderClick?: () => void
   /** 列表项点击事件 */
@@ -73,8 +73,8 @@ watch(() => props.list, (newList) => {
       :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
       <ul ref="bodyRef" :class="[$style.body, { [$style.close]: !isOpen }]">
         <li v-for="(item, index) in props.list" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
-          :style="{ '--translateY': `${slideCount[index] * 100}%` }" @animationend="() => slideAnimating = false"
-          :class="{ [$style.active]: index === props.activeIndex, [$style.slideAnimation]: slideAnimating }">
+          :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }" @animationend="() => slideAnimating = false"
+          :class="{ [$style.active]: item.id === props.activeId, [$style.slideAnimation]: slideAnimating }">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>
       </ul>
@@ -115,7 +115,7 @@ watch(() => props.list, (newList) => {
 }
 
 .body li {
-  height: 30px;
+  position: relative;
   padding: 0 10px;
   border-radius: 6px;
   font-size: 14px;
