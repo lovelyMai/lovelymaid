@@ -4,6 +4,8 @@ import { onMounted, ref } from 'vue'
 import { watchRef } from '../utils/common'
 
 interface Props {
+  /** 输入框类型 */
+  type?: "text" | "password"
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
@@ -15,6 +17,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  type: 'text',
   placeholder: '搜索...'
 });
 
@@ -66,9 +69,9 @@ defineExpose({
     <div :class="$style.icon">
       <slot></slot>
     </div>
-    <input ref="InputRef" :value="inputValue" @input="onInputChange" @keyup.enter.prevent="enter(inputValue)" :enterkeyhint="props.enterkeyhint"
-      @compositionend="compositionend" @compositionstart="compositionstart" type="text"
-      :placeholder="props.placeholder" />
+    <input :type="props.type" ref="InputRef" :value="inputValue" @input="onInputChange"
+      @keyup.enter.prevent="enter(inputValue)" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
+      @compositionstart="compositionstart" :placeholder="props.placeholder" />
     <span v-if="inputValue" class="lovelymaid lovelymaid-clear" @click.stop="onInputClear"></span>
   </div>
 </template>

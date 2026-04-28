@@ -46,10 +46,13 @@ watch(() => props.list.length, async () => {
 // 列表项动画
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
-const oldList = ref<{ id: string, name: string }[]>([...props.list])
+const oldList = ref<{ id: string, name: string }[] | undefined>(undefined)
 watch(() => props.list, (newList) => {
+  if (!oldList.value) {
+    oldList.value = [...newList]
+  }
   if (enableTransition.value) {
-    slideCount.value = getSlideCount(newList, oldList.value)
+    slideCount.value = getSlideCount(newList, oldList.value as [])
     slideAnimating.value = true
     oldList.value = [...newList]
   }

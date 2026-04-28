@@ -27,7 +27,7 @@ onMounted(() => watchRef(ButtonRef, () => {
 
 <template>
   <div ref="ButtonRef"
-    :class="[$style.Button, { 'common': props.type === 'common', 'lovelymaid-glass-container': props.type === 'glass' }]"
+    :class="[$style.Button, { [$style.common]: props.type === 'common', 'lovelymaid-glass-container': props.type === 'glass' }]"
     @click="props.onClick" :title="props.title">
     <slot></slot>
   </div>
