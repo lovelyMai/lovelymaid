@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import { debounce } from '@/utils/common'
 
@@ -19,18 +19,22 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 输入值改变事件
-const InputRef = ref<HTMLTextAreaElement | null>(null)
+const TextAreaRef = ref<HTMLTextAreaElement | null>(null)
 const inputValue = ref<string>('')
 const autoResize = debounce(() => {
-  InputRef.value!.style.height = 'auto'
-  const newHeight = InputRef.value!.scrollHeight
-  InputRef.value!.style.height = `${newHeight + 2}px`
+  TextAreaRef.value!.style.height = 'auto'
+  const newHeight = TextAreaRef.value!.scrollHeight
+  console.log(newHeight)
+  TextAreaRef.value!.style.height = `${newHeight}px`
 }, 16)
 const onInputChange = (e: Event) => {
   inputValue.value = (e.target as HTMLTextAreaElement).value
   props.onChange?.(inputValue.value)
   autoResize()
 }
+onMounted(() => {
+  autoResize()
+})
 
 // 中文输入法下回车防止搜索
 let isComposing = false;
@@ -53,24 +57,40 @@ const enter = (e: KeyboardEvent) => {
 
 // 暴露方法
 defineExpose({
-  focus: () => InputRef.value?.focus(),
-  blur: () => InputRef.value?.blur(),
+  focus: () => TextAreaRef.value?.focus(),
+  blur: () => TextAreaRef.value?.blur(),
 })
 </script>
 
 <template>
-  <textarea class="lovelymaid-glass-container" ref="InputRef" :value="inputValue" @input="onInputChange"
-    @keydown="enter" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
-    @compositionstart="compositionstart" :placeholder="props.placeholder" />
+  <div :class="[$style.container, 'lovelymaid-glass-container']" ref="ContainerRef">
+    <textarea rows="1" ref="TextAreaRef" :value="inputValue" @input="onInputChange" @keydown="enter"
+      :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
+      :placeholder="props.placeholder" />
+  </div>
 </template>
 
+<style module>
+.container {
+  border-radius: 20px;
+  --min-height: auto;
+  --max-height: auto;
+  --font-size: 14px;
+  --font-weight: 400;
+  --placeholder-color: #544957;
+}
+</style>
 <style scoped>
 textarea {
-  min-height: 55px;
-  max-height: 120px;
+  display: block;
+  width: 100%;
+  min-height: var(--min-height);
+  max-height: var(--max-height);
   padding: 12px;
-  border-radius: 18px;
-  font-size: 14px;
+  background-color: transparent;
+  border-radius: 20px;
+  font-size: var(--font-size);
+  font-weight: var(--font-weight);
   caret-color: #3c86f6;
   outline: 0px solid transparent;
   transition: outline .2s ease;
@@ -80,8 +100,8 @@ textarea {
 }
 
 textarea::placeholder {
-  font-size: 14px;
-  color: #544957;
+  font-size: var(--font-size);
+  color: var(--placeholder-color);
 }
 
 textarea:focus {
