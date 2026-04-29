@@ -9,7 +9,7 @@ interface Props {
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
-  enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send" | undefined
+  enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   /** 获得当前输入值 */
   onChange?: (inputValue: string) => void
   /** 回车搜索事件 */
@@ -18,14 +18,14 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
-  placeholder: '搜索...'
+  placeholder: '输入...'
 });
 
 // 初始化
 const ContainerRef = ref<HTMLElement | null>(null)
 const searchHeight = ref<string>('0')
 onMounted(() => watchRef(ContainerRef, () => {
-  searchHeight.value = `${ContainerRef.value!.offsetHeight}px`
+  searchHeight.value = `${ContainerRef.value!.offsetHeight - 2}px`
 }, true))
 
 // 输入值改变事件
@@ -51,7 +51,7 @@ const compositionstart = () => {
   isComposing = true;
 };
 
-// 回车搜索事件
+// 回车事件
 const enter = async (inputValue: string) => {
   if (isComposing) return
   props.onEnter?.(inputValue)
@@ -67,10 +67,10 @@ defineExpose({
 <template>
   <div :class="[$style.Input, 'lovelymaid-glass-container']" ref="ContainerRef">
     <div :class="$style.icon">
-      <slot></slot>
+      <slot><span class="lovelymaid lovelymaid-search"></span></slot>
     </div>
     <input :type="props.type" ref="InputRef" :value="inputValue" @input="onInputChange"
-      @keyup.enter.prevent="enter(inputValue)" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
+      @keydown.enter.prevent="enter(inputValue)" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
       @compositionstart="compositionstart" :placeholder="props.placeholder" />
     <span v-if="inputValue" class="lovelymaid lovelymaid-clear" @click.stop="onInputClear"></span>
   </div>

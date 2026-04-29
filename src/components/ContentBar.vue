@@ -31,14 +31,14 @@ const calculateTransform = () => {
   if (!ContainerRef.value) return
   transformDistance.value = getLayoutLeftInViewport(ContainerRef.value) + ContainerRef.value.offsetWidth + 10
 }
-const delayCalculateTransform = debounce(calculateTransform, 100)
+const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
   calculateTransform()
   setTimeout(() => transition.value = 'transform .5s', 100)
-  window.addEventListener('resize', delayCalculateTransform)
+  window.addEventListener('resize', debounceCalculateTransform)
 })
 onUnmounted(() => {
-  window.removeEventListener('resize', delayCalculateTransform)
+  window.removeEventListener('resize', debounceCalculateTransform)
 })
 
 // 切换 visilble

@@ -88,6 +88,7 @@ watch(() => props.list, (newList) => {
   justify-content: space-between;
   align-items: center;
   height: 30px;
+  cursor: pointer;
 }
 
 .title {
@@ -124,6 +125,7 @@ watch(() => props.list, (newList) => {
   overflow: hidden;
   text-overflow: ellipsis;
   transition: all .2s;
+  cursor: pointer;
 }
 
 .active {

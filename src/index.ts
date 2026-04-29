@@ -6,6 +6,7 @@ import FoldList from './components/FoldList.vue'
 import Input from './components/Input.vue'
 import SideBar from './components/SideBar.vue'
 import TabBar from './components/TabBar.vue'
+import TextArea from './components/TextArea.vue'
 
 import createAppRouter from './app-router/createAppRouter'
 
@@ -22,5 +23,6 @@ export {
   Input,
   SideBar,
   TabBar,
+  TextArea,
   createAppRouter
 }
