@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
-import { debounce } from '@/utils/common'
-
 interface Props {
   /** 输入框提示词 */
   placeholder?: string
@@ -21,12 +19,11 @@ const props = withDefaults(defineProps<Props>(), {
 // 输入值改变事件
 const TextAreaRef = ref<HTMLTextAreaElement | null>(null)
 const inputValue = ref<string>('')
-const autoResize = debounce(() => {
+const autoResize = () => {
   TextAreaRef.value!.style.height = 'auto'
   const newHeight = TextAreaRef.value!.scrollHeight
-  console.log(newHeight)
   TextAreaRef.value!.style.height = `${newHeight}px`
-}, 16)
+}
 const onInputChange = (e: Event) => {
   inputValue.value = (e.target as HTMLTextAreaElement).value
   props.onChange?.(inputValue.value)
@@ -72,9 +69,10 @@ defineExpose({
 
 <style module>
 .container {
-  border-radius: 20px;
+  border-radius: var(--border-radius);
   --min-height: auto;
   --max-height: auto;
+  --border-radius: 20px;
   --font-size: 14px;
   --font-weight: 400;
   --placeholder-color: #544957;
@@ -88,7 +86,7 @@ textarea {
   max-height: var(--max-height);
   padding: 12px;
   background-color: transparent;
-  border-radius: 20px;
+  border-radius: calc(var(--border-radius) - 1px);
   font-size: var(--font-size);
   font-weight: var(--font-weight);
   caret-color: #3c86f6;

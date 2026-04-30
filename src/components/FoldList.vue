@@ -125,7 +125,6 @@ watch(() => props.list, (newList) => {
   overflow: hidden;
   text-overflow: ellipsis;
   transition: all .2s;
-  cursor: pointer;
 }
 
 .active {

@@ -23,9 +23,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 初始化
 const ContainerRef = ref<HTMLElement | null>(null)
-const searchHeight = ref<string>('0')
+const containerHeight = ref<string>('0')
+const inputHeight = ref<string>('0')
 onMounted(() => watchRef(ContainerRef, () => {
-  searchHeight.value = `${ContainerRef.value!.offsetHeight - 2}px`
+  const offsetHeight = ContainerRef.value!.offsetHeight
+  containerHeight.value = `${offsetHeight}px`
+  inputHeight.value = `${offsetHeight - 2}px`
 }, true))
 
 // 输入值改变事件
@@ -82,7 +85,7 @@ defineExpose({
   align-items: center;
   position: relative;
   height: 35px;
-  border-radius: calc(v-bind(searchHeight) / 2);
+  border-radius: calc(v-bind(containerHeight) / 2);
   --font-size: 14px;
   --font-weight: 400;
   --clear-color: #767676;
@@ -95,9 +98,9 @@ defineExpose({
   align-items: center;
   position: absolute;
   left: 0;
-  width: v-bind(searchHeight);
+  width: v-bind(inputHeight);
   height: 100%;
-  font-size: calc(v-bind(searchHeight) / 3);
+  font-size: calc(v-bind(inputHeight) / 3);
   color: #19191a;
 }
 </style>
@@ -106,8 +109,8 @@ input {
   width: 100%;
   height: 100%;
   background-color: transparent;
-  border-radius: calc(v-bind(searchHeight) / 2);
-  padding: 0 v-bind(searchHeight);
+  border-radius: calc(v-bind(inputHeight) / 2);
+  padding: 0 v-bind(inputHeight);
   font-size: var(--font-size);
   font-weight: var(--font-weight);
   caret-color: #3c86f6;
@@ -127,8 +130,8 @@ input:focus {
 
 .lovelymaid-clear {
   position: absolute;
-  right: calc(v-bind(searchHeight) / 3);
-  font-size: calc(v-bind(searchHeight) / 3);
+  right: calc(v-bind(inputHeight) / 3);
+  font-size: calc(v-bind(inputHeight) / 3);
   color: var(--clear-color);
   cursor: pointer;
 }

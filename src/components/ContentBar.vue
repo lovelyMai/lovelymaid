@@ -100,6 +100,7 @@ watch(() => props.visible, (newVisible) => {
   height: 30px;
   margin-top: 10px;
   font-size: 16px;
+  font-weight: 500;
   line-height: 30px;
   overflow: hidden;
   text-overflow: ellipsis;
