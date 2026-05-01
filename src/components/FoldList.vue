@@ -101,7 +101,7 @@ watch(() => props.list, (newList) => {
   overflow: hidden;
 }
 
-.EnableTransition {
+.BodyContainer.EnableTransition {
   transition: height .5s ease;
 }
 

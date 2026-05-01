@@ -113,6 +113,7 @@ watch(() => props.visible, (newVisible) => {
 }
 
 .content {
+  display: flow-root;
   position: relative;
   z-index: 0;
 }

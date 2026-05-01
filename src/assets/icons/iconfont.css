@@ -1,13 +1,18 @@
 @font-face {
   font-family: "lovelymaid"; /* Project id 5124876 */
-  src: url('iconfont.ttf?t=1776689481987') format('truetype');
+  src: url('iconfont.ttf?t=1777622576704') format('truetype');
 }
 
 .lovelymaid {
   font-family: "lovelymaid" !important;
+  font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.lovelymaid-ellipsis:before {
+  content: "\e608";
 }
 
 .lovelymaid-search:before {
