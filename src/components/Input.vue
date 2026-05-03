@@ -73,7 +73,7 @@ defineExpose({
       <slot><span class="lovelymaid lovelymaid-search"></span></slot>
     </div>
     <input :type="props.type" ref="InputRef" :value="inputValue" @input="onInputChange"
-      @keydown.enter.prevent="enter(inputValue)" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
+      @keydown.enter="enter(inputValue)" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
       @compositionstart="compositionstart" :placeholder="props.placeholder" />
     <span v-if="inputValue" class="lovelymaid lovelymaid-clear" @click.stop="onInputClear"></span>
   </div>

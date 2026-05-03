@@ -108,7 +108,6 @@ watch(() => props.list, (newList) => {
 .body {
   transform: translateY(0);
   transition: transform .5s ease;
-  transition-delay: 0.032s;
 }
 
 .close {

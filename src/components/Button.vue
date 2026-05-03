@@ -17,11 +17,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 计算字体大小
 const ButtonRef = ref<any>(null)
-const ButtonHeight = ref<string>('')
+const borderRadius = ref<string>('')
 const fontSize = ref<string>('0')
 onMounted(() => watchRef(ButtonRef, () => {
-  ButtonHeight.value = `${ButtonRef.value.offsetHeight}px`
-  fontSize.value = `${ButtonRef.value.offsetWidth / 2}px`
+  const shorter = Math.min(ButtonRef.value.offsetHeight, ButtonRef.value.offsetWidth)
+  borderRadius.value = `${shorter / 2}px`
+  fontSize.value = `${shorter / 2}px`
 }, true))
 </script>
 
@@ -40,17 +41,18 @@ onMounted(() => watchRef(ButtonRef, () => {
   align-items: center;
   width: 30px;
   height: 30px;
-  border-radius: calc(v-bind(ButtonHeight) / 2);
+  border-radius: v-bind(borderRadius);
   cursor: pointer;
   touch-action: none;
   transition: transform .2s;
   font-size: v-bind(fontSize);
   font-weight: 500;
   color: #19191a;
+  --background-color: #3b86f7;
 }
 
 .Button.common {
-  background-color: #3b86f7;
+  background-color: var(--background-color);
 }
 
 .Button:active {

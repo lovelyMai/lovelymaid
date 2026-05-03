@@ -87,6 +87,7 @@ watch(() => props.visible, (newVisible) => {
   display: flex;
   justify-content: space-between;
   position: sticky;
+  gap: 5px;
   top: 0;
   z-index: 1;
   height: 0;
@@ -97,6 +98,7 @@ watch(() => props.visible, (newVisible) => {
 
 .title {
   flex: 1;
+  min-width: 0;
   height: 30px;
   margin-top: 10px;
   font-size: 16px;
