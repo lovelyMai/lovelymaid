@@ -13,14 +13,16 @@ const props = defineProps<Props>()
 const isPop = ref<boolean>(false)
 const popX = ref<number>(0)
 const popY = ref<number>(0)
-const clickIcon = (e: any) => {
+const clickIcon = (e1: any) => {
   if (isPop.value) return
   isPop.value = true
-  const rect = e.target.getBoundingClientRect()
-  popX.value = rect.left + e.offsetX + e.target.offsetWidth / 2
-  popY.value = rect.top + e.offsetY + e.target.offsetHeight / 2
-  const closePop = (e: any) => {
-    e.stopPropagation()
+  const rect = e1.target.getBoundingClientRect()
+  popX.value = rect.left + e1.offsetX + e1.target.offsetWidth / 2
+  popY.value = rect.top + e1.offsetY + e1.target.offsetHeight / 2
+  const closePop = (e2: any) => {
+    if (e1.target === e2.target) {
+      e2.stopPropagation()
+    }
     isPop.value = false
     document.removeEventListener('click', closePop, true)
   }
