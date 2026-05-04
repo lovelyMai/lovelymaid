@@ -19,13 +19,12 @@ const clickIcon = (e: any) => {
   const rect = e.target.getBoundingClientRect()
   popX.value = rect.left + e.offsetX + e.target.offsetWidth / 2
   popY.value = rect.top + e.offsetY + e.target.offsetHeight / 2
-  const closePop = () => {
+  const closePop = (e: any) => {
+    e.stopPropagation()
     isPop.value = false
-    e.target.removeEventListener('click', closePop)
-    document.removeEventListener('click', closePop)
+    document.removeEventListener('click', closePop, true)
   }
-  e.target.addEventListener('click', closePop)
-  document.addEventListener('click', closePop)
+  document.addEventListener('click', closePop, true)
 }
 </script>
 
