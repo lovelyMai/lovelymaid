@@ -7,18 +7,19 @@ import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
 interface Props {
   /** 是否显示 */
   visible?: boolean;
+  /** 是否展开 */
+  isOpen?: boolean
   /** 切换按钮点击事件 */
-  onSwitch?: (value: boolean) => void;
+  onSwitch?: () => void;
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true,
+  isOpen: true
 })
 
 // 侧边栏开关状态
-const isOpen = ref<boolean>(true);
 const switchSideBar = () => {
-  isOpen.value = !isOpen.value;
-  props.onSwitch?.(isOpen.value);
+  props.onSwitch?.();
 }
 
 // 计算侧边栏平移距离
@@ -26,7 +27,7 @@ const ContainerRef = ref<HTMLElement | null>(null)
 const ContainerWidth = ref<number>(0)
 const transition = ref<string>('none')
 const TransformDistance = ref<number>(0)
-const translateX = computed<string>(() => isOpen.value ? '0' : `${-TransformDistance.value}px`)
+const translateX = computed<string>(() => props.isOpen ? '0' : `${-TransformDistance.value}px`)
 const calculateTransform = () => {
   if (!ContainerRef.value) return
   ContainerWidth.value = ContainerRef.value.offsetWidth
@@ -43,7 +44,7 @@ onUnmounted(() => {
 })
 
 // 计算侧边栏按钮平移距离
-const buttonTransformDistance = computed<string>(() => isOpen.value ? '0' : `${TransformDistance.value - ContainerWidth.value + 55}px`)
+const buttonTransformDistance = computed<string>(() => props.isOpen ? '0' : `${TransformDistance.value - ContainerWidth.value + 55}px`)
 
 // 切换 visilble
 const display = ref<string>('block')
@@ -66,7 +67,7 @@ watch(() => props.visible, (newVisible) => {
 <template>
   <div ref="ContainerRef" :class="[$style.SideBar, 'lovelymaid-glass-container']">
     <div :class="$style.header">
-      <div :class="[$style.SwitchButton, { [$style.close]: !isOpen }]" @click="switchSideBar"
+      <div :class="[$style.SwitchButton, { [$style.close]: !props.isOpen }]" @click="switchSideBar"
         :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
         <span class="lovelymaid lovelymaid-sidebar_left"></span>
       </div>

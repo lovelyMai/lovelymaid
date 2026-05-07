@@ -41,7 +41,7 @@ let slideCenter: number
 onMounted(() => {
   cleanup = watchRef(BarRef, () => {
     barHeight.value = BarRef.value!.offsetHeight
-    barWidth.value = props.showSearch ? BarRef.value!.offsetWidth - barHeight.value - 5 : BarRef.value!.offsetWidth - 5
+    barWidth.value = props.showSearch ? BarRef.value!.offsetWidth - barHeight.value - 5 : BarRef.value!.offsetWidth
     searchWidth.value = BarRef.value!.offsetWidth - barHeight.value * 0.8 - 5
     borderRadius.value = barHeight.value / 2
     slideWidth.value = (barWidth.value - 6) / listLength.value
@@ -257,6 +257,8 @@ defineExpose({
   gap: 5px;
   height: 50px;
   font-size: 8px;
+  user-select: none;
+  -webkit-user-select: none;
   --top-color: #0067EC;
 }
 
