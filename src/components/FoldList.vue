@@ -6,13 +6,13 @@ interface Props {
   /** 标题 */
   title?: string
   /** 要渲染的列表 */
-  list?: { id: string, name: string }[]
+  list?: { id: string, name: string, [key: string]: any }[]
   /** 激活项索引 */
   activeId?: string
   /** 头部点击事件 */
   onHeaderClick?: () => void
   /** 列表项点击事件 */
-  onItemClick?: (item: { id: string, name: string }, index: number) => void
+  onItemClick?: (item: { id: string, name: string, [key: string]: any }, index: number) => void
 }
 const props = withDefaults(defineProps<Props>(), {
   title: '标题',

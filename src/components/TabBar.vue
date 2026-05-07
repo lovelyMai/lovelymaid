@@ -9,9 +9,9 @@ import { getLayoutLeftInViewport } from '../utils/getOffsetInViewport';
 
 interface Props {
   /** 列表 */
-  list: string[]
+  list: { name?: string, [key: string]: any }[]
   /** 列表项点击事件 */
-  onItemClick?: (item: string, index: number) => void
+  onItemClick?: (item: { name?: string, [key: string]: any }, index: number) => void
   /** 是否启用搜索按钮 */
   showSearch?: boolean
   /** 挂载时激活索引 */
@@ -225,17 +225,17 @@ defineExpose({
     <div :class="[$style.bar, 'lovelymaid-glass-container', { [$style.active]: !searchIsActive }]">
       <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
-          <slot name="bottom" :index="activeIndex"></slot>
+          <slot :item="props.list[activeIndex]" :index="activeIndex"></slot>
         </li>
         <li :class="$style.tab" v-for="(item, index) in props.list" :key="index">
-          <slot name="bottom" :item="item" :index="index"></slot>
-          <span>{{ item }}</span>
+          <slot :item="item" :index="index"></slot>
+          <span v-if="item.name">{{ item.name }}</span>
         </li>
         <div :class="$style.slide" ref="SlideRef" v-show="!searchIsActive"></div>
         <ul :class="[$style.container, $style.top]" v-show="!searchIsActive">
-          <li :class="[$style.tab, $style.top]" v-for="(item, index) in props.list" :key="'top-' + index">
-            <slot name="top" :item="item" :index="index"></slot>
-            <span>{{ item }}</span>
+          <li :class="[$style.tab, $style.top]" v-for="(item, index) in props.list" :key="index">
+            <slot :item="item" :index="index"></slot>
+            <span v-if="item.name">{{ item.name }}</span>
           </li>
         </ul>
       </ul>
@@ -256,9 +256,9 @@ defineExpose({
   display: flex;
   gap: 5px;
   height: 50px;
-  font-size: 8px;
   user-select: none;
   -webkit-user-select: none;
+  --font-size: 8px;
   --top-color: #0067EC;
 }
 
@@ -324,6 +324,10 @@ defineExpose({
   align-items: center;
   width: calc(v-bind(slideWidth) * 1px);
   height: 100%;
+}
+
+.tab :nth-child(2) {
+  font-size: var(--font-size);
 }
 
 .tab.small {
