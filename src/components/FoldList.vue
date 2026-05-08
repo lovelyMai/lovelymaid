@@ -47,12 +47,14 @@ watch(() => props.list.length, async () => {
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
 const oldList = ref<{ id: string, name: string }[] | undefined>(undefined)
-watch(() => props.list, (newList) => {
+watch(() => props.list, async (newList) => {
   if (!oldList.value) {
     oldList.value = [...newList]
   }
   if (enableTransition.value) {
-    slideCount.value = getSlideCount(newList, oldList.value as [])
+    slideAnimating.value = false
+    slideCount.value = getSlideCount(newList, oldList.value)
+    await nextTick()
     slideAnimating.value = true
     oldList.value = [...newList]
   }
@@ -73,7 +75,8 @@ watch(() => props.list, (newList) => {
       :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
       <ul ref="bodyRef" :class="[$style.body, { [$style.close]: !isOpen }]">
         <li v-for="(item, index) in props.list" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
-          :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }" @animationend="() => slideAnimating = false"
+          :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }"
+          @animationend="() => slideAnimating = false"
           :class="{ [$style.active]: item.id === props.activeId, [$style.slideAnimation]: slideAnimating }">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>

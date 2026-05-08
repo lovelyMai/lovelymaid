@@ -10,7 +10,6 @@ import TextArea from './components/TextArea.vue'
 
 import createAppRouter from './app-router/createAppRouter'
 
-import '@/assets/styles/reset.css'
 import '@/assets/styles/main.css'
 import '@/assets/icons/iconfont.css'
 
