@@ -94,7 +94,7 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   if (type === 'start') {
     slideTransition.value = `transform .5s, background .1s`
     targetPos.value = targetLeft
-  } else if (followed || Math.abs(targetLeft - realLeft) < (maxDistance.value / 5)) {
+  } else if (followed || Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
     slideTransition.value = `background .1s`
     targetPos.value = targetLeft
     followed = true
@@ -103,13 +103,13 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
     targetPos.value = realLeft
     calculatePosTimer = setInterval(() => {
       const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
-      if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 5)) {
+      if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
         slideTransition.value = `background .1s`
         targetPos.value = targetLeft
         followed = true
         clearTimer(calculatePosTimer)
       } else {
-        targetPos.value += (targetLeft - realLeft) > 0 ? maxDistance.value / 5 : -maxDistance.value / 5
+        targetPos.value += (targetLeft - realLeft) > 0 ? maxDistance.value / 10 : -maxDistance.value / 10
       }
     }, 8)
   }
