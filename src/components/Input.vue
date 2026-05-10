@@ -1,23 +1,26 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 import { watchRef } from '../utils/common'
 
 interface Props {
   /** 输入框类型 */
   type?: "text" | "password"
+  /** 值 */
+  value?: string
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
-  /** 获得当前输入值 */
-  onChange?: (inputValue: string) => void
+  /** 输入改变事件 */
+  onChange?: (newValue: string) => void
   /** 回车搜索事件 */
   onEnter?: (inputValue: string) => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
+  value: '',
   placeholder: '输入...'
 });
 
@@ -32,8 +35,11 @@ onMounted(() => watchRef(ContainerRef, () => {
 }, true))
 
 // 输入值改变事件
-const InputRef = ref<HTMLElement | null>(null)
-const inputValue = ref<string>('')
+const InputRef = ref<HTMLInputElement | null>(null)
+const inputValue = ref<string>(props.value)
+watch(() => props.value, (newValue) => {
+  inputValue.value = newValue
+})
 const onInputChange = (e: Event) => {
   inputValue.value = (e.target as HTMLInputElement).value
   props.onChange?.(inputValue.value)
@@ -64,25 +70,27 @@ const enter = async (inputValue: string) => {
 defineExpose({
   focus: () => InputRef.value?.focus(),
   blur: () => InputRef.value?.blur(),
+  select: () => InputRef.value?.select()
 })
 </script>
 
 <template>
   <div :class="[$style.Input, 'lovelymaid-glass-container']" ref="ContainerRef">
-    <div :class="$style.icon">
+    <div :class="[$style.icon, $style.custom]">
       <slot><span class="lovelymaid lovelymaid-search"></span></slot>
     </div>
     <input :type="props.type" ref="InputRef" :value="inputValue" @input="onInputChange"
       @keydown.enter="enter(inputValue)" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
       @compositionstart="compositionstart" :placeholder="props.placeholder" />
-    <span v-if="inputValue" class="lovelymaid lovelymaid-clear" @click.stop="onInputClear"></span>
+    <div :class="[$style.icon, $style.clear]">
+      <span v-if="inputValue" class="lovelymaid lovelymaid-clear" @click.stop="onInputClear"></span>
+    </div>
   </div>
 </template>
 
 <style module>
 .Input {
   display: flex;
-  align-items: center;
   position: relative;
   height: 35px;
   border-radius: calc(v-bind(containerHeight) / 2);
@@ -97,11 +105,18 @@ defineExpose({
   justify-content: center;
   align-items: center;
   position: absolute;
-  left: 0;
   width: v-bind(inputHeight);
   height: 100%;
-  font-size: calc(v-bind(inputHeight) / 3);
+  font-size: calc(v-bind(inputHeight) / 2);
   color: #19191a;
+}
+
+.icon.custom {
+  left: 0;
+}
+
+.icon.clear {
+  right: 0;
 }
 </style>
 <style scoped>
@@ -129,9 +144,7 @@ input:focus {
 }
 
 .lovelymaid-clear {
-  position: absolute;
-  right: calc(v-bind(inputHeight) / 3);
-  font-size: calc(v-bind(inputHeight) / 3);
+  font-size: calc(v-bind(inputHeight) / 2);
   color: var(--clear-color);
   cursor: pointer;
 }
