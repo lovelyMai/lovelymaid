@@ -8,6 +8,7 @@ import SideBar from './components/SideBar.vue'
 import TabBar from './components/TabBar.vue'
 import TextArea from './components/TextArea.vue'
 
+import '@/assets/styles/reset.css'
 import '@/assets/styles/main.css'
 import '@/assets/icons/iconfont.css'
 
