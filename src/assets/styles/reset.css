@@ -9,16 +9,3 @@ ul.lovelymaid,
 .lovelymaid ul {
   list-style: none;
 }
-
-input.lovelymaid,
-.lovelymaid input,
-button.lovelymaid,
-.lovelymaid button,
-textarea.lovelymaid,
-.lovelymaid textarea,
-select.lovelymaid,
-.lovelymaid select {
-  border: none;
-  outline: none;
-  border-radius: 0;
-}

@@ -25,7 +25,6 @@ const inputValue = ref<string>('')
 const autoResize = () => {
   TextAreaRef.value!.style.height = 'auto'
   const newHeight = TextAreaRef.value!.scrollHeight
-  console.log(newHeight)
   TextAreaRef.value!.style.height = `${newHeight}px`
 }
 const onInputChange = (e: Event) => {
@@ -66,7 +65,7 @@ defineExpose({
 <template>
   <div :class="[$style.container, 'lovelymaid', 'lovelymaid-glass-container']" ref="ContainerRef">
     <textarea :rows="props.minrow" ref="TextAreaRef" :value="inputValue" @input="onInputChange" @keydown="enter"
-      :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
+      :enterkeyhint="props.enterkeyhint" @compositionstart="compositionstart" @compositionend="compositionend"
       :placeholder="props.placeholder" />
   </div>
 </template>
