@@ -2,6 +2,8 @@
 import { onMounted, ref } from 'vue'
 
 interface Props {
+  /** 最小行数 */
+  minrow?: number
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
@@ -13,6 +15,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  minrow: 1,
   placeholder: '输入...'
 });
 
@@ -22,6 +25,7 @@ const inputValue = ref<string>('')
 const autoResize = () => {
   TextAreaRef.value!.style.height = 'auto'
   const newHeight = TextAreaRef.value!.scrollHeight
+  console.log(newHeight)
   TextAreaRef.value!.style.height = `${newHeight}px`
 }
 const onInputChange = (e: Event) => {
@@ -60,8 +64,8 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="[$style.container, 'lovelymaid-glass-container']" ref="ContainerRef">
-    <textarea rows="1" ref="TextAreaRef" :value="inputValue" @input="onInputChange" @keydown="enter"
+  <div :class="[$style.container, 'lovelymaid', 'lovelymaid-glass-container']" ref="ContainerRef">
+    <textarea :rows="props.minrow" ref="TextAreaRef" :value="inputValue" @input="onInputChange" @keydown="enter"
       :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
       :placeholder="props.placeholder" />
   </div>
@@ -70,11 +74,11 @@ defineExpose({
 <style module>
 .container {
   border-radius: var(--border-radius);
-  --min-height: auto;
   --max-height: auto;
   --border-radius: 20px;
   --font-size: 14px;
   --font-weight: 400;
+  --line-height: normal;
   --placeholder-color: #544957;
 }
 </style>
@@ -82,13 +86,13 @@ defineExpose({
 textarea {
   display: block;
   width: 100%;
-  min-height: var(--min-height);
   max-height: var(--max-height);
   padding: 12px;
   background-color: transparent;
   border-radius: calc(var(--border-radius) - 1px);
   font-size: var(--font-size);
   font-weight: var(--font-weight);
+  line-height: var(--line-height);
   caret-color: #3c86f6;
   outline: 0px solid transparent;
   transition: outline .2s ease;
@@ -98,7 +102,6 @@ textarea {
 }
 
 textarea::placeholder {
-  font-size: var(--font-size);
   color: var(--placeholder-color);
 }
 

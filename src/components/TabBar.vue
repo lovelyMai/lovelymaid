@@ -221,7 +221,7 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="$style.TabBar" ref="BarRef">
+  <div :class="['lovelymaid', $style.TabBar]" ref="BarRef">
     <div :class="[$style.bar, 'lovelymaid-glass-container', { [$style.active]: !searchIsActive }]">
       <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
@@ -242,10 +242,10 @@ defineExpose({
     </div>
     <div :class="[$style.search, { [$style.active]: searchIsActive }]" v-if="props.showSearch">
       <Button type="glass" :class="$style.Button" v-show="!searchIsShow" :onClick="clickSearch">
-        <span class="lovelymaid lovelymaid-search button"></span>
+        <span class="lovelymai lovely-search button"></span>
       </Button>
       <Input :class="$style.Search" v-show="searchIsShow" enterkeyhint="search">
-        <span class="lovelymaid lovelymaid-search input"></span>
+        <span class="lovelymai lovely-search input"></span>
       </Input>
     </div>
   </div>
@@ -366,11 +366,11 @@ defineExpose({
 }
 </style>
 <style scoped>
-.button.lovelymaid-search {
+.button.lovely-search {
   font-size: calc(v-bind(barHeight) * 0.4px);
 }
 
-.input.lovelymaid-search {
+.input.lovely-search {
   font-size: 24px;
 }
 </style>

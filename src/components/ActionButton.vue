@@ -31,7 +31,7 @@ const clickIcon = (e1: any) => {
 </script>
 
 <template>
-  <span class="lovelymaid lovelymaid-ellipsis ActionButton" @click.stop="clickIcon">
+  <span class="lovelymaid lovelymai lovely-ellipsis ActionButton" @click.stop="clickIcon">
     <teleport to="body">
       <div class="list" v-if="isPop" :style="{ left: `${popX}px`, top: `${popY}px` }">
         <div class="item" v-for="(item, index) in props.list" :key="index" @click="props.onItemClick?.(item, index)">

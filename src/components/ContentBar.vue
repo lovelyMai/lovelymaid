@@ -60,11 +60,11 @@ watch(() => props.visible, (newVisible) => {
 </script>
 
 <template>
-  <div :class="[$style.ContentBar, 'lovelymaid-glass-container']" ref="ContainerRef">
+  <div :class="['lovelymaid', 'lovelymaid-glass-container', $style.ContentBar]" ref="ContainerRef">
     <div :class="$style.header">
       <div :class="$style.title" :title="props.title">{{ props.title }}</div>
       <Button type="glass" :class="$style.Button" :onClick="props.onCloseClick" title="收起内容栏">
-        <span class="lovelymaid lovelymaid-close"></span>
+        <span class="lovelymai lovely-close"></span>
       </Button>
     </div>
     <div :class="$style.content">

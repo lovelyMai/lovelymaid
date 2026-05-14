@@ -1,3 +1,28 @@
+.lovelymaid,
+.lovelymaid * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+ul.lovelymaid,
+.lovelymaid ul {
+  list-style: none;
+}
+
+input.lovelymaid,
+.lovelymaid input,
+button.lovelymaid,
+.lovelymaid button,
+textarea.lovelymaid,
+.lovelymaid textarea,
+select.lovelymaid,
+.lovelymaid select {
+  border: none;
+  outline: none;
+  border-radius: 0;
+}
+
 .lovelymaid-common-container {
   background-color: #f2f2f6;
   backdrop-filter: blur(10px) saturate(1.5);

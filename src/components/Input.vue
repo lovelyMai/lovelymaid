@@ -75,15 +75,15 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="[$style.Input, 'lovelymaid-glass-container']" ref="ContainerRef">
+  <div :class="['lovelymaid', 'lovelymaid-glass-container', $style.Input]" ref="ContainerRef">
     <div :class="[$style.icon, $style.custom]">
-      <slot><span class="lovelymaid lovelymaid-search"></span></slot>
+      <slot><span class="lovelymai lovely-search"></span></slot>
     </div>
     <input :type="props.type" ref="InputRef" :value="inputValue" @input="onInputChange"
       @keydown.enter="enter(inputValue)" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
       @compositionstart="compositionstart" :placeholder="props.placeholder" />
     <div :class="[$style.icon, $style.clear]">
-      <span v-if="inputValue" class="lovelymaid lovelymaid-clear" @click.stop="onInputClear"></span>
+      <span v-if="inputValue" class="lovelymai lovely-clear" @click.stop="onInputClear"></span>
     </div>
   </div>
 </template>
@@ -143,7 +143,7 @@ input:focus {
   outline: 3px solid #94bbf0;
 }
 
-.lovelymaid-clear {
+.lovely-clear {
   font-size: calc(v-bind(inputHeight) / 2);
   color: var(--clear-color);
   cursor: pointer;

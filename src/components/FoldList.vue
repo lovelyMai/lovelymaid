@@ -62,12 +62,12 @@ watch(() => props.list, async (newList) => {
 </script>
 
 <template>
-  <div :class="$style.FoldList">
+  <div :class="['lovelymaid', $style.FoldList]">
     <div :class="$style.header" @click.stop="onHeaderClick">
       <div :class="$style.title">
         {{ props.title }}
       </div>
-      <span :class="['lovelymaid', 'lovelymaid-right-arrow']"
+      <span :class="['lovelymai', 'lovely-right-arrow']"
         :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }" :title="isOpen ? '收起列表' : '展开列表'"
         @click.stop="isOpen = !isOpen"></span>
     </div>

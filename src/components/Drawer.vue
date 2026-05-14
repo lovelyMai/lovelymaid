@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div :class="$style.Drawer">
+  <div :class="['lovelymaid', $style.Drawer]">
     <transition name="lovelymaid-fade">
       <div :class="$style.mask" v-if="props.isOpen"></div>
     </transition>
@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
         <div :class="$style.header">
           <div :class="$style.title">{{ props.title }}</div>
           <Button type="glass" :class="$style.Button" :onClick="props.onCloseClick" title="关闭弹窗" >
-            <span class="lovelymaid lovelymaid-close"></span>
+            <span class="lovelymai lovely-close"></span>
           </Button>
         </div>
         <div :class="$style.content">

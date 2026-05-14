@@ -65,11 +65,11 @@ watch(() => props.visible, (newVisible) => {
 </script>
 
 <template>
-  <div ref="ContainerRef" :class="[$style.SideBar, 'lovelymaid-glass-container']">
+  <div ref="ContainerRef" :class="['lovelymaid', 'lovelymaid-glass-container', $style.SideBar]">
     <div :class="$style.header">
       <div :class="[$style.SwitchButton, { [$style.close]: !props.isOpen }]" @click="switchSideBar"
         :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
-        <span class="lovelymaid lovelymaid-sidebar_left"></span>
+        <span class="lovelymai lovely-sidebar_left"></span>
       </div>
     </div>
     <slot>这是内容</slot>
@@ -119,7 +119,7 @@ watch(() => props.visible, (newVisible) => {
 }
 </style>
 <style scoped>
-.lovelymaid-sidebar_left {
+.lovely-sidebar_left {
   font-size: 20px;
   color: #19191a;
 }
