@@ -88,6 +88,7 @@ textarea {
   max-height: var(--max-height);
   padding: 12px;
   background-color: transparent;
+  border: none;
   border-radius: calc(var(--border-radius) - 1px);
   font-size: var(--font-size);
   font-weight: var(--font-weight);

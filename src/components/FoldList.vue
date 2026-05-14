@@ -73,13 +73,14 @@ watch(() => props.list, async (newList) => {
     </div>
     <div :class="[$style.BodyContainer, { [$style.EnableTransition]: enableTransition }]"
       :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
-      <ul ref="bodyRef" :class="[$style.body, { [$style.close]: !isOpen }]">
-        <li v-for="(item, index) in props.list" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
+      <ul :class="[$style.body, { [$style.close]: !isOpen }]" ref="bodyRef">
+        <li
+          :class="[$style.item, { [$style.active]: item.id === props.activeId, [$style.slideAnimation]: slideAnimating }]"
+          v-for="(item, index) in props.list" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
           :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }"
-          @animationend="() => slideAnimating = false"
-          :class="{ [$style.active]: item.id === props.activeId, [$style.slideAnimation]: slideAnimating }">
+          @animationend="() => slideAnimating = false">
           <slot :item="item" :index="index">{{ item.name }}</slot>
-        </li>
+      </li>
       </ul>
     </div>
   </div>
@@ -94,7 +95,7 @@ watch(() => props.list, async (newList) => {
   cursor: pointer;
 }
 
-.title {
+.header .title {
   font-size: 12px;
   color: #767676;
   font-weight: 500;
@@ -113,11 +114,11 @@ watch(() => props.list, async (newList) => {
   transition: transform .5s ease;
 }
 
-.close {
+.body.close {
   transform: translateY(-100%);
 }
 
-.body li {
+.body .item {
   position: relative;
   padding: 0 10px;
   border-radius: 6px;
@@ -129,7 +130,7 @@ watch(() => props.list, async (newList) => {
   transition: all .2s;
 }
 
-.active {
+.body .item.active {
   background-color: rgba(228, 228, 228, 1);
   color: #3b86f7;
 }

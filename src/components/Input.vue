@@ -83,7 +83,7 @@ defineExpose({
       @keydown.enter="enter(inputValue)" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
       @compositionstart="compositionstart" :placeholder="props.placeholder" />
     <div :class="[$style.icon, $style.clear]">
-      <span v-if="inputValue" class="lovelymai lovely-clear" @click.stop="onInputClear"></span>
+      <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
     </div>
   </div>
 </template>
@@ -109,6 +109,7 @@ defineExpose({
   height: 100%;
   font-size: calc(v-bind(inputHeight) / 2);
   color: #19191a;
+  pointer-events: none;
 }
 
 .icon.custom {
@@ -124,6 +125,7 @@ input {
   width: 100%;
   height: 100%;
   background-color: transparent;
+  border: none;
   border-radius: calc(v-bind(inputHeight) / 2);
   padding: 0 v-bind(inputHeight);
   font-size: var(--font-size);
@@ -147,5 +149,6 @@ input:focus {
   font-size: calc(v-bind(inputHeight) / 2);
   color: var(--clear-color);
   cursor: pointer;
+  pointer-events: auto;
 }
 </style>

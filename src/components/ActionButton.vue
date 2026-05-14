@@ -33,11 +33,11 @@ const clickIcon = (e1: any) => {
 <template>
   <span class="lovelymaid lovelymai lovely-ellipsis ActionButton" @click.stop="clickIcon">
     <teleport to="body">
-      <div class="list" v-if="isPop" :style="{ left: `${popX}px`, top: `${popY}px` }">
-        <div class="item" v-for="(item, index) in props.list" :key="index" @click="props.onItemClick?.(item, index)">
+      <ul class="list" v-if="isPop" :style="{ left: `${popX}px`, top: `${popY}px` }">
+        <li class="item" v-for="(item, index) in props.list" :key="index" @click="props.onItemClick?.(item, index)">
           <slot :item="item" :index="index">{{ item.name }}</slot>
-        </div>
-      </div>
+        </li>
+      </ul>
     </teleport>
   </span>
 </template>
@@ -61,11 +61,11 @@ const clickIcon = (e1: any) => {
   backface-visibility: hidden;
 }
 
-.item {
+.list .item {
   border-radius: 8px;
 }
 
-.item:hover {
+.list .item:hover {
   background-color: #3b86f7;
   color: #fff;
 }
