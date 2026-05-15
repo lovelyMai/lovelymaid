@@ -7,8 +7,12 @@ interface Props {
   title?: string
   /** 要渲染的列表 */
   list?: { id: string, name: string, [key: string]: any }[]
+  /** 是否展开 */
+  isOpen: boolean
   /** 激活项索引 */
   activeId?: string
+  /** 折叠按钮点击事件 */
+  onButtonClick: () => void
   /** 头部点击事件 */
   onHeaderClick?: () => void
   /** 列表项点击事件 */
@@ -17,10 +21,10 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   title: '标题',
   list: () => [],
+  isOpen: true
 });
 
 // 标准流高度动画
-const isOpen = ref<boolean>(true)
 const bodyHeight = ref<number>(0)
 const bodyRef = ref<HTMLElement | null>(null)
 const enableTransition = ref(false)
@@ -63,13 +67,12 @@ watch(() => props.list, async (newList) => {
 
 <template>
   <div :class="['lovelymaid', $style.FoldList]">
-    <div :class="$style.header" @click.stop="onHeaderClick">
+    <div :class="$style.header" @click="onHeaderClick">
       <div :class="$style.title">
         {{ props.title }}
       </div>
-      <span :class="['lovelymai', 'lovely-right-arrow']"
-        :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }" :title="isOpen ? '收起列表' : '展开列表'"
-        @click.stop="isOpen = !isOpen"></span>
+      <span class="lovelymai lovely-right-arrow" :style="{ transform: props.isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
+        :title="isOpen ? '收起列表' : '展开列表'" @click.stop="props.onButtonClick"></span>
     </div>
     <div :class="[$style.BodyContainer, { [$style.EnableTransition]: enableTransition }]"
       :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
@@ -80,24 +83,33 @@ watch(() => props.list, async (newList) => {
           :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }"
           @animationend="() => slideAnimating = false">
           <slot :item="item" :index="index">{{ item.name }}</slot>
-      </li>
+        </li>
       </ul>
     </div>
   </div>
 </template>
 
 <style module>
+.FoldList {
+  --header-height: 30px;
+  --title-font-size: 12px;
+  --title-color: #767676;
+  --list-font-size: 14px;
+  --list-line-height: 30px;
+  --list-color: inherit;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 30px;
+  height: var(--header-height);
   cursor: pointer;
 }
 
 .header .title {
-  font-size: 12px;
-  color: #767676;
+  font-size: var(--title-font-size);
+  color: var(--title-color);
   font-weight: 500;
 }
 
@@ -122,8 +134,9 @@ watch(() => props.list, async (newList) => {
   position: relative;
   padding: 0 10px;
   border-radius: 6px;
-  font-size: 14px;
-  line-height: 30px;
+  font-size: var(--list-font-size);
+  line-height: var(--list-line-height);
+  color: var(--list-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -151,12 +164,11 @@ watch(() => props.list, async (newList) => {
 </style>
 
 <style scoped>
-.lovelymaid {
+.lovely-right-arrow {
   font-size: 16px;
-  color: #767676;
+  color: var(--title-color);
   font-weight: 700;
   transition: transform .3s;
   cursor: pointer;
-  will-change: transform;
 }
 </style>

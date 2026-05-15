@@ -16,9 +16,8 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && npm run build:types",
-    "build:types": "vue-tsc -p tsconfig.build.json --declaration --emitDeclarationOnly --outDir dist"
+    "start": "vite",
+    "build": "vite build && vue-tsc -p tsconfig.build.json --declaration --emitDeclarationOnly --outDir dist"
   },
   "peerDependencies": {
     "vue": "^3.0.0"
