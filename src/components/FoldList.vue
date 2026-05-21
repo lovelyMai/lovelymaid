@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted, watch } from 'vue'
+import { ref, nextTick, onMounted, watch, computed } from 'vue'
 import getSlideCount from '../utils/calculateOffsets'
 
 interface Props {
@@ -50,17 +50,16 @@ watch(() => props.list.length, async () => {
 // 列表项动画
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
-const oldList = ref<{ id: string, name: string }[] | undefined>(undefined)
-watch(() => props.list, async (newList) => {
-  if (!oldList.value) {
-    oldList.value = [...newList]
-  }
+const oldList = ref<{ id: string, name: string }[]>([])
+const listSnapshot = computed(() => props.list.map(item => item.id).join(','))
+watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
+  if (newSnapshot === oldSnapshot) return 
   if (enableTransition.value) {
     slideAnimating.value = false
-    slideCount.value = getSlideCount(newList, oldList.value)
+    slideCount.value = getSlideCount(props.list, oldList.value)
     await nextTick()
     slideAnimating.value = true
-    oldList.value = [...newList]
+    oldList.value = [...props.list]
   }
 }, { deep: true })
 </script>
