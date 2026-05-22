@@ -68,8 +68,9 @@ watch(() => props.visible, (newVisible) => {
       </Button>
     </div>
     <div :class="$style.content">
-      <slot>这是内容</slot>
+      <slot name="default"></slot>
     </div>
+    <slot name="outside"></slot>
   </div>
 </template>
 

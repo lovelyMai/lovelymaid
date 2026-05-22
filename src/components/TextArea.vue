@@ -1,27 +1,33 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 interface Props {
   /** 最小行数 */
   minrow?: number
+  /** 值 */
+  value?: string
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   /** 获得当前输入值 */
   onChange?: (inputValue: string) => void
-  /** 回车搜索事件 */
+  /** 回车事件 */
   onEnter?: (inputValue: string) => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
   minrow: 1,
+  value: '',
   placeholder: '输入...'
 });
 
 // 输入值改变事件
 const TextAreaRef = ref<HTMLTextAreaElement | null>(null)
-const inputValue = ref<string>('')
+const inputValue = ref<string>(props.value)
+watch(() => props.value, (newValue) => {
+  inputValue.value = newValue
+})
 const autoResize = () => {
   TextAreaRef.value!.style.height = 'auto'
   const newHeight = TextAreaRef.value!.scrollHeight
