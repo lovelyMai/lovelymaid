@@ -24,14 +24,18 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 输入值改变事件
 const TextAreaRef = ref<HTMLTextAreaElement | null>(null)
+const ContainerRef = ref<HTMLElement | null>(null)
 const inputValue = ref<string>(props.value)
 watch(() => props.value, (newValue) => {
   inputValue.value = newValue
 })
 const autoResize = () => {
+  const currentHeight = TextAreaRef.value!.clientHeight + 2
+  ContainerRef.value!.style.height = `${currentHeight}px`
   TextAreaRef.value!.style.height = 'auto'
   const newHeight = TextAreaRef.value!.scrollHeight
   TextAreaRef.value!.style.height = `${newHeight}px`
+  ContainerRef.value!.style.height = 'auto'
 }
 const onInputChange = (e: Event) => {
   inputValue.value = (e.target as HTMLTextAreaElement).value
