@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 
 interface Props {
   /** 最小行数 */
@@ -26,10 +26,11 @@ const props = withDefaults(defineProps<Props>(), {
 const TextAreaRef = ref<HTMLTextAreaElement | null>(null)
 const ContainerRef = ref<HTMLElement | null>(null)
 const inputValue = ref<string>(props.value)
-watch(() => props.value, async (newValue) => {
+watch(() => props.value, (newValue) => {
   inputValue.value = newValue
 })
-watch(inputValue, () => {
+watch(inputValue, async () => {
+  await nextTick()
   autoResize()
 })
 const autoResize = () => {
@@ -37,6 +38,7 @@ const autoResize = () => {
   ContainerRef.value!.style.height = `${currentHeight}px`
   TextAreaRef.value!.style.height = 'auto'
   const newHeight = TextAreaRef.value!.scrollHeight
+  console.log(newHeight)
   TextAreaRef.value!.style.height = `${newHeight}px`
   ContainerRef.value!.style.height = 'auto'
 }
