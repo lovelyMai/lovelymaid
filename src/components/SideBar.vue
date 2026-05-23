@@ -49,16 +49,20 @@ const buttonTransformDistance = computed<string>(() => props.isOpen ? '0' : `${T
 // 切换 visilble
 const display = ref<string>('block')
 const scale = ref<string>('1')
+let timer1: number | undefined
+let timer2: number | undefined
 watch(() => props.visible, (newVisible) => {
+  clearTimeout(timer1)
+  clearTimeout(timer2)
   transition.value = 'transform .3s'
-  setTimeout(() => transition.value = 'transform .5s', 300)
+  timer1 = setTimeout(() => transition.value = 'transform .5s', 300)
   if (newVisible) {
     display.value = 'block'
     requestAnimationFrame(() => {
       scale.value = '1'
     })
   } else {
-    setTimeout(() => display.value = 'none', 300)
+    timer2 = setTimeout(() => display.value = 'none', 300)
     scale.value = '0'
   }
 })

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch, computed } from 'vue'
+
 import getSlideCount from '../utils/calculateOffsets'
 
 interface Props {
@@ -27,7 +28,6 @@ const props = withDefaults(defineProps<Props>(), {
 // 标准流高度动画
 const bodyHeight = ref<number>(0)
 const bodyRef = ref<HTMLElement | null>(null)
-const enableTransition = ref(false)
 const calculateHeight = async () => {
   await nextTick()
   if (bodyRef.value) {
@@ -36,9 +36,6 @@ const calculateHeight = async () => {
 }
 const initialize = async () => {
   await calculateHeight()
-  setTimeout(() => {
-    enableTransition.value = true
-  }, 100)
 }
 onMounted(() => {
   initialize()
@@ -50,17 +47,15 @@ watch(() => props.list.length, async () => {
 // 列表项动画
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
-const oldList = ref<{ id: string, name: string }[]>([])
+const oldList = ref<{ id: string, name: string }[]>(props.list)
 const listSnapshot = computed(() => props.list.map(item => item.id).join(','))
 watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
-  if (newSnapshot === oldSnapshot) return 
-  if (enableTransition.value) {
-    slideAnimating.value = false
-    slideCount.value = getSlideCount(props.list, oldList.value)
-    await nextTick()
-    slideAnimating.value = true
-    oldList.value = [...props.list]
-  }
+  if (newSnapshot === oldSnapshot) return
+  slideAnimating.value = false
+  slideCount.value = getSlideCount(props.list, oldList.value)
+  await nextTick()
+  slideAnimating.value = true
+  oldList.value = [...props.list]
 }, { deep: true })
 </script>
 
@@ -73,7 +68,7 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
       <span class="lovelymai lovely-right-arrow" :style="{ transform: props.isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
         :title="isOpen ? '收起列表' : '展开列表'" @click.stop="props.onButtonClick"></span>
     </div>
-    <div :class="[$style.BodyContainer, { [$style.EnableTransition]: enableTransition }]"
+    <div :class="$style.BodyContainer"
       :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
       <ul :class="[$style.body, { [$style.close]: !isOpen }]" ref="bodyRef">
         <li
@@ -114,9 +109,6 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
 
 .BodyContainer {
   overflow: hidden;
-}
-
-.BodyContainer.EnableTransition {
   transition: height .5s ease;
 }
 
