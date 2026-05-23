@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 interface Props {
   /** 最小行数 */
@@ -26,8 +26,11 @@ const props = withDefaults(defineProps<Props>(), {
 const TextAreaRef = ref<HTMLTextAreaElement | null>(null)
 const ContainerRef = ref<HTMLElement | null>(null)
 const inputValue = ref<string>(props.value)
-watch(() => props.value, (newValue) => {
+watch(() => props.value, async (newValue) => {
   inputValue.value = newValue
+})
+watch(inputValue, () => {
+  autoResize()
 })
 const autoResize = () => {
   const currentHeight = TextAreaRef.value!.clientHeight + 2
@@ -40,11 +43,7 @@ const autoResize = () => {
 const onInputChange = (e: Event) => {
   inputValue.value = (e.target as HTMLTextAreaElement).value
   props.onChange?.(inputValue.value)
-  autoResize()
 }
-onMounted(() => {
-  autoResize()
-})
 
 // 中文输入法下回车防止搜索
 let isComposing = false;
