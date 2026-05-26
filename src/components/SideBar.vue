@@ -47,29 +47,24 @@ onUnmounted(() => {
 const buttonTransformDistance = computed<string>(() => props.isOpen ? '0' : `${TransformDistance.value - ContainerWidth.value + 55}px`)
 
 // 切换 visilble
-const display = ref<string>('block')
-const scale = ref<string>('1')
-let timer1: number | undefined
-let timer2: number | undefined
+const scale = ref<string>(props.visible ? '1' : '0')
+let timer: number | undefined
 watch(() => props.visible, (newVisible) => {
-  clearTimeout(timer1)
-  clearTimeout(timer2)
+  clearTimeout(timer)
   transition.value = 'transform .3s'
-  timer1 = setTimeout(() => transition.value = 'transform .5s', 300)
+  timer = setTimeout(() => transition.value = 'transform .5s', 300)
   if (newVisible) {
-    display.value = 'block'
     requestAnimationFrame(() => {
       scale.value = '1'
     })
   } else {
-    timer2 = setTimeout(() => display.value = 'none', 300)
     scale.value = '0'
   }
 })
 </script>
 
 <template>
-  <div ref="ContainerRef" :class="['lovelymaid', 'lovelymaid-glass-container', $style.SideBar]">
+  <div :class="['lovelymaid', 'lovelymaid-glass-container', $style.SideBar]" ref="ContainerRef">
     <div :class="$style.header">
       <div :class="[$style.SwitchButton, { [$style.close]: !props.isOpen }]" @click="switchSideBar"
         :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
@@ -82,7 +77,6 @@ watch(() => props.visible, (newVisible) => {
 
 <style module>
 .SideBar {
-  display: v-bind(display);
   border-radius: 20px;
   transform: translateX(v-bind(translateX)) scale(v-bind(scale));
   transition: v-bind(transition);
@@ -110,7 +104,6 @@ watch(() => props.visible, (newVisible) => {
     transform .5s,
     box-shadow .5s;
   cursor: pointer;
-  will-change: transform;
 }
 
 .SwitchButton.close {

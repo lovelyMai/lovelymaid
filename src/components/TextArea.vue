@@ -38,7 +38,6 @@ const autoResize = () => {
   ContainerRef.value!.style.height = `${currentHeight}px`
   TextAreaRef.value!.style.height = 'auto'
   const newHeight = TextAreaRef.value!.scrollHeight
-  console.log(newHeight)
   TextAreaRef.value!.style.height = `${newHeight}px`
   ContainerRef.value!.style.height = 'auto'
 }

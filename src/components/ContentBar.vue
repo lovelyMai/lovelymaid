@@ -42,22 +42,17 @@ onUnmounted(() => {
 })
 
 // 切换 visilble
-const display = ref<string>(props.visible ? 'block' : 'none')
 const scale = ref<string>(props.visible ? '1' : '0')
-let timer1: number | undefined
-let timer2: number | undefined
+let timer: number | undefined
 watch(() => props.visible, (newVisible) => {
-  clearTimeout(timer1)
-  clearTimeout(timer2)
+  clearTimeout(timer)
   transition.value = 'transform .3s'
-  timer1 = setTimeout(() => transition.value = 'transform .5s', 300)
+  timer = setTimeout(() => transition.value = 'transform .5s', 300)
   if (newVisible) {
-    display.value = 'block'
     requestAnimationFrame(() => {
       scale.value = '1'
     })
   } else {
-    timer2 = setTimeout(() => display.value = 'none', 300)
     scale.value = '0'
   }
 })
@@ -80,7 +75,6 @@ watch(() => props.visible, (newVisible) => {
 
 <style module>
 .ContentBar {
-  display: v-bind(display);
   border-radius: 20px;
   transform: translateX(v-bind(translateX)) scale(v-bind(scale));
   transition: v-bind(transition);
