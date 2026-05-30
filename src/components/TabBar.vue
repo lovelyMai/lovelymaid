@@ -10,15 +10,15 @@ import { getLayoutLeftInViewport } from '../utils/getOffsetInViewport';
 interface Props {
   /** 列表 */
   list: { name?: string, [key: string]: any }[]
-  /** 列表项点击事件 */
-  onItemClick?: (item: { name?: string, [key: string]: any }, index: number) => void
+  /** 激活索引 */
+  activeIndex?: number
   /** 是否启用搜索按钮 */
   showSearch?: boolean
-  /** 挂载时激活索引 */
-  initialIndex?: number
+  /** 列表项点击事件 */
+  onItemClick?: (item: { name?: string, [key: string]: any }, index: number) => void
 }
 const props = withDefaults(defineProps<Props>(), {
-  initialIndex: 0
+  activeIndex: 0
 })
 const listLength = computed(() => props.list.length)
 
@@ -35,7 +35,7 @@ const maxDistance = ref<number>(0)
 const virtualLeft = ref<number>(0)
 const virtualRight = ref<number>(0)
 const barTransition = ref<string>('none')
-const activeIndex = ref<number>(props.initialIndex)
+const activeIndex = ref<number>(props.activeIndex)
 const targetPos = ref<number>(0)
 let slideCenter: number
 onMounted(() => {
@@ -191,6 +191,14 @@ const stopSlide = (e: PointerEvent) => {
   document.removeEventListener('pointermove', moveSlide)
   document.removeEventListener('pointerup', stopSlide)
 }
+watch(() => props.activeIndex, (newIndex) => {
+  activeIndex.value = newIndex
+  clearTimer(calculatePosTimer)
+  targetPos.value = newIndex * slideWidth.value
+  clearTimer(virtualTimer1, virtualTimer2)
+  updateVirtualPos(500)
+  props.onItemClick?.(props.list[newIndex], newIndex)
+})
 
 // list改变归位
 watch(() => props.list.length, () => targetPos.value = 0)
@@ -205,18 +213,6 @@ const clickSearch = () => {
 watch(searchIsActive, (newValue) => {
   if (newValue) setTimeout(() => searchIsShow.value = true, 100)
   else setTimeout(() => searchIsShow.value = false, 200)
-})
-
-// 暴露内部方法
-defineExpose({
-  clickTab: (index: number) => {
-    activeIndex.value = index
-    clearTimer(calculatePosTimer)
-    targetPos.value = index * slideWidth.value
-    clearTimer(virtualTimer1, virtualTimer2)
-    updateVirtualPos(500)
-    props.onItemClick?.(props.list[index], index)
-  }
 })
 </script>
 
