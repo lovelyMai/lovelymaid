@@ -197,7 +197,6 @@ watch(() => props.activeIndex, (newIndex) => {
   targetPos.value = newIndex * slideWidth.value
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
-  props.onItemClick?.(props.list[newIndex], newIndex)
 })
 
 // list改变归位

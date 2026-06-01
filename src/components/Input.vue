@@ -52,8 +52,7 @@ const onInputClear = () => {
 
 // 中文输入法下回车防止搜索
 let isComposing = false;
-const compositionend = async () => {
-  await new Promise(resolve => setTimeout(resolve, 100))
+const compositionend = () => {
   isComposing = false;
 };
 const compositionstart = () => {
