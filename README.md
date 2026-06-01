@@ -1,19 +1,20 @@
-# Usage
+# 使用指南
 
-## Step 1: Import CSS in your entry file
+## 第一步：在入口文件中引入 CSS
 
-Add the following import statement **at the very beginning** of your main entry file (usually `main.js` or `main.ts`):
+在你的主入口文件（通常是 `main.js` 或 `main.ts`）**最顶部**添加以下导入语句：
 
 ```javascript
 import 'lovelymaid/dist/lovelymaid.css'
 ```
 
-**Important:** Make sure this import comes **before any other style imports** in your project. This allows your custom styles to override the component library's default styles.
+**重要提示：** 确保此导入语句位于项目中**所有其他样式导入之前**。这样你的自定义样式才能覆盖组件库的默认样式。
 
-Example `main.js`:
+示例 `main.js`：
+
 ```javascript
-// main.js or main.ts
-import 'lovelymaid/dist/lovelymaid.css'  // ← MUST be first!
+// main.js 或 main.ts
+import 'lovelymaid/dist/lovelymaid.css'  // ← 必须放在最前面！
 import './your-own-styles.css'
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -21,9 +22,9 @@ import App from './App.vue'
 createApp(App).mount('#app')
 ```
 
-## Step 2: Use components in any Vue component
+## 第二步：在任何 Vue 组件中使用组件
 
-Import and use LovelyMaid components directly in your Vue components:
+直接在 Vue 组件中导入并使用 LovelyMaid 组件：
 
 ```vue
 <script setup>
@@ -32,7 +33,6 @@ import { SideBar } from 'lovelymaid'
 
 <template>
   <SideBar :visible="true">
-    Sidebar Content
+    侧边栏内容
   </SideBar>
 </template>
-```
