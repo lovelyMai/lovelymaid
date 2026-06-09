@@ -1,36 +1,73 @@
 <script setup lang="ts">
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import Button from './Button.vue';
+import { watchRef } from '@/utils/common.js';
+import { checkVerticalScroll } from '@/utils/checkScroll';
 
 interface Props {
   /** 是否展开 */
-  isOpen?: boolean;
-  /** 标题 */
-  title?: string;
-  /** 关闭按钮点击事件 */
-  onCloseClick?: () => void;
+  isOpen: boolean
+  /** 是否显示遮罩 */
+  showMask?: boolean
+  /** 滑动关闭 */
+  onSlideClose: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
-  isOpen: true,
-  title: '标题',
+  showMask: false
 });
+
+// Header 高度自适应
+const HeaderContainerRef = ref<HTMLElement | null>(null)
+const HeaderMarginBottom = ref<string>('60px')
+onMounted(() => watchRef(HeaderContainerRef, ({ height }) => {
+  HeaderMarginBottom.value = `${height}px`
+}, true))
+
+// 上下滚动
+const DrawerContainerRef = ref<HTMLElement | null>(null)
+const scroll = ref<any | null>(null)
+const isOpen = ref<boolean>(props.isOpen)
+const isTouching = ref<boolean>(false)
+watch(() => props.isOpen, (newOpen) => {
+  isOpen.value = newOpen
+})
+onMounted(() => {
+  scroll.value = checkVerticalScroll(DrawerContainerRef.value!, 0, ref(true), 500)
+  watch(() => scroll.value!.isTouching, async (newTouching) => {
+    if (newTouching) {
+      isTouching.value = true
+      return
+    }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        isTouching.value = false
+      })
+    })
+    if (scroll.value!.speed > 0.1 || (scroll.value!.distance > DrawerContainerRef.value!.offsetHeight / 3 && scroll.value!.speed > -0.1)) {
+      props.onSlideClose()
+    }
+  })
+})
+onUnmounted(() => {
+  scroll.value?.cleanup()
+})
 </script>
 
 <template>
   <div :class="['lovelymaid', $style.Drawer]">
     <transition name="lovelymaid-fade">
-      <div :class="$style.mask" v-if="props.isOpen"></div>
+      <div :class="$style.mask" v-if="props.showMask && isOpen"></div>
     </transition>
-    <transition name="lovelymaid-slide-up">
-      <div :class="[$style.DrawerContainer, 'lovelymaid-common-container']" v-if="props.isOpen">
+    <transition name="lovelymaid-slide">
+      <div :class="[$style.DrawerContainer, 'lovelymaid-common-container']" ref="DrawerContainerRef" v-show="isOpen"
+        :style="isTouching ? { transform: `translateY(${scroll.distance}px)`, transition: 'none' } : undefined">
         <div :class="$style.header">
-          <div :class="$style.title">{{ props.title }}</div>
-          <Button type="glass" :class="$style.Button" :onClick="props.onCloseClick" title="关闭弹窗" >
-            <span class="lovelymai lovely-close"></span>
-          </Button>
+          <div ref="HeaderContainerRef">
+            <slot name="header"></slot>
+          </div>
         </div>
         <div :class="$style.content">
-          <slot>这是内容</slot>
+          <slot></slot>
         </div>
       </div>
     </transition>
@@ -51,54 +88,30 @@ const props = withDefaults(defineProps<Props>(), {
   width: 100dvw;
   height: 100dvh;
   background-color: rgba(0, 0, 0, 0.1);
-  transition: opacity .3s;
 }
 
 .DrawerContainer {
   position: fixed;
+  left: 0;
   bottom: 0;
   z-index: 1;
   width: 100dvw;
   height: var(--height);
   border-top-left-radius: 38px;
   border-top-right-radius: 38px;
-  transition: transform .5s cubic-bezier(0.2, 0.9, 0.4, 1);
-  overflow: auto;
+  overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
+  transition: transform .5s cubic-bezier(0.2, 0.9, 0.4, 1);
 }
 
 .header {
-  display: flex;
-  justify-content: center;
   position: sticky;
   top: 0;
   z-index: 1;
   height: 0;
-  margin-bottom: 60px;
-  box-shadow: 0 0px 20px 35px rgba(248, 248, 248, .95);
-}
-
-.title {
-  max-width: calc(100% - 130px);
-  height: 45px;
-  margin-top: 15px;
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 45px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.Button {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 45px;
-  height: 45px;
-  font-size: 28px;
-  font-weight: 600;
+  margin-bottom: v-bind(HeaderMarginBottom);
+  box-shadow: 0 0 calc(v-bind(HeaderMarginBottom) / 2) calc(v-bind(HeaderMarginBottom) / 2) rgba(248, 248, 248, .95);
 }
 
 .content {
@@ -113,8 +126,13 @@ const props = withDefaults(defineProps<Props>(), {
   opacity: 0;
 }
 
-.lovelymaid-slide-up-enter-from,
-.lovelymaid-slide-up-leave-to {
+.lovelymaid-fade-enter-active,
+.lovelymaid-fade-leave-active {
+  transition: opacity .3s;
+}
+
+.lovelymaid-slide-enter-from,
+.lovelymaid-slide-leave-to {
   transform: translateY(100%);
 }
 </style>

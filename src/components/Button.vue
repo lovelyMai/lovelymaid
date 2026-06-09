@@ -19,8 +19,8 @@ const props = withDefaults(defineProps<Props>(), {
 const ButtonRef = ref<any>(null)
 const borderRadius = ref<string>('')
 const fontSize = ref<string>('0')
-onMounted(() => watchRef(ButtonRef, () => {
-  const shorter = Math.min(ButtonRef.value.offsetHeight, ButtonRef.value.offsetWidth)
+onMounted(() => watchRef(ButtonRef, ({ width, height }) => {
+  const shorter = Math.min(width, height)
   borderRadius.value = `${shorter / 2}px`
   fontSize.value = `${shorter / 2}px`
 }, true))
@@ -28,7 +28,7 @@ onMounted(() => watchRef(ButtonRef, () => {
 
 <template>
   <div ref="ButtonRef"
-    :class="[ 'lovelymaid', $style.Button, { 'lovelymaid-glass-container': props.type === 'glass', [$style.common]: props.type === 'common', }]"
+    :class="['lovelymaid', $style.Button, { 'lovelymaid-glass-container': props.type === 'glass', [$style.common]: props.type === 'common', }]"
     @click="props.onClick" :title="props.title">
     <slot></slot>
   </div>

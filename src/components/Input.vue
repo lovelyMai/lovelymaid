@@ -41,28 +41,28 @@ watch(() => props.value, (newValue) => {
   inputValue.value = newValue
 })
 const onInputChange = (e: Event) => {
-  inputValue.value = (e.target as HTMLInputElement).value
-  props.onChange?.(inputValue.value)
+  props.onChange?.((e.target as HTMLInputElement).value)
 }
 const onInputClear = () => {
-  inputValue.value = ''
-  props.onChange?.(inputValue.value)
+  props.onChange?.('')
   InputRef.value?.focus()
 }
 
 // 中文输入法下回车防止搜索
 let isComposing = false;
 const compositionend = () => {
-  isComposing = false;
+  setTimeout(() => {
+    isComposing = false;
+  }, 0);
 };
 const compositionstart = () => {
   isComposing = true;
 };
 
 // 回车事件
-const enter = async (inputValue: string) => {
+const enter = async () => {
   if (isComposing) return
-  props.onEnter?.(inputValue)
+  props.onEnter?.(inputValue.value)
 }
 
 // 暴露方法
@@ -78,9 +78,9 @@ defineExpose({
     <div :class="[$style.icon, $style.custom]">
       <slot><span class="lovelymai lovely-search"></span></slot>
     </div>
-    <input :type="props.type" ref="InputRef" :value="inputValue" @input="onInputChange"
-      @keydown.enter="enter(inputValue)" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
-      @compositionstart="compositionstart" :placeholder="props.placeholder" />
+    <input :type="props.type" ref="InputRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
+      :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
+      :placeholder="props.placeholder" />
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
     </div>

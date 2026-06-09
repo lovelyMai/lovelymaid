@@ -29,6 +29,9 @@ const inputValue = ref<string>(props.value)
 watch(() => props.value, (newValue) => {
   inputValue.value = newValue
 })
+const onInputChange = (e: Event) => {
+  props.onChange?.((e.target as HTMLTextAreaElement).value)
+}
 watch(inputValue, async () => {
   await nextTick()
   autoResize()
@@ -41,15 +44,14 @@ const autoResize = () => {
   TextAreaRef.value!.style.height = `${newHeight}px`
   ContainerRef.value!.style.height = 'auto'
 }
-const onInputChange = (e: Event) => {
-  inputValue.value = (e.target as HTMLTextAreaElement).value
-  props.onChange?.(inputValue.value)
-}
 
 // 中文输入法下回车防止搜索
 let isComposing = false;
 const compositionend = () => {
-  isComposing = false;
+  setTimeout(() => {
+    isComposing = false;
+  }, 0)
+  
 };
 const compositionstart = () => {
   isComposing = true;
