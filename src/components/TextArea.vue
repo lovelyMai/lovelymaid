@@ -50,8 +50,8 @@ let isComposing = false;
 const compositionend = () => {
   setTimeout(() => {
     isComposing = false;
-  }, 0)
-  
+  }, 10)
+
 };
 const compositionstart = () => {
   isComposing = true;
@@ -59,11 +59,9 @@ const compositionstart = () => {
 
 // 回车事件
 const enter = (e: KeyboardEvent) => {
-  if (isComposing) return
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault()
-    props.onEnter?.(inputValue.value)
-  }
+  if (isComposing || e.shiftKey) return
+  e.preventDefault()
+  props.onEnter?.(inputValue.value)
 }
 
 // 暴露方法
@@ -75,7 +73,7 @@ defineExpose({
 
 <template>
   <div :class="[$style.container, 'lovelymaid', 'lovelymaid-glass-container']" ref="ContainerRef">
-    <textarea :rows="props.minrow" ref="TextAreaRef" :value="inputValue" @input="onInputChange" @keydown="enter"
+    <textarea :rows="props.minrow" ref="TextAreaRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionstart="compositionstart" @compositionend="compositionend"
       :placeholder="props.placeholder" />
   </div>

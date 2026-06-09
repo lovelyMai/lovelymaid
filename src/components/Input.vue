@@ -53,7 +53,7 @@ let isComposing = false;
 const compositionend = () => {
   setTimeout(() => {
     isComposing = false;
-  }, 0);
+  }, 10);
 };
 const compositionstart = () => {
   isComposing = true;
