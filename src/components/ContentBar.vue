@@ -67,9 +67,8 @@ watch(() => props.visible, (newVisible) => {
       </Button>
     </div>
     <div :class="$style.content">
-      <slot name="default"></slot>
+      <slot></slot>
     </div>
-    <slot name="outside"></slot>
   </div>
 </template>
 
@@ -111,11 +110,5 @@ watch(() => props.visible, (newVisible) => {
 .Button {
   margin-top: 10px;
   font-size: 20px;
-}
-
-.content {
-  display: flow-root;
-  position: relative;
-  z-index: 0;
 }
 </style>

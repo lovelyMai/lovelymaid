@@ -102,7 +102,7 @@ onUnmounted(() => {
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
-  transition: transform .5s cubic-bezier(0.2, 0.9, 0.4, 1);
+  transition: transform .5s cubic-bezier(0.2, 0.8, 0.6, 1);
 }
 
 .header {
