@@ -32,7 +32,11 @@ export function checkHorizontalScroll(
   let lastTime = 0;  // 记录上一次触摸的时间戳
   let lastSpeed = 0;  // 记录最后一次计算的速度值
   let scrollableElement: Element | null = null; // 新增：找到的可滚动元素
-  let startScrollLeft = 0; // 新增：开始触摸时的滚动位置
+
+  // rAF 节流
+  let rafId: number | null = null
+  let pendingDistance = 0
+  let pendingSpeed = 0
 
   // 检测元素是否可以横向滚动
   function isHorizontallyScrollable(element: Element): boolean {
@@ -74,8 +78,6 @@ export function checkHorizontalScroll(
     scrollableElement = findHorizontallyScrollableParent(target);
 
     if (scrollableElement) {
-      // 记录开始时的滚动位置
-      startScrollLeft = scrollableElement.scrollLeft;
       // 正常初始化，我们要跟踪它
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
@@ -96,9 +98,23 @@ export function checkHorizontalScroll(
       lastX = 0;
       lastTime = 0;
       scrollableElement = null;
-      startScrollLeft = 0;
     }
   };
+
+  // rAF 驱动的更新，避免频繁触发 Vue 响应式
+  function flushReactiveUpdate() {
+    rafId = null
+    distance.value = pendingDistance
+    speed.value = pendingSpeed
+  }
+
+  function scheduleReactiveUpdate() {
+    pendingDistance = accumulatedDistance
+    pendingSpeed = lastSpeed
+    if (rafId === null) {
+      rafId = requestAnimationFrame(flushReactiveUpdate)
+    }
+  }
 
   const handleTouchMove = (e: TouchEvent) => {
     if (!enabled.value) return;
@@ -152,12 +168,13 @@ export function checkHorizontalScroll(
         e.preventDefault(); // 阻止默认滚动
 
         isTouching.value = true
-        distance.value = accumulatedDistance
-        speed.value = 0
+        pendingDistance = accumulatedDistance
+        pendingSpeed = 0
+        scheduleReactiveUpdate()
       }
     } else {
-      // 已超过阈值，计算连续距离
-      accumulatedDistance = deltaX - threshold;
+      // 已超过阈值，计算连续距离（不允许为负）
+      accumulatedDistance = Math.max(0, deltaX - threshold);
 
       // 阻止默认行为
       e.preventDefault();
@@ -167,8 +184,9 @@ export function checkHorizontalScroll(
       if (lastX === 0 && lastTime === 0) {
         lastX = currentX;
         lastTime = currentTime;
-        distance.value = accumulatedDistance
-        speed.value = 0
+        pendingDistance = accumulatedDistance
+        pendingSpeed = 0
+        scheduleReactiveUpdate()
         return;
       }
       const timeDiff = currentTime - lastTime;
@@ -176,8 +194,7 @@ export function checkHorizontalScroll(
       lastSpeed = s;
       lastX = currentX;
       lastTime = currentTime;
-      distance.value = accumulatedDistance
-      speed.value = s
+      scheduleReactiveUpdate()
     }
   };
 
@@ -195,7 +212,6 @@ export function checkHorizontalScroll(
       isThresholdPassed = false;
       accumulatedDistance = 0;
       scrollableElement = null;
-      startScrollLeft = 0;
       return;
     }
 
@@ -204,7 +220,12 @@ export function checkHorizontalScroll(
     isThresholdPassed = false;
     accumulatedDistance = 0;
     scrollableElement = null;
-    startScrollLeft = 0;
+
+    // 取消待执行的 rAF，避免覆盖最终值
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId)
+      rafId = null
+    }
 
     // 使用最后一次计算的速度值
     distance.value = finalDistance
@@ -272,7 +293,11 @@ export function checkVerticalScroll(
   let lastTime = 0;  // 记录上一次触摸的时间戳
   let lastSpeed = 0;  // 记录最后一次计算的速度值
   let scrollableElement: Element | null = null; // 找到的可滚动元素
-  let startScrollTop = 0; // 开始触摸时的滚动位置
+
+  // rAF 节流
+  let rafId: number | null = null
+  let pendingDistance = 0
+  let pendingSpeed = 0
 
   // 检测元素是否可以纵向滚动
   function isVerticallyScrollable(element: Element): boolean {
@@ -314,8 +339,6 @@ export function checkVerticalScroll(
     scrollableElement = findVerticallyScrollableParent(target);
 
     if (scrollableElement) {
-      // 记录开始时的滚动位置
-      startScrollTop = scrollableElement.scrollTop;
       // 正常初始化，我们要跟踪它
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
@@ -336,9 +359,23 @@ export function checkVerticalScroll(
       lastY = 0;
       lastTime = 0;
       scrollableElement = null;
-      startScrollTop = 0;
     }
   };
+
+  // rAF 驱动的更新，避免频繁触发 Vue 响应式
+  function flushReactiveUpdate() {
+    rafId = null
+    distance.value = pendingDistance
+    speed.value = pendingSpeed
+  }
+
+  function scheduleReactiveUpdate() {
+    pendingDistance = accumulatedDistance
+    pendingSpeed = lastSpeed
+    if (rafId === null) {
+      rafId = requestAnimationFrame(flushReactiveUpdate)
+    }
+  }
 
   const handleTouchMove = (e: TouchEvent) => {
     if (!enabled.value) return;
@@ -392,12 +429,13 @@ export function checkVerticalScroll(
         e.preventDefault(); // 阻止默认滚动
 
         isTouching.value = true
-        distance.value = accumulatedDistance
-        speed.value = 0
+        pendingDistance = accumulatedDistance
+        pendingSpeed = 0
+        scheduleReactiveUpdate()
       }
     } else {
-      // 已超过阈值，计算连续距离
-      accumulatedDistance = deltaY - threshold;
+      // 已超过阈值，计算连续距离（不允许为负）
+      accumulatedDistance = Math.max(0, deltaY - threshold);
 
       // 阻止默认行为
       e.preventDefault();
@@ -407,8 +445,9 @@ export function checkVerticalScroll(
       if (lastY === 0 && lastTime === 0) {
         lastY = currentY;
         lastTime = currentTime;
-        distance.value = accumulatedDistance
-        speed.value = 0
+        pendingDistance = accumulatedDistance
+        pendingSpeed = 0
+        scheduleReactiveUpdate()
         return;
       }
       const timeDiff = currentTime - lastTime;
@@ -416,8 +455,7 @@ export function checkVerticalScroll(
       lastSpeed = s;
       lastY = currentY;
       lastTime = currentTime;
-      distance.value = accumulatedDistance
-      speed.value = s
+      scheduleReactiveUpdate()
     }
   };
 
@@ -435,7 +473,6 @@ export function checkVerticalScroll(
       isThresholdPassed = false;
       accumulatedDistance = 0;
       scrollableElement = null;
-      startScrollTop = 0;
       return;
     }
 
@@ -444,7 +481,12 @@ export function checkVerticalScroll(
     isThresholdPassed = false;
     accumulatedDistance = 0;
     scrollableElement = null;
-    startScrollTop = 0;
+
+    // 取消待执行的 rAF，避免覆盖最终值
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId)
+      rafId = null
+    }
 
     // 使用最后一次计算的速度值
     distance.value = finalDistance

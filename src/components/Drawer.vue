@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { watchRef } from '@/utils/common.js';
 import { checkVerticalScroll } from '@/utils/checkScroll';
@@ -66,9 +66,7 @@ onUnmounted(() => {
             <slot name="header"></slot>
           </div>
         </div>
-        <div :class="$style.content">
-          <slot></slot>
-        </div>
+        <slot></slot>
       </div>
     </transition>
   </div>
@@ -103,6 +101,7 @@ onUnmounted(() => {
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
   transition: transform .5s cubic-bezier(0.2, 0.8, 0.6, 1);
+  will-change: transform;
 }
 
 .header {
@@ -112,11 +111,6 @@ onUnmounted(() => {
   height: 0;
   margin-bottom: v-bind(HeaderMarginBottom);
   box-shadow: 0 0 calc(v-bind(HeaderMarginBottom) / 2) calc(v-bind(HeaderMarginBottom) / 2) rgba(248, 248, 248, .95);
-}
-
-.content {
-  position: relative;
-  z-index: 0;
 }
 </style>
 
