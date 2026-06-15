@@ -192,6 +192,7 @@ const stopSlide = (e: PointerEvent) => {
   document.removeEventListener('pointerup', stopSlide)
 }
 watch(() => props.activeIndex, (newIndex) => {
+  slideTransition.value = `transform .5s, background .1s`
   activeIndex.value = newIndex
   clearTimer(calculatePosTimer)
   targetPos.value = newIndex * slideWidth.value
