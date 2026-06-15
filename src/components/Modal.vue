@@ -5,14 +5,17 @@ import { watchRef } from '@/utils/common.js';
 import { checkVerticalScroll } from '@/utils/checkScroll';
 
 interface Props {
+  /** 类型 */
+  type?: 'desktop' | 'mobile'
   /** 是否展开 */
   isOpen: boolean
   /** 是否显示遮罩 */
   showMask?: boolean
   /** 滑动关闭 */
-  onSlideClose: () => void
+  onSlideClose?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
+  type: 'desktop',
   showMask: false
 });
 
@@ -32,6 +35,7 @@ watch(() => props.isOpen, (newOpen) => {
   isOpen.value = newOpen
 })
 onMounted(() => {
+  if (props.type === 'desktop') return
   scroll.value = checkVerticalScroll(DrawerContainerRef.value!, 0, ref(true), 500)
   watch(() => scroll.value!.isTouching, async (newTouching) => {
     if (newTouching) {
@@ -44,7 +48,7 @@ onMounted(() => {
       })
     })
     if (scroll.value!.speed > 0.1 || (scroll.value!.distance > DrawerContainerRef.value!.offsetHeight / 3 && scroll.value!.speed > -0.1)) {
-      props.onSlideClose()
+      props.onSlideClose?.()
     }
   })
 })
@@ -59,7 +63,9 @@ onUnmounted(() => {
       <div :class="$style.mask" v-if="props.showMask && isOpen"></div>
     </transition>
     <transition name="lovelymaid-slide">
-      <div :class="[$style.DrawerContainer, 'lovelymaid-common-container']" ref="DrawerContainerRef" v-show="isOpen"
+      <div
+        :class="['lovelymaid-common-container', $style.DrawerContainer, props.type === 'desktop' ? $style.desktop : $style.mobile]"
+        ref="DrawerContainerRef" v-show="isOpen"
         :style="isTouching ? { transform: `translateY(${scroll.distance}px)`, transition: 'none' } : undefined">
         <div :class="$style.header">
           <div ref="HeaderContainerRef">
@@ -76,6 +82,7 @@ onUnmounted(() => {
 .Drawer {
   position: relative;
   z-index: 10;
+  --width: 50dvw;
   --height: 90dvh;
 }
 
@@ -90,18 +97,28 @@ onUnmounted(() => {
 
 .DrawerContainer {
   position: fixed;
-  left: 0;
-  bottom: 0;
   z-index: 1;
-  width: 100dvw;
   height: var(--height);
-  border-top-left-radius: 38px;
-  border-top-right-radius: 38px;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
   transition: transform .5s cubic-bezier(0.2, 0.8, 0.6, 1);
   will-change: transform;
+}
+
+.DrawerContainer.desktop {
+  left: calc(50dvw - var(--width) / 2);
+  bottom: calc(50dvh - var(--height) / 2);
+  width: var(--width);
+  border-radius: 38px;
+}
+
+.DrawerContainer.mobile {
+  left: 0;
+  bottom: 0;
+  width: 100dvw;
+  border-top-left-radius: 38px;
+  border-top-right-radius: 38px;
 }
 
 .header {
@@ -127,6 +144,6 @@ onUnmounted(() => {
 
 .lovelymaid-slide-enter-from,
 .lovelymaid-slide-leave-to {
-  transform: translateY(100%);
+  transform: translateY(100dvh);
 }
 </style>
