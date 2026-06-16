@@ -30,7 +30,8 @@ watch(() => props.value, (newValue) => {
   inputValue.value = newValue
 })
 const onInputChange = (e: Event) => {
-  props.onChange?.((e.target as HTMLTextAreaElement).value)
+  inputValue.value = (e.target as HTMLInputElement).value
+  props.onChange?.(inputValue.value)
 }
 watch(inputValue, async () => {
   await nextTick()
@@ -68,6 +69,7 @@ const enter = (e: KeyboardEvent) => {
 defineExpose({
   focus: () => TextAreaRef.value?.focus(),
   blur: () => TextAreaRef.value?.blur(),
+  select: () => TextAreaRef.value?.select()
 })
 </script>
 

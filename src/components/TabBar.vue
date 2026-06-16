@@ -16,6 +16,8 @@ interface Props {
   showSearch?: boolean
   /** 列表项点击事件 */
   onItemClick?: (item: { name?: string, [key: string]: any }, index: number) => void
+  /** 输入改变事件 */
+  onSearch?: (inputValue: string) => void
 }
 const props = withDefaults(defineProps<Props>(), {
   activeIndex: 0
@@ -214,6 +216,9 @@ watch(searchIsActive, (newValue) => {
   if (newValue) setTimeout(() => searchIsShow.value = true, 100)
   else setTimeout(() => searchIsShow.value = false, 200)
 })
+
+// 搜索
+const inputValue = ref<string>('')
 </script>
 
 <template>
@@ -240,7 +245,8 @@ watch(searchIsActive, (newValue) => {
       <Button type="glass" :class="$style.Button" v-show="!searchIsShow" :onClick="clickSearch">
         <span class="lovelymai lovely-search button"></span>
       </Button>
-      <Input :class="$style.Search" v-show="searchIsShow" enterkeyhint="search">
+      <Input :class="$style.Search" v-show="searchIsShow" :value="inputValue" enterkeyhint="search"
+        :onChange="(newValue) => inputValue = newValue" :onEnter="onSearch">
         <span class="lovelymai lovely-search input"></span>
       </Input>
     </div>

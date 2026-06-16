@@ -1,11 +1,13 @@
 import ActionButton from './components/ActionButton.vue'
 import Button from './components/Button.vue'
 import ContentBar from './components/ContentBar.vue'
-import Modal from './components/Modal.vue'
 import FoldList from './components/FoldList.vue'
+import Form from './components/Form.vue'
 import Input from './components/Input.vue'
+import Modal from './components/Modal.vue'
 import SideBar from './components/SideBar.vue'
 import TabBar from './components/TabBar.vue'
+import Table from './components/Table.vue'
 import TextArea from './components/TextArea.vue'
 
 import '@/assets/styles/reset.css'
@@ -16,9 +18,10 @@ export {
   ActionButton,
   Button,
   ContentBar,
-  Modal,
   FoldList,
+  Form,
   Input,
+  Modal,
   SideBar,
   TabBar,
   TextArea,

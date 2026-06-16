@@ -20,9 +20,7 @@ const clickIcon = (e1: any) => {
   popX.value = rect.left + e1.offsetX + e1.target.offsetWidth / 2
   popY.value = rect.top + e1.offsetY + e1.target.offsetHeight / 2
   const closePop = (e2: any) => {
-    if (e1.target === e2.target) {
-      e2.stopPropagation()
-    }
+    e2.stopPropagation()
     isPop.value = false
     document.removeEventListener('click', closePop, true)
   }

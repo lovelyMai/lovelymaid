@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch, useSlots } from 'vue'
 
 import { watchRef } from '../utils/common'
 
@@ -25,9 +25,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 初始化
+const slots = useSlots()
 const ContainerRef = ref<HTMLElement | null>(null)
 const containerHeight = ref<string>('0')
 const inputHeight = ref<string>('0')
+const inputPaddingLeft = computed<string>(() => slots.default ? inputHeight.value : `calc(${inputHeight.value} / 2)`)
 onMounted(() => watchRef(ContainerRef, () => {
   const offsetHeight = ContainerRef.value!.offsetHeight
   containerHeight.value = `${offsetHeight}px`
@@ -41,10 +43,12 @@ watch(() => props.value, (newValue) => {
   inputValue.value = newValue
 })
 const onInputChange = (e: Event) => {
-  props.onChange?.((e.target as HTMLInputElement).value)
+  inputValue.value = (e.target as HTMLInputElement).value
+  props.onChange?.(inputValue.value)
 }
 const onInputClear = () => {
-  props.onChange?.('')
+  inputValue.value = ''
+  props.onChange?.(inputValue.value)
   InputRef.value?.focus()
 }
 
@@ -75,8 +79,8 @@ defineExpose({
 
 <template>
   <div :class="['lovelymaid', 'lovelymaid-glass-container', $style.Input]" ref="ContainerRef">
-    <div :class="[$style.icon, $style.custom]">
-      <slot><span class="lovelymai lovely-search"></span></slot>
+    <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
+      <slot></slot>
     </div>
     <input :type="props.type" ref="InputRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
@@ -126,7 +130,8 @@ input {
   background-color: transparent;
   border: none;
   border-radius: calc(v-bind(inputHeight) / 2);
-  padding: 0 v-bind(inputHeight);
+  padding-left: v-bind(inputPaddingLeft);
+  padding-right: v-bind(inputHeight);
   font-size: var(--font-size);
   font-weight: var(--font-weight);
   caret-color: #3c86f6;
