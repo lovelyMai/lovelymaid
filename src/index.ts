@@ -1,9 +1,9 @@
-import ActionButton from './components/ActionButton.vue'
 import Button from './components/Button.vue'
 import ContentBar from './components/ContentBar.vue'
 import FoldList from './components/FoldList.vue'
 import Form from './components/Form.vue'
 import Input from './components/Input.vue'
+import Menu from './components/Menu.vue'
 import Modal from './components/Modal.vue'
 import SideBar from './components/SideBar.vue'
 import TabBar from './components/TabBar.vue'
@@ -15,14 +15,15 @@ import '@/assets/styles/main.css'
 import '@/assets/icons/iconfont.css'
 
 export {
-  ActionButton,
   Button,
   ContentBar,
   FoldList,
   Form,
   Input,
+  Menu,
   Modal,
   SideBar,
   TabBar,
   TextArea,
 }
+export type { FormItem } from './types'

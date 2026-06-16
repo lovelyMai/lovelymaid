@@ -14,7 +14,7 @@ interface Props {
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   /** 输入改变事件 */
   onChange?: (newValue: string) => void
-  /** 回车搜索事件 */
+  /** 回车事件 */
   onEnter?: (inputValue: string) => void
 }
 
