@@ -9,20 +9,24 @@ export type FormItem = {
   placeholder?: string
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   width?: string
-  onChange?: (newValue: string) => void
-  onEnter?: (inputValue: string) => void
+  height?: string
 }
 interface Props {
   config: FormItem[]
+  columnWidth?: string
+  rowHeight?: string
+  onChange?: (newValue: string, index: number) => void
+  onEnter?: (inputValue: string, index: number) => void
 }
 const props = defineProps<Props>()
 </script>
 <template>
   <ul :class="['lovelymaid', $style.Form]">
-    <li :class="$style.FormItem" v-for="(item, index) in props.config" :key="item.id" :style="{ width: item.width }">
+    <li :class="$style.FormItem" v-for="(item, index) in props.config" :key="item.id"
+      :style="{ width: item.width || props.columnWidth || '150px', height: item.height || props.rowHeight || '35px' }">
       <span :class="$style.name">{{ item.name }}</span>
       <Input :class="$style.Input" :type="item.type" :value="item.value" :placeholder="item.placeholder"
-        :enterkeyhint="item.enterkeyhint" :onChange="item.onChange" :onEnter="item.onEnter" />
+        :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange?.(newValue, index)" :onEnter="(inputValue) => props.onEnter?.(inputValue, index)" />
     </li>
   </ul>
 </template>
@@ -41,5 +45,6 @@ const props = defineProps<Props>()
 
 .FormItem .Input {
   flex: 1;
+  height: 100%;
 }
 </style>
