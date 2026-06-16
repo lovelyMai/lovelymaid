@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import Input from './Input.vue'
-import type { FormItem } from '@/types';
 
+export type FormItem = {
+  id: string
+  name: string
+  type?: 'text' | 'password'
+  value?: string
+  placeholder?: string
+  enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
+  width?: string
+  onChange?: (newValue: string) => void
+  onEnter?: (inputValue: string) => void
+}
 interface Props {
   config: FormItem[]
 }

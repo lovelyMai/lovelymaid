@@ -74,7 +74,7 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="[$style.container, 'lovelymaid', 'lovelymaid-glass-container']" ref="ContainerRef">
+  <div :class="['lovelymaid', 'lovelymaid-glass-container', $style.container]" ref="ContainerRef">
     <textarea :rows="props.minrow" ref="TextAreaRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionstart="compositionstart" @compositionend="compositionend"
       :placeholder="props.placeholder" />
