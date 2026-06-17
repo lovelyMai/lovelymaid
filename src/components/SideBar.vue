@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import Card from './Card.vue';
 
 import { debounce } from '@/utils/common';
 import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
@@ -23,15 +24,15 @@ const switchSideBar = () => {
 }
 
 // 计算侧边栏平移距离
-const ContainerRef = ref<HTMLElement | null>(null)
+const SideBarRef = ref<InstanceType<typeof Card> | null>(null)
 const ContainerWidth = ref<number>(0)
 const transition = ref<string>('none')
 const TransformDistance = ref<number>(0)
 const translateX = computed<string>(() => props.isOpen ? '0' : `${-TransformDistance.value}px`)
 const calculateTransform = () => {
-  if (!ContainerRef.value) return
-  ContainerWidth.value = ContainerRef.value.offsetWidth
-  TransformDistance.value = getLayoutLeftInViewport(ContainerRef.value) + ContainerWidth.value + 10
+  if (!SideBarRef.value) return
+  ContainerWidth.value = SideBarRef.value.$el.offsetWidth
+  TransformDistance.value = getLayoutLeftInViewport(SideBarRef.value.$el) + ContainerWidth.value + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
@@ -64,7 +65,7 @@ watch(() => props.visible, (newVisible) => {
 </script>
 
 <template>
-  <div :class="['lovelymaid', 'lovelymaid-glass-container', $style.SideBar]" ref="ContainerRef">
+  <Card :class="$style.SideBar" ref="SideBarRef" type="glass">
     <div :class="$style.header">
       <div :class="[$style.SwitchButton, { [$style.close]: !props.isOpen }]" @click="switchSideBar"
         :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
@@ -72,7 +73,7 @@ watch(() => props.visible, (newVisible) => {
       </div>
     </div>
     <slot>这是内容</slot>
-  </div>
+  </Card>
 </template>
 
 <style module>

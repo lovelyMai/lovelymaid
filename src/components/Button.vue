@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { watchRef } from '../utils/common';
+import { watchDOM } from '../utils/common';
 
 interface Props {
   /** 类型 */
@@ -16,10 +16,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 计算字体大小
-const ButtonRef = ref<any>(null)
+const ButtonRef = ref<HTMLElement | null>(null)
 const borderRadius = ref<string>('')
 const fontSize = ref<string>('0')
-onMounted(() => watchRef(ButtonRef, ({ width, height }) => {
+onMounted(() => watchDOM(ButtonRef.value, ({ width, height }) => {
   const shorter = Math.min(width, height)
   borderRadius.value = `${shorter / 2}px`
   fontSize.value = `${shorter / 2}px`
@@ -27,9 +27,9 @@ onMounted(() => watchRef(ButtonRef, ({ width, height }) => {
 </script>
 
 <template>
-  <div ref="ButtonRef"
+  <div
     :class="['lovelymaid', $style.Button, { 'lovelymaid-glass-container': props.type === 'glass', [$style.common]: props.type === 'common', }]"
-    @click="props.onClick" :title="props.title">
+    ref="ButtonRef" @click="props.onClick" :title="props.title">
     <slot></slot>
   </div>
 </template>

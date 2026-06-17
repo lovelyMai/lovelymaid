@@ -28,30 +28,30 @@ export function throttle<T extends (...args: any[]) => any>(
 }
 
 // 观察 DOM
-export function watchRef(
-  elementRef: { value: HTMLElement | null },
+export function watchDOM(
+  element: HTMLElement | null,
   callback: (size: { width: number; height: number }) => void,
   immediate: boolean
 ): () => void {
-  if (!elementRef.value) {
+  if (!element) {
     return () => { }
   }
 
   if (immediate) callback({
-    width: elementRef.value.offsetWidth,
-    height: elementRef.value.offsetHeight
+    width: element.offsetWidth,
+    height: element.offsetHeight
   })
 
   const observer = new ResizeObserver(() => {
-    if (elementRef.value) {
+    if (element) {
       callback({
-        width: elementRef.value.offsetWidth,
-        height: elementRef.value.offsetHeight
+        width: element.offsetWidth,
+        height: element.offsetHeight
       })
     }
   })
 
-  observer.observe(elementRef.value)
+  observer.observe(element)
 
   return () => observer.disconnect()
 }

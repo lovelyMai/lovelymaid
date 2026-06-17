@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, useSlots } from 'vue'
+import Card from './Card.vue'
 
-import { watchRef } from '../utils/common'
+import { watchDOM } from '../utils/common'
 
 interface Props {
   /** 输入框类型 */
@@ -26,18 +27,18 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 初始化
 const slots = useSlots()
-const ContainerRef = ref<HTMLElement | null>(null)
+const InputRef = ref<InstanceType<typeof Card> | null>(null)
 const containerHeight = ref<string>('0')
 const inputHeight = ref<string>('0')
 const inputPaddingLeft = computed<string>(() => slots.default ? inputHeight.value : `calc(${inputHeight.value} / 2)`)
-onMounted(() => watchRef(ContainerRef, () => {
-  const offsetHeight = ContainerRef.value!.offsetHeight
+onMounted(() => watchDOM(InputRef.value?.$el, () => {
+  const offsetHeight = InputRef.value!.$el.offsetHeight
   containerHeight.value = `${offsetHeight}px`
   inputHeight.value = `${offsetHeight - 2}px`
 }, true))
 
 // 输入值改变事件
-const InputRef = ref<HTMLInputElement | null>(null)
+const inputRef = ref<HTMLInputElement | null>(null)
 const inputValue = ref<string>(props.value)
 watch(() => props.value, (newValue) => {
   inputValue.value = newValue
@@ -49,7 +50,7 @@ const onInputChange = (e: Event) => {
 const onInputClear = () => {
   inputValue.value = ''
   props.onChange?.(inputValue.value)
-  InputRef.value?.focus()
+  inputRef.value?.focus()
 }
 
 // 中文输入法下回车防止搜索
@@ -71,24 +72,24 @@ const enter = async () => {
 
 // 暴露方法
 defineExpose({
-  focus: () => InputRef.value?.focus(),
-  blur: () => InputRef.value?.blur(),
-  select: () => InputRef.value?.select()
+  focus: () => inputRef.value?.focus(),
+  blur: () => inputRef.value?.blur(),
+  select: () => inputRef.value?.select()
 })
 </script>
 
 <template>
-  <div :class="['lovelymaid', 'lovelymaid-glass-container', $style.Input]" ref="ContainerRef">
+  <Card :class="$style.Input" ref="InputRef" type="glass">
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :type="props.type" ref="InputRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
+    <input :class="$style.input" ref="inputRef" :type="props.type" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
       :placeholder="props.placeholder" />
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
     </div>
-  </div>
+  </Card>
 </template>
 
 <style module>
@@ -122,9 +123,8 @@ defineExpose({
 .icon.clear {
   right: 0;
 }
-</style>
-<style scoped>
-input {
+
+.input {
   width: 100%;
   height: 100%;
   background-color: transparent;
@@ -139,16 +139,17 @@ input {
   transition: outline .2s ease;
 }
 
-input::placeholder {
+.input::placeholder {
   font-size: var(--font-size);
   font-weight: var(--font-weight);
   color: var(--placeholder-color);
 }
 
-input:focus {
+.input:focus {
   outline: 3px solid #94bbf0;
 }
-
+</style>
+<style scoped>
 .lovely-clear {
   font-size: calc(v-bind(inputHeight) / 2);
   color: var(--clear-color);

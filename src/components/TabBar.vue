@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-
+import Card from './Card.vue';
 import Button from './Button.vue'
 import Input from './Input.vue'
 
-import { watchRef } from '../utils/common';
+import { watchDOM } from '../utils/common';
 import { getLayoutLeftInViewport } from '../utils/getOffsetInViewport';
 
 interface Props {
@@ -41,7 +41,7 @@ const activeIndex = ref<number>(props.activeIndex)
 const targetPos = ref<number>(0)
 let slideCenter: number
 onMounted(() => {
-  cleanup = watchRef(BarRef, () => {
+  cleanup = watchDOM(BarRef.value, () => {
     barHeight.value = BarRef.value!.offsetHeight
     barWidth.value = props.showSearch ? BarRef.value!.offsetWidth - barHeight.value - 5 : BarRef.value!.offsetWidth
     searchWidth.value = BarRef.value!.offsetWidth - barHeight.value * 0.8 - 5
@@ -78,7 +78,7 @@ onUnmounted(() => {
 
 // 滑块动画
 const background = ref<string>('#e4e4e6')
-const barBackgroundColor = ref<string>('rgba(248, 248, 248, 0.9)')
+const barBackgroundColor = ref<string>('rgba(249, 249, 249, 0.9)')
 const border = ref<string>('none')
 const boxShadow = ref<string>('none')
 const barScale = ref<number>(1)
@@ -171,7 +171,7 @@ const moveSlide = (e: PointerEvent) => {
 const stopSlide = (e: PointerEvent) => {
   if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
   background.value = '#e4e4e6'
-  barBackgroundColor.value = 'rgba(248, 248, 248, 0.9)'
+  barBackgroundColor.value = 'rgba(249, 249, 249, 0.9)'
   border.value = 'none'
   boxShadow.value = 'none'
   slideTransition.value = `transform .5s, background .1s`
@@ -216,14 +216,11 @@ watch(searchIsActive, (newValue) => {
   if (newValue) setTimeout(() => searchIsShow.value = true, 100)
   else setTimeout(() => searchIsShow.value = false, 200)
 })
-
-// 搜索
-const inputValue = ref<string>('')
 </script>
 
 <template>
   <div :class="['lovelymaid', $style.TabBar]" ref="BarRef">
-    <div :class="[$style.bar, 'lovelymaid-glass-container', { [$style.active]: !searchIsActive }]">
+    <Card :class="[$style.bar, { [$style.active]: !searchIsActive }]" type="glass">
       <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
           <slot :item="props.list[activeIndex]" :index="activeIndex"></slot>
@@ -240,13 +237,12 @@ const inputValue = ref<string>('')
           </li>
         </ul>
       </ul>
-    </div>
+    </Card>
     <div :class="[$style.search, { [$style.active]: searchIsActive }]" v-if="props.showSearch">
       <Button type="glass" :class="$style.Button" v-show="!searchIsShow" :onClick="clickSearch">
         <span class="lovelymai lovely-search button"></span>
       </Button>
-      <Input :class="$style.Search" v-show="searchIsShow" :value="inputValue" enterkeyhint="search"
-        :onChange="(newValue) => inputValue = newValue" :onEnter="onSearch">
+      <Input :class="$style.Search" v-show="searchIsShow" enterkeyhint="search" :onEnter="onSearch">
         <span class="lovelymai lovely-search input"></span>
       </Input>
     </div>

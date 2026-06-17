@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue'
+import Card from './Card.vue';
 
-import { watchRef } from '@/utils/common.js';
+import { watchDOM } from '@/utils/common.js';
 import { checkVerticalScroll } from '@/utils/checkScroll';
 
 interface Props {
@@ -22,12 +23,12 @@ const props = withDefaults(defineProps<Props>(), {
 // Header 高度自适应
 const HeaderContainerRef = ref<HTMLElement | null>(null)
 const HeaderMarginBottom = ref<string>('60px')
-onMounted(() => watchRef(HeaderContainerRef, ({ height }) => {
+onMounted(() => watchDOM(HeaderContainerRef.value, ({ height }) => {
   HeaderMarginBottom.value = `${height}px`
 }, true))
 
 // 上下滚动
-const DrawerContainerRef = ref<HTMLElement | null>(null)
+const DrawerContainerRef = ref<InstanceType<typeof Card> | null>(null)
 const scroll = ref<any | null>(null)
 const isOpen = ref<boolean>(props.isOpen)
 const isTouching = ref<boolean>(false)
@@ -36,7 +37,7 @@ watch(() => props.isOpen, (newOpen) => {
 })
 onMounted(() => {
   if (props.type === 'desktop') return
-  scroll.value = checkVerticalScroll(DrawerContainerRef.value!, 0, ref(true), 500)
+  scroll.value = checkVerticalScroll(DrawerContainerRef.value!.$el, 0, ref(true), 500)
   watch(() => scroll.value!.isTouching, async (newTouching) => {
     if (newTouching) {
       isTouching.value = true
@@ -47,7 +48,7 @@ onMounted(() => {
         isTouching.value = false
       })
     })
-    if (scroll.value!.speed > 0.1 || (scroll.value!.distance > DrawerContainerRef.value!.offsetHeight / 3 && scroll.value!.speed > -0.1)) {
+    if (scroll.value!.speed > 0.1 || (scroll.value!.distance > DrawerContainerRef.value!.$el.offsetHeight / 3 && scroll.value!.speed > -0.1)) {
       props.onSlideClose?.()
     }
   })
@@ -63,9 +64,8 @@ onUnmounted(() => {
       <div :class="$style.mask" v-if="props.showMask && isOpen"></div>
     </transition>
     <transition name="lovelymaid-slide">
-      <div
-        :class="['lovelymaid-common-container', $style.DrawerContainer, props.type === 'desktop' ? $style.desktop : $style.mobile]"
-        ref="DrawerContainerRef" v-show="isOpen"
+      <Card :class="[$style.DrawerContainer, props.type === 'desktop' ? $style.desktop : $style.mobile]" v-show="isOpen"
+        ref="DrawerContainerRef" type="common"
         :style="isTouching ? { transform: `translateY(${scroll.distance}px)`, transition: 'none' } : undefined">
         <div :class="$style.header">
           <div ref="HeaderContainerRef">
@@ -73,7 +73,7 @@ onUnmounted(() => {
           </div>
         </div>
         <slot></slot>
-      </div>
+      </Card>
     </transition>
   </div>
 </template>

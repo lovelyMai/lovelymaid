@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
+import Card from './Card.vue'
 
 interface Props {
   /** 最小行数 */
@@ -23,8 +24,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 输入值改变事件
-const TextAreaRef = ref<HTMLTextAreaElement | null>(null)
-const ContainerRef = ref<HTMLElement | null>(null)
+const TextAreaRef = ref<InstanceType<typeof Card> | null>(null)
+const InputRef = ref<HTMLTextAreaElement | null>(null)
 const inputValue = ref<string>(props.value)
 watch(() => props.value, (newValue) => {
   inputValue.value = newValue
@@ -38,12 +39,12 @@ watch(inputValue, async () => {
   autoResize()
 })
 const autoResize = () => {
-  const currentHeight = TextAreaRef.value!.clientHeight + 2
-  ContainerRef.value!.style.height = `${currentHeight}px`
-  TextAreaRef.value!.style.height = 'auto'
-  const newHeight = TextAreaRef.value!.scrollHeight
-  TextAreaRef.value!.style.height = `${newHeight}px`
-  ContainerRef.value!.style.height = 'auto'
+  const currentHeight = InputRef.value!.clientHeight + 2
+  TextAreaRef.value!.$el.style.height = `${currentHeight}px`
+  InputRef.value!.style.height = 'auto'
+  const newHeight = InputRef.value!.scrollHeight
+  InputRef.value!.style.height = `${newHeight}px`
+  TextAreaRef.value!.$el.style.height = 'auto'
 }
 
 // 中文输入法下回车防止搜索
@@ -67,22 +68,22 @@ const enter = (e: KeyboardEvent) => {
 
 // 暴露方法
 defineExpose({
-  focus: () => TextAreaRef.value?.focus(),
-  blur: () => TextAreaRef.value?.blur(),
-  select: () => TextAreaRef.value?.select()
+  focus: () => InputRef.value?.focus(),
+  blur: () => InputRef.value?.blur(),
+  select: () => InputRef.value?.select()
 })
 </script>
 
 <template>
-  <div :class="['lovelymaid', 'lovelymaid-glass-container', $style.container]" ref="ContainerRef">
-    <textarea :rows="props.minrow" ref="TextAreaRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
+  <Card :class="$style.TextArea" ref="TextAreaRef" type="glass">
+    <textarea :rows="props.minrow" ref="InputRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionstart="compositionstart" @compositionend="compositionend"
       :placeholder="props.placeholder" />
-  </div>
+  </Card>
 </template>
 
 <style module>
-.container {
+.TextArea {
   border-radius: var(--border-radius);
   --max-height: auto;
   --border-radius: 20px;

@@ -1,4 +1,5 @@
 import Button from './components/Button.vue'
+import Card from './components/Card.vue'
 import ContentBar from './components/ContentBar.vue'
 import FoldList from './components/FoldList.vue'
 import Form, { type FormItem } from './components/Form.vue'
@@ -16,6 +17,7 @@ import '@/assets/icons/iconfont.css'
 
 export {
   Button,
+  Card,
   ContentBar,
   FoldList,
   Form, type FormItem,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
 
 interface Props {
   /** 列表 */
@@ -11,27 +11,33 @@ const props = defineProps<Props>()
 
 // 弹出列表
 const isPop = ref<boolean>(false)
+const ListRef = ref<HTMLElement | null>(null)
 const popX = ref<number>(0)
 const popY = ref<number>(0)
+let closePop: ((e: MouseEvent) => void) | null = null
+onUnmounted(() => {
+  if (closePop) document.removeEventListener('click', closePop, true)
+})
 const clickIcon = (e1: any) => {
   if (isPop.value) return
   isPop.value = true
   const rect = e1.target.getBoundingClientRect()
   popX.value = rect.left + e1.offsetX + e1.target.offsetWidth / 2
   popY.value = rect.top + e1.offsetY + e1.target.offsetHeight / 2
-  const closePop = (e2: any) => {
-    e2.stopPropagation()
+  closePop = (e2: MouseEvent) => {
     isPop.value = false
-    document.removeEventListener('click', closePop, true)
+    document.removeEventListener('click', closePop!, true)
+    if (ListRef.value?.contains(e2.target as Node)) return
+    e2.stopPropagation()
   }
   document.addEventListener('click', closePop, true)
 }
 </script>
 
 <template>
-  <span class="lovelymaid lovelymai lovely-ellipsis Menu" @click.stop="clickIcon">
+  <span class="lovelymaid lovelymai lovely-ellipsis Select" @click.stop="clickIcon">
     <teleport to="body">
-      <ul class="list" v-if="isPop" :style="{ left: `${popX}px`, top: `${popY}px` }">
+      <ul class="list" ref="ListRef" v-if="isPop" :style="{ left: `${popX}px`, top: `${popY}px` }" @click.stop>
         <li class="item" v-for="(item, index) in props.list" :key="index" @click="props.onItemClick?.(item, index)">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>
@@ -41,7 +47,7 @@ const clickIcon = (e1: any) => {
 </template>
 
 <style scoped>
-.Menu {
+.Select {
   display: flex;
   justify-content: center;
   align-items: center;

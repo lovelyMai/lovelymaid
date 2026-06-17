@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import Card from './Card.vue';
 
 import Button from './Button.vue';
 
@@ -23,13 +24,13 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 计算侧边栏平移距离
-const ContainerRef = ref<HTMLElement | null>(null)
+const ContentBarRef = ref<InstanceType<typeof Card> | null>(null)
 const transition = ref<string>('none')
 const transformDistance = ref<number>(0)
 const translateX = computed<string>(() => props.isOpen ? '0' : `${-transformDistance.value}px`)
 const calculateTransform = () => {
-  if (!ContainerRef.value) return
-  transformDistance.value = getLayoutLeftInViewport(ContainerRef.value) + ContainerRef.value.offsetWidth + 10
+  if (!ContentBarRef.value) return
+  transformDistance.value = getLayoutLeftInViewport(ContentBarRef.value.$el) + ContentBarRef.value.$el.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
@@ -59,7 +60,7 @@ watch(() => props.visible, (newVisible) => {
 </script>
 
 <template>
-  <div :class="['lovelymaid', 'lovelymaid-glass-container', $style.ContentBar]" ref="ContainerRef">
+  <Card :class="$style.ContentBar" ref="ContentBarRef" type="glass">
     <div :class="$style.header">
       <div :class="$style.title" :title="props.title">{{ props.title }}</div>
       <Button type="glass" :class="$style.Button" :onClick="props.onCloseClick" title="收起内容栏">
@@ -69,7 +70,7 @@ watch(() => props.visible, (newVisible) => {
     <div :class="$style.content">
       <slot></slot>
     </div>
-  </div>
+  </Card>
 </template>
 
 <style module>
