@@ -7,10 +7,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 </script>
 <template>
-  <div
-    :class="['lovelymaid', props.type === 'common' ? 'lovelymaid-common-container' : 'lovelymaid-glass-container']">
+  <div :class="props.type === 'common' ? 'lovelymaid-common-container' : 'lovelymaid-glass-container'">
     <slot></slot>
   </div>
 </template>
-<style module>
-</style>
+<style module></style>

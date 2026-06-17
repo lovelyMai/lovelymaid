@@ -31,24 +31,24 @@ export function throttle<T extends (...args: any[]) => any>(
 export function watchDOM(
   element: HTMLElement | null,
   callback: (size: { width: number; height: number }) => void,
-  immediate: boolean
+  immediate: boolean = false
 ): () => void {
   if (!element) {
     return () => { }
   }
 
-  if (immediate) callback({
-    width: element.offsetWidth,
-    height: element.offsetHeight
-  })
-
+  if (immediate) {
+    callback({
+      width: element.offsetWidth,
+      height: element.offsetHeight
+    })
+  }
   const observer = new ResizeObserver(() => {
-    if (element) {
-      callback({
-        width: element.offsetWidth,
-        height: element.offsetHeight
-      })
-    }
+    if (!element) return
+    callback({
+      width: element.offsetWidth,
+      height: element.offsetHeight
+    })
   })
 
   observer.observe(element)

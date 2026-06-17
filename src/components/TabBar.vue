@@ -219,7 +219,7 @@ watch(searchIsActive, (newValue) => {
 </script>
 
 <template>
-  <div :class="['lovelymaid', $style.TabBar]" ref="BarRef">
+  <div :class="$style.TabBar" ref="BarRef">
     <Card :class="[$style.bar, { [$style.active]: !searchIsActive }]" type="glass">
       <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">

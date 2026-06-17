@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, useSlots } from 'vue'
+import { computed, onMounted, ref, watch, useSlots, onUnmounted } from 'vue'
 import Card from './Card.vue'
 
 import { watchDOM } from '../utils/common'
@@ -28,14 +28,17 @@ const props = withDefaults(defineProps<Props>(), {
 // 初始化
 const slots = useSlots()
 const InputRef = ref<InstanceType<typeof Card> | null>(null)
-const containerHeight = ref<string>('0')
+const InputHeight = ref<string>('0')
 const inputHeight = ref<string>('0')
 const inputPaddingLeft = computed<string>(() => slots.default ? inputHeight.value : `calc(${inputHeight.value} / 2)`)
-onMounted(() => watchDOM(InputRef.value?.$el, () => {
-  const offsetHeight = InputRef.value!.$el.offsetHeight
-  containerHeight.value = `${offsetHeight}px`
-  inputHeight.value = `${offsetHeight - 2}px`
-}, true))
+let cleanup: () => void
+onMounted(() => {
+  cleanup = watchDOM(InputRef.value?.$el, ({ height }) => {
+    InputHeight.value = `${height}px`
+    inputHeight.value = `${height - 2}px`
+  }, true)
+})
+onUnmounted(() => cleanup())
 
 // 输入值改变事件
 const inputRef = ref<HTMLInputElement | null>(null)
@@ -83,9 +86,9 @@ defineExpose({
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" ref="inputRef" :type="props.type" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
-      :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
-      :placeholder="props.placeholder" />
+    <input :class="$style.input" ref="inputRef" :type="props.type" :value="inputValue" @input="onInputChange"
+      @keydown.enter="enter" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
+      @compositionstart="compositionstart" :placeholder="props.placeholder" />
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
     </div>
@@ -97,7 +100,7 @@ defineExpose({
   display: flex;
   position: relative;
   height: 35px;
-  border-radius: calc(v-bind(containerHeight) / 2);
+  border-radius: calc(v-bind(InputHeight) / 2);
   --font-size: 14px;
   --font-weight: 400;
   --clear-color: #767676;

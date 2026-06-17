@@ -24,7 +24,7 @@ createApp(App).mount('#app')
 
 ## 第二步：在任何 Vue 组件中使用组件
 
-直接在 Vue 组件中导入并使用 LovelyMaid 组件：
+直接在 Vue 组件中导入并使用 lovelymaid 组件：
 
 ```vue
 <script setup>

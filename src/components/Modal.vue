@@ -23,9 +23,13 @@ const props = withDefaults(defineProps<Props>(), {
 // Header 高度自适应
 const HeaderContainerRef = ref<HTMLElement | null>(null)
 const HeaderMarginBottom = ref<string>('60px')
-onMounted(() => watchDOM(HeaderContainerRef.value, ({ height }) => {
-  HeaderMarginBottom.value = `${height}px`
-}, true))
+let cleanup: () => void
+onMounted(() => {
+  cleanup = watchDOM(HeaderContainerRef.value, ({ height }) => {
+    HeaderMarginBottom.value = `${height}px`
+  }, true)
+})
+onUnmounted(() => cleanup())
 
 // 上下滚动
 const DrawerContainerRef = ref<InstanceType<typeof Card> | null>(null)
@@ -59,7 +63,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div :class="['lovelymaid', $style.Drawer]">
+  <div :class="$style.Drawer">
     <transition name="lovelymaid-fade">
       <div :class="$style.mask" v-if="props.showMask && isOpen"></div>
     </transition>

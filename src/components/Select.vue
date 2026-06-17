@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from 'vue';
+import Menu from './common/Menu.vue';
 
 interface Props {
   /** 列表 */
@@ -11,66 +12,46 @@ const props = defineProps<Props>()
 
 // 弹出列表
 const isPop = ref<boolean>(false)
-const ListRef = ref<HTMLElement | null>(null)
+const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
 const popX = ref<number>(0)
 const popY = ref<number>(0)
-let closePop: ((e: MouseEvent) => void) | null = null
+const closePop = (e2: MouseEvent) => {
+  if (!MenuRef.value || !MenuRef.value.MenuRef) return
+  isPop.value = false
+  document.removeEventListener('click', closePop, true)
+  if (MenuRef.value.MenuRef.contains(e2.target as HTMLElement)) return
+  e2.stopPropagation()
+}
 onUnmounted(() => {
-  if (closePop) document.removeEventListener('click', closePop, true)
+  document.removeEventListener('click', closePop, true)
 })
-const clickIcon = (e1: any) => {
+const clickIcon = (e1: MouseEvent) => {
   if (isPop.value) return
   isPop.value = true
-  const rect = e1.target.getBoundingClientRect()
-  popX.value = rect.left + e1.offsetX + e1.target.offsetWidth / 2
-  popY.value = rect.top + e1.offsetY + e1.target.offsetHeight / 2
-  closePop = (e2: MouseEvent) => {
-    isPop.value = false
-    document.removeEventListener('click', closePop!, true)
-    if (ListRef.value?.contains(e2.target as Node)) return
-    e2.stopPropagation()
-  }
+  const icon = e1.target as HTMLElement
+  const rect = icon.getBoundingClientRect()
+  popX.value = rect.left + e1.offsetX + icon.offsetWidth / 2
+  popY.value = rect.top + e1.offsetY + icon.offsetHeight / 2
   document.addEventListener('click', closePop, true)
 }
 </script>
 
 <template>
-  <span class="lovelymaid lovelymai lovely-ellipsis Select" @click.stop="clickIcon">
-    <teleport to="body">
-      <ul class="list" ref="ListRef" v-if="isPop" :style="{ left: `${popX}px`, top: `${popY}px` }" @click.stop>
-        <li class="item" v-for="(item, index) in props.list" :key="index" @click="props.onItemClick?.(item, index)">
-          <slot :item="item" :index="index">{{ item.name }}</slot>
-        </li>
-      </ul>
-    </teleport>
+  <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" @click.stop="clickIcon">
+    <Menu ref="MenuRef" :visible="isPop" :position="[popX, popY]" :list="props.list" :onItemClick="props.onItemClick"
+      v-slot="{ item, index }">
+      <slot :item="item" :index="index"></slot>
+    </Menu>
   </span>
 </template>
 
-<style scoped>
+<style module>
 .Select {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
-}
-
-.list {
-  position: fixed;
-  z-index: 999;
-  padding: 4px;
-  background-color: #f3f6f6;
-  border-radius: 10px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, .1);
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
-.list .item {
-  border-radius: 8px;
-}
-
-.list .item:hover {
-  background-color: #3b86f7;
-  color: #fff;
 }
 </style>

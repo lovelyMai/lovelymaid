@@ -60,7 +60,7 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
 </script>
 
 <template>
-  <div :class="['lovelymaid', $style.FoldList]">
+  <div :class="$style.FoldList">
     <div :class="$style.header" @click="onHeaderClick">
       <div :class="$style.title">
         {{ props.title }}
@@ -68,8 +68,7 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
       <span class="lovelymai lovely-right-arrow" :style="{ transform: props.isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
         :title="isOpen ? '收起列表' : '展开列表'" @click.stop="props.onButtonClick"></span>
     </div>
-    <div :class="$style.BodyContainer"
-      :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
+    <div :class="$style.BodyContainer" :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
       <ul :class="[$style.body, { [$style.close]: !isOpen }]" ref="bodyRef">
         <li
           :class="[$style.item, { [$style.active]: item.id === props.activeId, [$style.slideAnimation]: slideAnimating }]"

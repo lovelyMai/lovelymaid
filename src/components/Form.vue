@@ -21,12 +21,13 @@ interface Props {
 const props = defineProps<Props>()
 </script>
 <template>
-  <ul :class="['lovelymaid', $style.Form]">
+  <ul :class="$style.Form">
     <li :class="$style.FormItem" v-for="(item, index) in props.config" :key="item.id"
       :style="{ width: item.width || props.columnWidth || '150px', height: item.height || props.rowHeight || '35px' }">
       <span :class="$style.name">{{ item.name }}</span>
       <Input :class="$style.Input" :type="item.type" :value="item.value" :placeholder="item.placeholder"
-        :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange?.(newValue, index)" :onEnter="(inputValue) => props.onEnter?.(inputValue, index)" />
+        :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange?.(newValue, index)"
+        :onEnter="(inputValue) => props.onEnter?.(inputValue, index)" />
     </li>
   </ul>
 </template>
