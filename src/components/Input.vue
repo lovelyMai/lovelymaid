@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, useSlots, onUnmounted } from 'vue'
 import Card from './Card.vue'
+import Menu from './common/Menu.vue'
 
 import { watchDOM } from '../utils/common'
+import { createMenuManage } from '@/composables/menu.js'
 
 interface Props {
   /** 输入框类型 */
-  type?: "text" | "password"
+  type?: "text" | "password" | "select"
   /** 值 */
   value?: string
+  /** 选项 */
+  options?: { name: string, [key: string]: any }[]
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
@@ -22,7 +26,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   value: '',
-  placeholder: '输入...'
+  options: () => []
 });
 
 // 初始化
@@ -50,11 +54,6 @@ const onInputChange = (e: Event) => {
   inputValue.value = (e.target as HTMLInputElement).value
   props.onChange?.(inputValue.value)
 }
-const onInputClear = () => {
-  inputValue.value = ''
-  props.onChange?.(inputValue.value)
-  inputRef.value?.focus()
-}
 
 // 中文输入法下回车防止搜索
 let isComposing = false;
@@ -73,6 +72,21 @@ const enter = async () => {
   props.onEnter?.(inputValue.value)
 }
 
+// 菜单
+const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
+const MenuMangage = createMenuManage(MenuRef)
+const onMenuChange = (item: { name: string, [key: string]: any }, index: number) => {
+  inputValue.value = item.name
+  props.onChange?.(inputValue.value)
+}
+
+// 清空
+const onInputClear = () => {
+  inputValue.value = ''
+  props.onChange?.(inputValue.value)
+  inputRef.value?.focus()
+}
+
 // 暴露方法
 defineExpose({
   focus: () => inputRef.value?.focus(),
@@ -86,9 +100,15 @@ defineExpose({
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" ref="inputRef" :type="props.type" :value="inputValue" @input="onInputChange"
-      @keydown.enter="enter" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
-      @compositionstart="compositionstart" :placeholder="props.placeholder" />
+    <input :class="$style.input" v-if="props.type === 'text' || props.type === 'password'" ref="inputRef"
+      :type="props.type" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
+      :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
+      :placeholder="props.placeholder || '输入...'" />
+    <div :class="$style.select" v-else-if="props.type === 'select'" @click.stop="MenuMangage.open">
+      <span :class="$style.text">{{ inputValue || props.placeholder || '选择...' }}</span>
+      <Menu ref="MenuRef" :visible="MenuMangage.visible" :position="MenuMangage.position" :list="props.options"
+        :onItemClick="onMenuChange" />
+    </div>
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
     </div>
@@ -127,16 +147,20 @@ defineExpose({
   right: 0;
 }
 
-.input {
-  width: 100%;
-  height: 100%;
+.input,
+.select {
+  flex: 1;
+  min-width: 0;
+  padding-left: v-bind(inputPaddingLeft);
+  padding-right: v-bind(inputHeight);
   background-color: transparent;
   border: none;
   border-radius: calc(v-bind(inputHeight) / 2);
-  padding-left: v-bind(inputPaddingLeft);
-  padding-right: v-bind(inputHeight);
   font-size: var(--font-size);
   font-weight: var(--font-weight);
+}
+
+.input {
   caret-color: #3c86f6;
   outline: 0px solid transparent;
   transition: outline .2s ease;
@@ -150,6 +174,17 @@ defineExpose({
 
 .input:focus {
   outline: 3px solid #94bbf0;
+}
+
+.select {
+  display: flex;
+  align-items: center;
+}
+
+.select .text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
 <style scoped>

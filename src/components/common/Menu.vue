@@ -24,7 +24,8 @@ defineExpose({ MenuRef })
       :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }" @click.stop>
       <li :class="$style.item" v-for="(item, index) in props.list" :key="index"
         @click="props.onItemClick?.(item, index)">
-        <slot :item="item" :index="index">{{ item.name }}</slot>
+        <slot :item="item" :index="index"></slot>
+        <span :class="$style.text">{{ item.name }}</span>
       </li>
     </ul>
   </teleport>
@@ -43,12 +44,21 @@ defineExpose({ MenuRef })
 }
 
 .Menu .item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
   border-radius: 8px;
-  font-size: 12px;
+  cursor: pointer;
 }
 
 .Menu .item:hover {
   background-color: #3b86f7;
   color: #fff;
+}
+
+.Menu .item .text {
+  font-size: 12px;
+  font-weight: 500;
 }
 </style>

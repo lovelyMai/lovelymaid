@@ -4,8 +4,9 @@ import Input from './Input.vue'
 export type FormItem = {
   id: string
   name: string
-  type?: 'text' | 'password'
+  type?: 'text' | 'password' | 'select'
   value?: string
+  options?: { name: string, [key: string]: any }[]
   placeholder?: string
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   width?: string
@@ -26,7 +27,8 @@ const props = defineProps<Props>()
       :style="{ width: item.width || props.columnWidth || '150px', height: item.height || props.rowHeight || '35px' }">
       <span :class="$style.name">{{ item.name }}</span>
       <Input :class="$style.Input" :type="item.type" :value="item.value" :placeholder="item.placeholder"
-        :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange?.(newValue, index)"
+        :options="item.options" :enterkeyhint="item.enterkeyhint"
+        :onChange="(newValue) => props.onChange?.(newValue, index)"
         :onEnter="(inputValue) => props.onEnter?.(inputValue, index)" />
     </li>
   </ul>
@@ -46,6 +48,7 @@ const props = defineProps<Props>()
 
 .FormItem .Input {
   flex: 1;
+  min-width: 0;
   height: 100%;
 }
 </style>
