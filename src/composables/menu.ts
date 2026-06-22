@@ -1,7 +1,7 @@
 import { computed, onUnmounted, reactive, ref, type Ref } from 'vue'
 import Menu from '@/components/common/Menu.vue'
 
-export const createMenuManage = (MenuRef: Ref<InstanceType<typeof Menu> | null>) => {
+export const createMenuManager = (MenuRef: Ref<InstanceType<typeof Menu> | null>) => {
   const visible = ref<boolean>(false)
   const X = ref<number>(0)
   const Y = ref<number>(0)

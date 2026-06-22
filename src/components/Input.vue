@@ -4,7 +4,7 @@ import Card from './Card.vue'
 import Menu from './common/Menu.vue'
 
 import { watchDOM } from '../utils/common'
-import { createMenuManage } from '@/composables/menu.js'
+import { createMenuManager } from '@/composables/menu.js'
 
 interface Props {
   /** 输入框类型 */
@@ -74,7 +74,7 @@ const enter = async () => {
 
 // 菜单
 const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
-const MenuMangage = createMenuManage(MenuRef)
+const MenuMangager = createMenuManager(MenuRef)
 const onMenuChange = (item: { name: string, [key: string]: any }, index: number) => {
   inputValue.value = item.name
   props.onChange?.(inputValue.value)
@@ -104,9 +104,9 @@ defineExpose({
       :type="props.type" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
       :placeholder="props.placeholder || '输入...'" />
-    <div :class="$style.select" v-else-if="props.type === 'select'" @click.stop="MenuMangage.open">
+    <div :class="$style.select" v-else-if="props.type === 'select'" @click.stop="MenuMangager.open">
       <span :class="$style.text">{{ inputValue || props.placeholder || '选择...' }}</span>
-      <Menu ref="MenuRef" :visible="MenuMangage.visible" :position="MenuMangage.position" :list="props.options"
+      <Menu ref="MenuRef" :visible="MenuMangager.visible" :position="MenuMangager.position" :list="props.options"
         :onItemClick="onMenuChange" />
     </div>
     <div :class="[$style.icon, $style.clear]">
@@ -179,6 +179,9 @@ defineExpose({
 .select {
   display: flex;
   align-items: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .select .text {

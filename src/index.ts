@@ -8,7 +8,6 @@ import Select from './components//Select.vue'
 import Modal from './components/Modal.vue'
 import SideBar from './components/SideBar.vue'
 import TabBar from './components/TabBar.vue'
-import Table from './components/Table.vue'
 import TextArea from './components/TextArea.vue'
 
 import '@/assets/styles/reset.css'

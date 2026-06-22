@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Menu from './common/Menu.vue';
-import { createMenuManage } from '@/composables/menu.js';
+import { createMenuManager } from '@/composables/menu.js';
 
 interface Props {
   /** 列表 */
@@ -13,12 +13,12 @@ const props = defineProps<Props>()
 
 // 菜单
 const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
-const MenuMangage = createMenuManage(MenuRef)
+const MenuMangager = createMenuManager(MenuRef)
 </script>
 
 <template>
-  <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" @click.stop="MenuMangage.open">
-    <Menu ref="MenuRef" :visible="MenuMangage.visible" :position="MenuMangage.position" :list="props.list"
+  <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" @click.stop="MenuMangager.open">
+    <Menu ref="MenuRef" :visible="MenuMangager.visible" :position="MenuMangager.position" :list="props.list"
       :onItemClick="props.onItemClick" v-slot="{ item, index }">
       <slot :item="item" :index="index"></slot>
     </Menu>

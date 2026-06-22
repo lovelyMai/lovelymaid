@@ -9,22 +9,26 @@ export type FormItem = {
   options?: { name: string, [key: string]: any }[]
   placeholder?: string
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
-  width?: string
-  height?: string
+  size?: [number | string, number | string]
 }
 interface Props {
+  /** 表单配置 */
   config: FormItem[]
-  columnWidth?: string
-  rowHeight?: string
+  /** 表单项默认尺寸 */
+  defaultSize?: [number | string, number | string]
+  /** 输入改变事件 */
   onChange?: (newValue: string, index: number) => void
+  /** 回车事件 */
   onEnter?: (inputValue: string, index: number) => void
 }
 const props = defineProps<Props>()
 </script>
 <template>
   <ul :class="$style.Form">
-    <li :class="$style.FormItem" v-for="(item, index) in props.config" :key="item.id"
-      :style="{ width: item.width || props.columnWidth || '150px', height: item.height || props.rowHeight || '35px' }">
+    <li :class="$style.FormItem" v-for="(item, index) in props.config" :key="item.id" :style="{
+      width: (item.size?.[0] ?? props.defaultSize?.[0] ?? 150) + 'px',
+      height: (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px'
+    }">
       <span :class="$style.name">{{ item.name }}</span>
       <Input :class="$style.Input" :type="item.type" :value="item.value" :placeholder="item.placeholder"
         :options="item.options" :enterkeyhint="item.enterkeyhint"
@@ -37,6 +41,7 @@ const props = defineProps<Props>()
 .Form {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
   gap: 10px;
 }
 
