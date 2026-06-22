@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+export type List = { name: string, list?: List, [key: string]: any }[]
 interface Props {
   /** 是否显示 */
   visible: boolean
   /** 位置 */
   position: [number, number]
   /** 列表 */
-  list: { name: string, [key: string]: any }[]
+  list: List
   /** 列表项点击事件 */
   onItemClick?: (item: { name: string, [key: string]: any }, index: number) => void
 }
@@ -20,14 +21,16 @@ defineExpose({ MenuRef })
 
 <template>
   <teleport to="body">
-    <ul :class="$style.Menu" ref="MenuRef" v-if="props.visible"
-      :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }" @click.stop>
-      <li :class="$style.item" v-for="(item, index) in props.list" :key="index"
-        @click="props.onItemClick?.(item, index)">
-        <slot :item="item" :index="index"></slot>
-        <span :class="$style.text">{{ item.name }}</span>
-      </li>
-    </ul>
+    <transition name="lovelymaid-fade-leave">
+      <ul :class="$style.Menu" ref="MenuRef" v-if="props.visible"
+        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }" @click.stop>
+        <li :class="$style.item" v-for="(item, index) in props.list" :key="index"
+          @click="props.onItemClick?.(item, index)">
+          <slot :item="item" :index="index"></slot>
+          <span :class="$style.text">{{ item.name }}</span>
+        </li>
+      </ul>
+    </transition>
   </teleport>
 </template>
 
@@ -37,8 +40,10 @@ defineExpose({ MenuRef })
   z-index: 999;
   padding: 4px;
   background-color: #f3f6f6;
+  border: 1px solid #fff;
   border-radius: 10px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, .1);
+  outline: 0.5px solid #b3b3b3;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, .3);
   transform: translateZ(0);
   backface-visibility: hidden;
 }

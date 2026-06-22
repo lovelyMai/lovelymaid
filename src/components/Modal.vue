@@ -136,16 +136,6 @@ onUnmounted(() => {
 </style>
 
 <style>
-.lovelymaid-fade-enter-from,
-.lovelymaid-fade-leave-to {
-  opacity: 0;
-}
-
-.lovelymaid-fade-enter-active,
-.lovelymaid-fade-leave-active {
-  transition: opacity .3s;
-}
-
 .lovelymaid-slide-enter-from,
 .lovelymaid-slide-leave-to {
   transform: translateY(100dvh);

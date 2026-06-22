@@ -11,3 +11,21 @@
   border: 1px solid #fff;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
 }
+
+.lovelymaid-fade-enter-from,
+.lovelymaid-fade-leave-to {
+  opacity: 0;
+}
+
+.lovelymaid-fade-enter-active,
+.lovelymaid-fade-leave-active {
+  transition: opacity .2s;
+}
+
+.lovelymaid-fade-leave-leave-to {
+  opacity: 0;
+}
+
+.lovelymaid-fade-leave-leave-active {
+  transition: opacity .2s;
+}
