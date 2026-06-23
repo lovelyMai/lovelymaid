@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import Input from './Input.vue'
+import { type List } from './common/Menu.vue'
 
 export type FormItem = {
   id: string
   name: string
   type?: 'text' | 'password' | 'select'
   value?: string
-  options?: { name: string, [key: string]: any }[]
+  options?: List
   placeholder?: string
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   size?: [number | string, number | string]

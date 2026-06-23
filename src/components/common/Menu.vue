@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { createSubMenuManager, type MenuManager } from '@/composables/menu.js'
+import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
 
-export type List = { name: string, list?: List, [key: string]: any }[]
+export type List = { id: string, name: string, list?: List, [key: string]: any }[]
 interface Props {
   /** 是否显示 */
   visible: boolean
@@ -14,20 +15,51 @@ interface Props {
 }
 const props = defineProps<Props>()
 
-// 暴露菜单
+const isSubMenu = inject('menu-is-sub', false)
+provide('menu-is-sub', true)
+
+// 子菜单
+const MenuManagers = ref<Record<string, MenuManager>>({})
 const MenuRef = ref<HTMLElement | null>(null)
-defineExpose({ MenuRef })
+watch(() => props.visible, async (visible) => {
+  await nextTick()
+  if (visible) {
+    if (!MenuRef.value) return
+    const items = MenuRef.value.querySelectorAll('[data-has-children="true"]')
+    items.forEach((el) => {
+      const index = Number((el as HTMLElement).dataset.index)
+      if (MenuManagers.value[index]) return
+      MenuManagers.value[index] = createSubMenuManager(el as HTMLElement)
+    })
+  } else {
+    for (const manager of Object.values(MenuManagers.value)) {
+      manager.cleanup()
+    }
+    MenuManagers.value = {}
+  }
+}, { immediate: true })
+onUnmounted(() => {
+  for (const manager of Object.values(MenuManagers.value)) {
+    manager.cleanup()
+  }
+})
+
+// 暴露菜单
+defineExpose({ root: MenuRef, props })
 </script>
 
 <template>
-  <teleport to="body">
+  <teleport to="body" :disabled="isSubMenu">
     <transition name="lovelymaid-fade-leave">
       <ul :class="$style.Menu" ref="MenuRef" v-if="props.visible"
         :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }" @click.stop>
-        <li :class="$style.item" v-for="(item, index) in props.list" :key="index"
-          @click="props.onItemClick?.(item, index)">
+        <li :class="$style.item" v-for="(item, index) in props.list" :key="index" :data-index="index"
+          :data-has-children="item.list ? 'true' : 'false'" @click="() => props.onItemClick?.(item, index)">
           <slot :item="item" :index="index"></slot>
           <span :class="$style.text">{{ item.name }}</span>
+          <span class="lovelymai lovely-right-arrow" v-if="item.list"></span>
+          <Menu v-if="item.list" :visible="MenuManagers[index]?.visible ?? false"
+            :position="MenuManagers[index]?.position ?? [0, 0]" :list="item.list" :onItemClick="props.onItemClick" />
         </li>
       </ul>
     </transition>
@@ -44,8 +76,8 @@ defineExpose({ MenuRef })
   border-radius: 10px;
   outline: 0.5px solid #b3b3b3;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, .3);
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .Menu .item {
@@ -54,6 +86,7 @@ defineExpose({ MenuRef })
   gap: 5px;
   padding: 5px;
   border-radius: 8px;
+  color: #000;
   cursor: pointer;
 }
 
@@ -65,5 +98,9 @@ defineExpose({ MenuRef })
 .Menu .item .text {
   font-size: 12px;
   font-weight: 500;
+}
+
+.Menu .item :global(.lovely-right-arrow) {
+  transform: translateY(1px);
 }
 </style>

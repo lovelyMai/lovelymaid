@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, useSlots, onUnmounted } from 'vue'
 import Card from './Card.vue'
-import Menu from './common/Menu.vue'
+import Menu, { type List } from './common/Menu.vue'
 
 import { watchDOM } from '../utils/common'
-import { createMenuManager } from '@/composables/menu.js'
+import { createMenuManager, type MenuManager } from '@/composables/menu.js'
 
 interface Props {
   /** 输入框类型 */
@@ -12,7 +12,7 @@ interface Props {
   /** 值 */
   value?: string
   /** 选项 */
-  options?: { name: string, [key: string]: any }[]
+  options?: List
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
@@ -74,7 +74,15 @@ const enter = async () => {
 
 // 菜单
 const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
-const MenuMangager = createMenuManager(MenuRef)
+const selectRef = ref<HTMLElement | null>(null)
+const MenuMangager = ref<MenuManager | undefined>(undefined)
+onMounted(() => {
+  if (props.type !== 'select' || !selectRef.value) return
+  MenuMangager.value = createMenuManager(selectRef.value, MenuRef.value)
+})
+onUnmounted(() => {
+  MenuMangager.value?.cleanup()
+})
 const onMenuChange = (item: { name: string, [key: string]: any }, index: number) => {
   inputValue.value = item.name
   props.onChange?.(inputValue.value)
@@ -104,10 +112,10 @@ defineExpose({
       :type="props.type" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
       :placeholder="props.placeholder || '输入...'" />
-    <div :class="$style.select" v-else-if="props.type === 'select'" @click.stop="MenuMangager.open">
+    <div :class="$style.select" ref="selectRef" v-else-if="props.type === 'select'">
       <span :class="$style.text">{{ inputValue || props.placeholder || '选择...' }}</span>
-      <Menu ref="MenuRef" :visible="MenuMangager.visible" :position="MenuMangager.position" :list="props.options"
-        :onItemClick="onMenuChange" />
+      <Menu ref="MenuRef" :visible="MenuMangager?.visible ?? false" :position="MenuMangager?.position ?? [0, 0]"
+        :list="props.options" :onItemClick="onMenuChange" />
     </div>
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
