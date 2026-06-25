@@ -14,7 +14,6 @@ interface Props {
   onItemClick?: (item: { name: string, [key: string]: any }, index: number) => void
 }
 const props = defineProps<Props>()
-
 const isSubMenu = inject('menu-is-sub', false)
 provide('menu-is-sub', true)
 

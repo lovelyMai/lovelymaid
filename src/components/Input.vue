@@ -104,7 +104,7 @@ defineExpose({
 </script>
 
 <template>
-  <Card :class="$style.Input" ref="InputRef" type="glass">
+  <Card :class="$style.Input" ref="InputRef" :type="MenuMangager?.visible ? 'common' : 'glass'">
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
