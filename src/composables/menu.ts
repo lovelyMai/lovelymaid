@@ -1,5 +1,5 @@
 import { computed, reactive, ref } from 'vue'
-import Menu from '@/components/common/Menu.vue'
+import { type Menu } from '@/components/common/Menu.vue'
 
 export type MenuManager = {
   visible: boolean
@@ -7,13 +7,13 @@ export type MenuManager = {
   cleanup: () => void
 }
 
-export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: InstanceType<typeof Menu> | null): MenuManager => {
+export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu | null): MenuManager => {
   const visible = ref<boolean>(false)
   const X = ref<number>(0)
   const Y = ref<number>(0)
   const position = computed<[number, number]>(() => [X.value, Y.value])
   const close = (e: MouseEvent) => {
-    if (!MenuInstance || !MenuInstance.root) return
+    if (!MenuInstance?.root) return
     if (!MenuInstance.root.contains(e.target as HTMLElement)) {
       e.stopPropagation()
     }
@@ -40,18 +40,31 @@ export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Instance
   return reactive({ visible, position, cleanup })
 }
 
-export const createSubMenuManager = (TriggerEl: HTMLElement): MenuManager => {
+export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu | null): MenuManager => {
   const visible = ref<boolean>(false)
   const X = ref<number>(0)
   const Y = ref<number>(0)
   const position = computed<[number, number]>(() => [X.value, Y.value])
   const parentEl = TriggerEl.parentElement
+  const change = (e: MouseEvent) => {
+    console.log(1)
+    if (!MenuInstance?.root) return
+    const target = e.target as HTMLElement
+    if (MenuInstance.root.contains(target)) {
+      TriggerEl.style.backgroundColor = '#888'
+      TriggerEl.style.color = '#000'
+    } else {
+      TriggerEl.style.backgroundColor = ''
+      TriggerEl.style.color = ''
+    }
+  }
   const close = (e: MouseEvent) => {
     if (!parentEl) return
     const target = e.target as HTMLElement
     // 离开 TriggerEl 但还在它的父元素内时关闭
     if (parentEl.contains(target) && !TriggerEl.contains(target)) {
       visible.value = false
+      parentEl.removeEventListener('mouseover', change, true)
       parentEl.removeEventListener('mouseover', close, true)
     }
   }
@@ -62,12 +75,13 @@ export const createSubMenuManager = (TriggerEl: HTMLElement): MenuManager => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     X.value = rect.right
     Y.value = rect.top - 5
+    parentEl.addEventListener('mouseover', change, true)
     parentEl.addEventListener('mouseover', close, true)
   }
   TriggerEl.addEventListener('mouseenter', open)
   const cleanup = () => {
-    if (!parentEl) return
-    parentEl.removeEventListener('mouseover', close)
+    parentEl?.removeEventListener('mouseover', change, true)
+    parentEl?.removeEventListener('mouseover', close, true)
   }
 
   return reactive({ visible, position, cleanup })

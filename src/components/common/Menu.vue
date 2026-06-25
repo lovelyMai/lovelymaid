@@ -18,8 +18,9 @@ const isSubMenu = inject('menu-is-sub', false)
 provide('menu-is-sub', true)
 
 // 子菜单
-const MenuManagers = ref<Record<string, MenuManager>>({})
 const MenuRef = ref<HTMLElement | null>(null)
+const SubMenuRefs = ref<Record<string, Menu | null>>({})
+const MenuManagers = ref<Record<string, MenuManager>>({})
 watch(() => props.visible, async (visible) => {
   await nextTick()
   if (visible) {
@@ -28,7 +29,7 @@ watch(() => props.visible, async (visible) => {
     items.forEach((el) => {
       const index = Number((el as HTMLElement).dataset.index)
       if (MenuManagers.value[index]) return
-      MenuManagers.value[index] = createSubMenuManager(el as HTMLElement)
+      MenuManagers.value[index] = createSubMenuManager(el as HTMLElement, SubMenuRefs.value[index])
     })
   } else {
     for (const manager of Object.values(MenuManagers.value)) {
@@ -45,6 +46,10 @@ onUnmounted(() => {
 
 // 暴露菜单
 defineExpose({ root: MenuRef, props })
+export type Menu = {
+  root: HTMLElement | null
+  props: Props
+}
 </script>
 
 <template>
@@ -57,8 +62,9 @@ defineExpose({ root: MenuRef, props })
           <slot :item="item" :index="index"></slot>
           <span :class="$style.text">{{ item.name }}</span>
           <span class="lovelymai lovely-right-arrow" v-if="item.list"></span>
-          <Menu v-if="item.list" :visible="MenuManagers[index]?.visible ?? false"
-            :position="MenuManagers[index]?.position ?? [0, 0]" :list="item.list" :onItemClick="props.onItemClick" />
+          <Menu v-if="item.list" :ref="(el) => SubMenuRefs[index] = (el as Menu | null)"
+            :visible="MenuManagers[index]?.visible ?? false" :position="MenuManagers[index]?.position ?? [0, 0]"
+            :list="item.list" :onItemClick="props.onItemClick" />
         </li>
       </ul>
     </transition>
