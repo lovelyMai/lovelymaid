@@ -1,14 +1,20 @@
 <script setup lang="ts">
 interface Props {
-  type?: 'common' | 'glass'
+  type?: 'common' | 'select' | 'glass'
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'common'
 })
+
+const typeClass = {
+  common: 'lovelymaid-common-container',
+  select: 'lovelymaid-select-container',
+  glass: 'lovelymaid-glass-container'
+}
 </script>
 
 <template>
-  <div :class="props.type === 'common' ? 'lovelymaid-common-container' : 'lovelymaid-glass-container'">
+  <div :class="typeClass[props.type]">
     <slot></slot>
   </div>
 </template>

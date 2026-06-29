@@ -83,7 +83,8 @@ onMounted(() => {
 onUnmounted(() => {
   MenuMangager.value?.cleanup()
 })
-const onMenuChange = (item: { name: string, [key: string]: any }, index: number) => {
+const onMenuClick = (item: { id: string, name: string, list?: List, [key: string]: any }, index: number) => {
+  if (item.list) return
   inputValue.value = item.name
   props.onChange?.(inputValue.value)
 }
@@ -104,7 +105,7 @@ defineExpose({
 </script>
 
 <template>
-  <Card :class="$style.Input" ref="InputRef" :type="MenuMangager?.visible ? 'common' : 'glass'">
+  <Card :class="$style.Input" ref="InputRef" :type="MenuMangager?.visible ? 'select' : 'glass'">
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
@@ -115,7 +116,7 @@ defineExpose({
     <div :class="$style.select" ref="selectRef" v-else-if="props.type === 'select'">
       <span :class="$style.text">{{ inputValue || props.placeholder || '选择...' }}</span>
       <Menu ref="MenuRef" :visible="MenuMangager?.visible ?? false" :position="MenuMangager?.position ?? [0, 0]"
-        :list="props.options" :onItemClick="onMenuChange" />
+        :list="props.options" :onItemClick="onMenuClick" />
     </div>
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>

@@ -47,11 +47,10 @@ export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu 
   const position = computed<[number, number]>(() => [X.value, Y.value])
   const parentEl = TriggerEl.parentElement
   const change = (e: MouseEvent) => {
-    console.log(1)
     if (!MenuInstance?.root) return
     const target = e.target as HTMLElement
     if (MenuInstance.root.contains(target)) {
-      TriggerEl.style.backgroundColor = '#888'
+      TriggerEl.style.backgroundColor = '#dadada'
       TriggerEl.style.color = '#000'
     } else {
       TriggerEl.style.backgroundColor = ''

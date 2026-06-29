@@ -1,6 +1,11 @@
 .lovelymaid-common-container {
   background-color: #f2f2f6;
-  backdrop-filter: blur(10px) saturate(1.5);
+  border: 1px solid #fff;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
+}
+
+.lovelymaid-select-container {
+  background-color: #dadada;
   border: 1px solid #fff;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);
 }

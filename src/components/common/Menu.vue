@@ -11,7 +11,7 @@ interface Props {
   /** 列表 */
   list: List
   /** 列表项点击事件 */
-  onItemClick?: (item: { name: string, [key: string]: any }, index: number) => void
+  onItemClick?: (item: { id: string, name: string, list?: List, [key: string]: any }, index: number) => void
 }
 const props = defineProps<Props>()
 const isSubMenu = inject('menu-is-sub', false)
