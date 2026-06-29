@@ -75,13 +75,13 @@ const enter = async () => {
 // 菜单
 const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
 const selectRef = ref<HTMLElement | null>(null)
-const MenuMangager = ref<MenuManager | undefined>(undefined)
+const MenuManager = ref<MenuManager | undefined>(undefined)
 onMounted(() => {
-  if (props.type !== 'select' || !selectRef.value) return
-  MenuMangager.value = createMenuManager(selectRef.value, MenuRef.value)
+  if (props.type !== 'select' || !selectRef.value || !MenuRef.value) return
+  MenuManager.value = createMenuManager(selectRef.value, MenuRef.value)
 })
 onUnmounted(() => {
-  MenuMangager.value?.cleanup()
+  MenuManager.value?.cleanup()
 })
 const onMenuClick = (item: { id: string, name: string, list?: List, [key: string]: any }, index: number) => {
   if (item.list) return
@@ -105,7 +105,7 @@ defineExpose({
 </script>
 
 <template>
-  <Card :class="$style.Input" ref="InputRef" :type="MenuMangager?.visible ? 'select' : 'glass'">
+  <Card :class="$style.Input" ref="InputRef" :type="MenuManager?.visible ? 'select' : 'glass'">
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
@@ -115,7 +115,7 @@ defineExpose({
       :placeholder="props.placeholder || '输入...'" />
     <div :class="$style.select" ref="selectRef" v-else-if="props.type === 'select'">
       <span :class="$style.text">{{ inputValue || props.placeholder || '选择...' }}</span>
-      <Menu ref="MenuRef" :visible="MenuMangager?.visible ?? false" :position="MenuMangager?.position ?? [0, 0]"
+      <Menu ref="MenuRef" :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]"
         :list="props.options" :onItemClick="onMenuClick" />
     </div>
     <div :class="[$style.icon, $style.clear]">

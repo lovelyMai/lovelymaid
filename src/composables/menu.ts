@@ -7,7 +7,7 @@ export type MenuManager = {
   cleanup: () => void
 }
 
-export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu | null): MenuManager => {
+export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu): MenuManager => {
   const visible = ref<boolean>(false)
   const X = ref<number>(0)
   const Y = ref<number>(0)
@@ -40,7 +40,7 @@ export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu | n
   return reactive({ visible, position, cleanup })
 }
 
-export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu | null): MenuManager => {
+export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu): MenuManager => {
   const visible = ref<boolean>(false)
   const X = ref<number>(0)
   const Y = ref<number>(0)

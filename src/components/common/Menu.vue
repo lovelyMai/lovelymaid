@@ -57,7 +57,7 @@ export type Menu = {
     <transition name="lovelymaid-fade-leave">
       <ul :class="$style.Menu" ref="MenuRef" v-if="props.visible"
         :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }" @click.stop>
-        <li :class="$style.item" v-for="(item, index) in props.list" :key="index" :data-index="index"
+        <li :class="$style.item" v-for="(item, index) in props.list" :key="item.id" :data-index="index"
           :data-has-children="item.list ? 'true' : 'false'" @click="() => props.onItemClick?.(item, index)">
           <slot :item="item" :index="index"></slot>
           <span :class="$style.text">{{ item.name }}</span>
