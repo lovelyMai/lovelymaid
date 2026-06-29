@@ -61,26 +61,25 @@ export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu)
     if (!parentEl) return
     const target = e.target as HTMLElement
     // 离开 TriggerEl 但还在它的父元素内时关闭
-    if (parentEl.contains(target) && !TriggerEl.contains(target)) {
+    if (parentEl.contains(target) && !TriggerEl.contains(target) && visible.value) {
       visible.value = false
-      parentEl.removeEventListener('mouseover', change, true)
-      parentEl.removeEventListener('mouseover', close, true)
+      parentEl.removeEventListener('mouseover', change)
+      parentEl.removeEventListener('mouseover', close)
     }
   }
   const open = (e: MouseEvent) => {
-    e.stopPropagation()
     if (visible.value || !parentEl) return
     visible.value = true
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     X.value = rect.right
     Y.value = rect.top - 5
-    parentEl.addEventListener('mouseover', change, true)
-    parentEl.addEventListener('mouseover', close, true)
+    parentEl.addEventListener('mouseover', change)
+    parentEl.addEventListener('mouseover', close)
   }
   TriggerEl.addEventListener('mouseenter', open)
   const cleanup = () => {
-    parentEl?.removeEventListener('mouseover', change, true)
-    parentEl?.removeEventListener('mouseover', close, true)
+    parentEl?.removeEventListener('mouseover', change)
+    parentEl?.removeEventListener('mouseover', close)
   }
 
   return reactive({ visible, position, cleanup })
