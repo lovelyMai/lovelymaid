@@ -8,7 +8,7 @@ export type FormItem = {
   name: string
   type?: 'text' | 'password' | 'select'
   value?: string
-  options?: MenuItem[]
+  config?: MenuItem[]
   placeholder?: string
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   size?: [number | string, number | string]
@@ -37,7 +37,7 @@ const onEnter = (index: number) => {
     }">
       <span :class="$style.name">{{ item.name }}</span>
       <Input :class="$style.Input" :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
-        :type="item.type" :value="item.value" :placeholder="item.placeholder" :options="item.options"
+        :type="item.type" :value="item.value" :placeholder="item.placeholder" :config="item.config"
         :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange?.(newValue, index)"
         :onEnter="(_) => onEnter(index)" />
     </li>

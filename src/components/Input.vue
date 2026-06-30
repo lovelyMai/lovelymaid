@@ -12,7 +12,7 @@ interface Props {
   /** 值 */
   value?: string
   /** 选项 */
-  options?: MenuItem[]
+  config?: MenuItem[]
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
@@ -26,7 +26,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   value: '',
-  options: () => []
+  config: () => []
 });
 
 // 初始化
@@ -116,7 +116,7 @@ defineExpose({
     <div :class="$style.select" ref="selectRef" v-else-if="props.type === 'select'">
       <span :class="$style.text">{{ inputValue || props.placeholder || '选择...' }}</span>
       <Menu ref="MenuRef" :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]"
-        :config="props.options" :onItemClick="onMenuClick" />
+        :config="props.config" :onItemClick="onMenuClick" />
     </div>
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
