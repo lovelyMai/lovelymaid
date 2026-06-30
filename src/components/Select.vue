@@ -14,17 +14,18 @@ const props = defineProps<Props>()
 // 菜单
 const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
 const SelectRef = ref<HTMLElement | null>(null)
-let MenuManagerInstance: MenuManager | undefined
+const MenuManagerInstance = ref<MenuManager | null>(null)
 onMounted(() => {
   if (!SelectRef.value || !MenuRef.value) return
-  MenuManagerInstance = createMenuManager(SelectRef.value, MenuRef.value)
+  MenuManagerInstance.value = createMenuManager(SelectRef.value, MenuRef.value)
 })
 </script>
 
 <template>
   <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" ref="SelectRef">
-    <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false" :position="MenuManagerInstance?.position ?? [0, 0]"
-      :config="props.config" :onItemClick="props.onItemClick" v-slot="{ item, index }">
+    <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false"
+      :position="MenuManagerInstance?.position ?? [0, 0]" :config="props.config" :onItemClick="props.onItemClick"
+      v-slot="{ item, index }">
       <slot :item="item" :index="index"></slot>
     </Menu>
   </span>

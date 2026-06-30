@@ -6,10 +6,10 @@ export type MenuItem = { id: string, name: string, config?: MenuItem[], [key: st
 interface Props {
   /** 是否显示 */
   visible: boolean
-  /** 位置 */
-  position: [number, number]
   /** 列表 */
   config: MenuItem[]
+  /** 位置 */
+  position: [number, number]
   /** 列表项点击事件 */
   onItemClick?: (item: MenuItem, index: number) => void
 }
