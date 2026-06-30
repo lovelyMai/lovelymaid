@@ -28,7 +28,7 @@ watch(() => props.visible, async (visible) => {
     const items = MenuRef.value.querySelectorAll('[data-has-children="true"]')
     items.forEach((el) => {
       const index = Number((el as HTMLElement).dataset.index)
-      if (MenuManagers.value[index]) return
+      if (MenuManagers.value[index] || !SubMenuRefs.value[index]) return
       MenuManagers.value[index] = createSubMenuManager(el as HTMLElement, SubMenuRefs.value[index])
     })
   } else {
