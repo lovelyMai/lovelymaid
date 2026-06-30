@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, useSlots, onUnmounted } from 'vue'
 import Card from './Card.vue'
-import Menu, { type List } from './common/Menu.vue'
+import Menu, { type MenuItem } from './common/Menu.vue'
 
 import { watchDOM } from '../utils/common'
 import { createMenuManager, type MenuManager } from '@/composables/menu.js'
@@ -12,7 +12,7 @@ interface Props {
   /** 值 */
   value?: string
   /** 选项 */
-  options?: List
+  options?: MenuItem[]
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
@@ -83,8 +83,8 @@ onMounted(() => {
 onUnmounted(() => {
   MenuManager.value?.cleanup()
 })
-const onMenuClick = (item: { id: string, name: string, list?: List, [key: string]: any }, index: number) => {
-  if (item.list) return
+const onMenuClick = (item: MenuItem, index: number) => {
+  if (item.config) return
   inputValue.value = item.name
   props.onChange?.(inputValue.value)
 }
@@ -116,7 +116,7 @@ defineExpose({
     <div :class="$style.select" ref="selectRef" v-else-if="props.type === 'select'">
       <span :class="$style.text">{{ inputValue || props.placeholder || '选择...' }}</span>
       <Menu ref="MenuRef" :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]"
-        :list="props.options" :onItemClick="onMenuClick" />
+        :config="props.options" :onItemClick="onMenuClick" />
     </div>
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
