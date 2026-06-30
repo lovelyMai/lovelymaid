@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import Input from './Input.vue'
 import { type List } from './common/Menu.vue'
 
@@ -19,10 +20,14 @@ interface Props {
   defaultSize?: [number | string, number | string]
   /** 输入改变事件 */
   onChange?: (newValue: string, index: number) => void
-  /** 回车事件 */
-  onEnter?: (inputValue: string, index: number) => void
 }
 const props = defineProps<Props>()
+
+// 回车聚焦下一个输入框
+const InputRefs = ref<Record<string, InstanceType<typeof Input> | null>>({})
+const onEnter = (index: number) => {
+  InputRefs.value[index + 1]?.focus()
+}
 </script>
 <template>
   <ul :class="$style.Form">
@@ -31,10 +36,10 @@ const props = defineProps<Props>()
       height: (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px'
     }">
       <span :class="$style.name">{{ item.name }}</span>
-      <Input :class="$style.Input" :type="item.type" :value="item.value" :placeholder="item.placeholder"
-        :options="item.options" :enterkeyhint="item.enterkeyhint"
-        :onChange="(newValue) => props.onChange?.(newValue, index)"
-        :onEnter="(inputValue) => props.onEnter?.(inputValue, index)" />
+      <Input :class="$style.Input" :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
+        :type="item.type" :value="item.value" :placeholder="item.placeholder" :options="item.options"
+        :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange?.(newValue, index)"
+        :onEnter="(_) => onEnter(index)" />
     </li>
   </ul>
 </template>
