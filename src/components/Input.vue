@@ -8,7 +8,7 @@ import { createMenuManager, type MenuManager } from '@/composables/menu.js'
 
 interface Props {
   /** 输入框类型 */
-  type?: "text" | "password" | "select"
+  type?: "text" | "password" | "number" | "select"
   /** 值 */
   value?: string
   /** 选项 */
@@ -109,8 +109,8 @@ defineExpose({
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" v-if="props.type === 'text' || props.type === 'password'" ref="inputRef"
-      :type="props.type" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
+    <input :class="$style.input" v-if="props.type === 'text' || props.type === 'number' || props.type === 'password'"
+      ref="inputRef" :type="props.type" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
       :placeholder="props.placeholder || '输入...'" />
     <div :class="$style.select" ref="selectRef" v-else-if="props.type === 'select'">
@@ -183,6 +183,10 @@ defineExpose({
 
 .input:focus {
   outline: 3px solid #94bbf0;
+}
+
+.input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
 }
 
 .select {

@@ -6,7 +6,7 @@ import { type MenuItem } from './common/Menu.vue'
 export type FormItem = {
   id: string
   name: string
-  type?: 'text' | 'password' | 'select'
+  type?: 'text' | 'number' | 'password' | 'select'
   value?: string
   config?: MenuItem[]
   placeholder?: string
