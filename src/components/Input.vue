@@ -37,7 +37,8 @@ const inputHeight = ref<string>('0')
 const inputPaddingLeft = computed<string>(() => slots.default ? inputHeight.value : `calc(${inputHeight.value} / 2)`)
 let cleanup: () => void
 onMounted(() => {
-  cleanup = watchDOM(InputRef.value?.$el, ({ height }) => {
+  if (!InputRef.value) return
+  cleanup = watchDOM(InputRef.value.$el, ({ height }) => {
     InputHeight.value = `${height}px`
     inputHeight.value = `${height - 2}px`
   }, true)

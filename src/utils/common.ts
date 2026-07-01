@@ -29,14 +29,10 @@ export function throttle<T extends (...args: any[]) => any>(
 
 // 观察 DOM
 export function watchDOM(
-  element: HTMLElement | null,
+  element: HTMLElement,
   callback: (size: { width: number; height: number }) => void,
   immediate: boolean = false
 ): () => void {
-  if (!element) {
-    return () => { }
-  }
-
   if (immediate) {
     callback({
       width: element.offsetWidth,

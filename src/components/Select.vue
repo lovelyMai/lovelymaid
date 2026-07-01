@@ -4,7 +4,7 @@ import Menu, { type MenuItem } from './common/Menu.vue';
 import { createMenuManager, type MenuManager } from '@/composables/menu.js';
 
 interface Props {
-  /** 列表 */
+  /** 选项配置 */
   config: MenuItem[]
   /** 列表项点击事件 */
   onItemClick?: (item: MenuItem, index: number) => void

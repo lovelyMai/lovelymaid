@@ -6,7 +6,7 @@ export type MenuItem = { id: string, name: string, config?: MenuItem[], [key: st
 interface Props {
   /** 是否显示 */
   visible: boolean
-  /** 列表 */
+  /** 菜单配置 */
   config: MenuItem[]
   /** 位置 */
   position: [number, number]

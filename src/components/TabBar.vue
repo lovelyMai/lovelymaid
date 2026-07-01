@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import Card from './Card.vue';
 import Button from './Button.vue'
 import Input from './Input.vue'
 
-import { watchDOM } from '../utils/common';
-import { getLayoutLeftInViewport } from '../utils/getOffsetInViewport';
+import { watchDOM } from '@/utils/common';
+import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
+import useCssVar from '@/utils/useCssVar.js';
 
+export type TabItem = { id: string, name?: string, [key: string]: any }
 interface Props {
-  /** 列表 */
-  list: { name?: string, [key: string]: any }[]
+  /** 标签配置 */
+  config: TabItem[]
   /** 激活索引 */
   activeIndex?: number
   /** 是否启用搜索按钮 */
@@ -22,38 +24,61 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   activeIndex: 0
 })
-const listLength = computed(() => props.list.length)
 
 // 初始化
-const BarRef = ref<HTMLElement | null>(null)
-const barWidth = ref<number>(0)
-const barHeight = ref<number>(0)
-const searchWidth = ref<number>(0)
-const borderRadius = ref<number>(0)
+const TabBarRef = ref<HTMLElement | null>(null)
+const contentRef = ref<HTMLElement | null>(null)
 const SlideRef = ref<HTMLElement | null>(null)
-const containerRef = ref<HTMLElement | null>(null)
-const slideWidth = ref<number>(0)
+const style = reactive({
+  Bar: {
+    width: 0,
+    height: 0,
+    'border-radius': 0,
+    'background-color': 'rgba(249, 249, 249, 0.9)',
+    scale: 1,
+    transition: 'none'
+  },
+  slide: {
+    width: 0,
+    background: '#e4e4e6',
+    border: 'none',
+    'box-shadow': 'none',
+    translateX: 0,
+    scale: 1,
+    transition: 'background .1s',
+    center: 0,
+  },
+  search: {
+    width: 0,
+  },
+  'content-top': {
+    clipLeft: 0,
+    clipRight: 0,
+    get scale() {
+      return style.slide.scale === 1.2 ? 1.1 : 1
+    }
+  }
+})
 const maxDistance = ref<number>(0)
-const virtualLeft = ref<number>(0)
-const virtualRight = ref<number>(0)
-const barTransition = ref<string>('none')
 const activeIndex = ref<number>(props.activeIndex)
-const targetPos = ref<number>(0)
-let slideCenter: number
 onMounted(() => {
-  cleanup = watchDOM(BarRef.value, () => {
-    barHeight.value = BarRef.value!.offsetHeight
-    barWidth.value = props.showSearch ? BarRef.value!.offsetWidth - barHeight.value - 5 : BarRef.value!.offsetWidth
-    searchWidth.value = BarRef.value!.offsetWidth - barHeight.value * 0.8 - 5
-    borderRadius.value = barHeight.value / 2
-    slideWidth.value = (barWidth.value - 6) / listLength.value
-    virtualLeft.value = activeIndex.value * slideWidth.value
-    virtualRight.value = virtualLeft.value + slideWidth.value
-    maxDistance.value = (barWidth.value - 6) * (listLength.value - 1) / listLength.value
-    targetPos.value = activeIndex.value * slideWidth.value
-    slideCenter = targetPos.value + slideWidth.value / 2
+  if (!TabBarRef.value) return
+  useCssVar(TabBarRef.value, style)
+  cleanup = watchDOM(TabBarRef.value, () => {
+    style.Bar.width = props.showSearch ? TabBarRef.value!.offsetWidth - style.Bar.height - 5 : TabBarRef.value!.offsetWidth
+    style.Bar.height = TabBarRef.value!.offsetHeight
+    style.search.width = TabBarRef.value!.offsetWidth - style.Bar.height * 0.8 - 5
+    style.Bar['border-radius'] = style.Bar.height / 2
+    style.slide.width = (style.Bar.width - 6) / props.config.length
+    style['content-top'].clipLeft = activeIndex.value * style.slide.width
+    style['content-top'].clipRight = style['content-top'].clipLeft + style.slide.width
+    maxDistance.value = (style.Bar.width - 6) * (props.config.length - 1) / props.config.length
+    style.slide.translateX = activeIndex.value * style.slide.width
+    style.slide.center = style.slide.translateX + style.slide.width / 2
   }, true)
-  setTimeout(() => barTransition.value = 'width .3s, height .3s, transform .2s', 500)
+  setTimeout(() => {
+    style.Bar.transition = 'width .3s, height .3s, transform .2s'
+  }, 500)
 })
 
 // 定时器
@@ -77,41 +102,32 @@ onUnmounted(() => {
 })
 
 // 滑块动画
-const background = ref<string>('#e4e4e6')
-const barBackgroundColor = ref<string>('rgba(249, 249, 249, 0.9)')
-const border = ref<string>('none')
-const boxShadow = ref<string>('none')
-const barScale = ref<number>(1)
-const slideScale = ref<number>(1)
-const textScale = computed<number>(() => slideScale.value === 1.2 ? 1.1 : 1)
-const slideTransition = ref<string>('background .1s')
-
 let followed = false
 const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
-  if (!SlideRef.value || !containerRef.value) return
-  const clickX = e.clientX - getLayoutLeftInViewport(containerRef.value)
-  const clickLeft = clickX - slideWidth.value / 2
+  if (!SlideRef.value || !contentRef.value) return
+  const clickX = e.clientX - getLayoutLeftInViewport(contentRef.value)
+  const clickLeft = clickX - style.slide.width / 2
   const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value).transform).m41
-  const targetLeft = clickLeft < 0 ? 0 : clickLeft > (listLength.value - 1) * slideWidth.value ? (listLength.value - 1) * slideWidth.value : clickLeft
+  const targetLeft = clickLeft < 0 ? 0 : clickLeft > (props.config.length - 1) * style.slide.width ? (props.config.length - 1) * style.slide.width : clickLeft
   if (type === 'start') {
-    slideTransition.value = `transform .5s, background .1s`
-    targetPos.value = targetLeft
+    style.slide.transition = `transform .5s, background .1s`
+    style.slide.translateX = targetLeft
   } else if (followed || Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
-    slideTransition.value = `background .1s`
-    targetPos.value = targetLeft
+    style.slide.transition = `background .1s`
+    style.slide.translateX = targetLeft
     followed = true
   } else {
-    slideTransition.value = `background .1s`
-    targetPos.value = realLeft
+    style.slide.transition = `background .1s`
+    style.slide.translateX = realLeft
     calculatePosTimer = setInterval(() => {
       const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
       if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
-        slideTransition.value = `background .1s`
-        targetPos.value = targetLeft
+        style.slide.transition = `background .1s`
+        style.slide.translateX = targetLeft
         followed = true
         clearTimer(calculatePosTimer)
       } else {
-        targetPos.value += (targetLeft - realLeft) > 0 ? maxDistance.value / 10 : -maxDistance.value / 10
+        style.slide.translateX += (targetLeft - realLeft) > 0 ? maxDistance.value / 10 : -maxDistance.value / 10
       }
     }, 8)
   }
@@ -119,10 +135,10 @@ const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
 const updateVirtualPos = (duration: number | undefined) => {
   const calc = () => {
     const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
-    slideCenter = realLeft + slideWidth.value / 2
-    const virtualWidth = slideWidth.value * 1.2 / 1.1
-    virtualLeft.value = slideCenter - virtualWidth / 2
-    virtualRight.value = slideCenter + virtualWidth / 2
+    style.slide.center = realLeft + style.slide.width / 2
+    const virtualWidth = style.slide.width * 1.2 / 1.1
+    style['content-top'].clipLeft = style.slide.center - virtualWidth / 2
+    style['content-top'].clipRight = style.slide.center + virtualWidth / 2
   }
   if (duration) {
     clearInterval(virtualTimer1)
@@ -146,13 +162,13 @@ let startTime: number
 const startSlide = (e: PointerEvent) => {
   startTime = Date.now()
   backgroundTimer = setTimeout(() => {
-    background.value = '#fff'
+    style.slide.background = '#fff'
   }, 100)
-  barBackgroundColor.value = '#fff'
-  border.value = '1px solid rgba(255, 255, 255, 0.5)'
-  boxShadow.value = '0 0 10px 0 rgba(0, 0, 0, 0.1)'
-  barScale.value = 1.05
-  slideScale.value = 1.2
+  style.Bar['background-color'] = '#fff'
+  style.slide.border = '1px solid rgba(255, 255, 255, 0.5)'
+  style.slide['box-shadow'] = '0 0 10px 0 rgba(0, 0, 0, 0.1)'
+  style.Bar.scale = 1.05
+  style.slide.scale = 1.2
   calculateTargetPos(e, 'start')
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
@@ -170,47 +186,49 @@ const moveSlide = (e: PointerEvent) => {
 }
 const stopSlide = (e: PointerEvent) => {
   if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
-  background.value = '#e4e4e6'
-  barBackgroundColor.value = 'rgba(249, 249, 249, 0.9)'
-  border.value = 'none'
-  boxShadow.value = 'none'
-  slideTransition.value = `transform .5s, background .1s`
-  barScale.value = 1
-  slideScale.value = 1
+  style.slide.background = '#e4e4e6'
+  style.Bar['background-color'] = 'rgba(249, 249, 249, 0.9)'
+  style.slide.border = 'none'
+  style.slide['box-shadow'] = 'none'
+  style.slide.transition = `transform .5s, background .1s`
+  style.Bar.scale = 1
+  style.slide.scale = 1
   if (searchIsActive.value) {
     searchIsActive.value = false
   } else {
-    const clickX = e.clientX - getLayoutLeftInViewport(containerRef.value)
-    const index = Math.floor(clickX / slideWidth.value)
-    activeIndex.value = index > listLength.value - 1 ? listLength.value - 1 : index < 0 ? 0 : index
+    const clickX = e.clientX - getLayoutLeftInViewport(contentRef.value)
+    const index = Math.floor(clickX / style.slide.width)
+    activeIndex.value = index > props.config.length - 1 ? props.config.length - 1 : index < 0 ? 0 : index
   }
   clearTimer(calculatePosTimer)
-  targetPos.value = activeIndex.value * slideWidth.value
+  style.slide.translateX = activeIndex.value * style.slide.width
   followed = false
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
-  props.onItemClick?.(props.list[activeIndex.value], activeIndex.value)
+  props.onItemClick?.(props.config[activeIndex.value], activeIndex.value)
   document.removeEventListener('pointermove', moveSlide)
   document.removeEventListener('pointerup', stopSlide)
 }
 watch(() => props.activeIndex, (newIndex) => {
-  slideTransition.value = `transform .5s, background .1s`
+  style.slide.transition = `transform .5s, background .1s`
   activeIndex.value = newIndex
   clearTimer(calculatePosTimer)
-  targetPos.value = newIndex * slideWidth.value
+  style.slide.translateX = newIndex * style.slide.width
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(500)
 })
 
 // list改变归位
-watch(() => props.list.length, () => targetPos.value = 0)
+watch(() => props.config.length, () => {
+  style.slide.translateX = 0
+})
 
 // 模式切换
 const searchIsActive = ref<boolean>(false)
 const searchIsShow = ref<boolean>(false)
 const clickSearch = () => {
   searchIsActive.value = true
-  targetPos.value = 0
+  style.slide.translateX = 0
 }
 watch(searchIsActive, (newValue) => {
   if (newValue) setTimeout(() => searchIsShow.value = true, 100)
@@ -219,19 +237,19 @@ watch(searchIsActive, (newValue) => {
 </script>
 
 <template>
-  <div :class="$style.TabBar" ref="BarRef">
-    <Card :class="[$style.bar, { [$style.active]: !searchIsActive }]" type="glass">
-      <ul :class="$style.container" ref="containerRef" @pointerdown="startSlide">
+  <div :class="$style.TabBar" ref="TabBarRef">
+    <Card :class="[$style.Bar, { [$style.active]: !searchIsActive }]" type="glass">
+      <ul :class="$style.content" ref="contentRef" @pointerdown="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
-          <slot :item="props.list[activeIndex]" :index="activeIndex"></slot>
+          <slot :item="props.config[activeIndex]" :index="activeIndex"></slot>
         </li>
-        <li :class="$style.tab" v-for="(item, index) in props.list" :key="index">
+        <li :class="$style.tab" v-for="(item, index) in props.config" :key="index">
           <slot :item="item" :index="index"></slot>
           <span v-if="item.name">{{ item.name }}</span>
         </li>
         <div :class="$style.slide" ref="SlideRef" v-show="!searchIsActive"></div>
-        <ul :class="[$style.container, $style.top]" v-show="!searchIsActive">
-          <li :class="[$style.tab, $style.top]" v-for="(item, index) in props.list" :key="index">
+        <ul :class="[$style.content, $style.top]" v-show="!searchIsActive">
+          <li :class="[$style.tab, $style.top]" v-for="(item, index) in props.config" :key="index">
             <slot :item="item" :index="index"></slot>
             <span v-if="item.name">{{ item.name }}</span>
           </li>
@@ -260,41 +278,41 @@ watch(searchIsActive, (newValue) => {
   --top-color: #0067EC;
 }
 
-.bar {
+.Bar {
   z-index: 1;
-  width: calc(v-bind(barHeight) * 0.8px);
+  width: calc(var(--Bar-height) * 0.8px);
   height: 80%;
   padding: 2px;
-  background-color: v-bind(barBackgroundColor) !important;
-  border-radius: calc(v-bind(borderRadius) * 1px);
+  background-color: var(--Bar-background-color) !important;
+  border-radius: calc(var(--Bar-border-radius) * 1px);
   cursor: pointer;
   overflow: hidden;
-  transition: v-bind(barTransition);
+  transition: var(--Bar-transition);
 }
 
-.bar.active {
-  width: calc(v-bind(barWidth) * 1px);
+.Bar.active {
+  width: calc(var(--Bar-width) * 1px);
   height: 100%;
   overflow: visible;
-  transform: scale(v-bind(barScale));
+  transform: scale(var(--Bar-scale));
 }
 
-.bar:not(.active):active {
+.Bar:not(.active):active {
   transform: scale(1.2);
 }
 
 .search {
-  width: calc(v-bind(barHeight) * 1px);
+  width: calc(var(--Bar-width) * 1px);
   height: 100%;
-  transition: v-bind(barTransition);
+  transition: var(--Bar-transition);
 }
 
 .search.active {
-  width: calc(v-bind(searchWidth) * 1px);
+  width: calc(var(--search-width) * 1px);
   height: 80%;
 }
 
-.container {
+.content {
   position: relative;
   display: flex;
   width: 100%;
@@ -302,14 +320,14 @@ watch(searchIsActive, (newValue) => {
   touch-action: none;
 }
 
-.container.top {
+.content.top {
   position: absolute;
   left: 0;
   top: 0;
   z-index: 1;
-  clip-path: inset(0 calc(100% - v-bind(virtualRight) * 1px) 0 calc(v-bind(virtualLeft) * 1px) round calc((v-bind(borderRadius) - 3) * 1px));
-  transform: translateZ(0) scale(v-bind(textScale));
-  transform-origin: calc(v-bind(slideCenter) * 1px) center;
+  clip-path: inset(0 calc(100% - var(--content-top-clipRight) * 1px) 0 calc(var(--content-top-clipLeft) * 1px) round calc((var(--Bar-border-radius) - 3) * 1px));
+  transform: translateZ(0) scale(var(--content-top-scale));
+  transform-origin: calc(var(--slide-center) * 1px) center;
   transition: transform .2s;
   backface-visibility: hidden;
 }
@@ -320,7 +338,7 @@ watch(searchIsActive, (newValue) => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: calc(v-bind(slideWidth) * 1px);
+  width: calc(var(--slide-width) * 1px);
   height: 100%;
 }
 
@@ -353,19 +371,19 @@ watch(searchIsActive, (newValue) => {
   left: 0;
   top: 0;
   z-index: 0;
-  width: calc(v-bind(slideWidth) * 1px);
+  width: calc(var(--slide-width) * 1px);
   height: 100%;
-  background: v-bind(background);
-  border: v-bind(border);
-  border-radius: calc((v-bind(borderRadius) - 3) * 1px);
-  box-shadow: v-bind(boxShadow);
-  transform: translateX(calc(v-bind(targetPos) * 1px)) scale(v-bind(slideScale));
-  transition: v-bind(slideTransition);
+  background: var(--slide-background);
+  border: var(--slide-border);
+  border-radius: calc((var(--Bar-border-radius) - 3) * 1px);
+  box-shadow: var(--slide-box-shadow);
+  transform: translateX(calc(var(--slide-translateX) * 1px)) scale(var(--slide-scale));
+  transition: var(--slide-transition);
 }
 </style>
 <style scoped>
 .button.lovely-search {
-  font-size: calc(v-bind(barHeight) * 0.4px);
+  font-size: calc(var(--Bar-height) * 0.4px);
 }
 
 .input.lovely-search {

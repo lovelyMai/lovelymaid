@@ -25,6 +25,7 @@ const HeaderContainerRef = ref<HTMLElement | null>(null)
 const HeaderMarginBottom = ref<string>('60px')
 let cleanup: () => void
 onMounted(() => {
+  if (!HeaderContainerRef.value) return
   cleanup = watchDOM(HeaderContainerRef.value, ({ height }) => {
     HeaderMarginBottom.value = `${height}px`
   }, true)

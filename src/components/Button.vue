@@ -21,6 +21,7 @@ const borderRadius = ref<string>('0')
 const fontSize = ref<string>('0')
 let cleanup: () => void
 onMounted(() => {
+  if (!ButtonRef.value) return
   cleanup = watchDOM(ButtonRef.value, ({ width, height }) => {
     const shorter = Math.min(width, height)
     borderRadius.value = `${shorter / 2}px`
