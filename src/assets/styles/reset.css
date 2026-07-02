@@ -2,6 +2,14 @@
   box-sizing: border-box;
 }
 
+body {
+  font-family: 'PingFang SC';
+}
+
+input, textarea {
+  font-family: inherit;
+}
+
 ul {
   margin: 0;
   padding: 0;

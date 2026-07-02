@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 输入值改变事件
 const TextAreaRef = ref<InstanceType<typeof Card> | null>(null)
-const InputRef = ref<HTMLTextAreaElement | null>(null)
+const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const inputValue = ref<string>(props.value)
 watch(() => props.value, (newValue) => {
   inputValue.value = newValue
@@ -36,14 +36,14 @@ const onInputChange = (e: Event) => {
 }
 watch(inputValue, async () => {
   await nextTick()
-  autoResize()
+  requestAnimationFrame(autoResize)
 })
 const autoResize = () => {
-  const currentHeight = InputRef.value!.clientHeight + 2
+  const currentHeight = textareaRef.value!.clientHeight + 2
   TextAreaRef.value!.$el.style.height = `${currentHeight}px`
-  InputRef.value!.style.height = 'auto'
-  const newHeight = InputRef.value!.scrollHeight
-  InputRef.value!.style.height = `${newHeight}px`
+  textareaRef.value!.style.height = 'auto'
+  const newHeight = textareaRef.value!.scrollHeight
+  textareaRef.value!.style.height = `${newHeight}px`
   TextAreaRef.value!.$el.style.height = 'auto'
 }
 
@@ -68,15 +68,15 @@ const enter = (e: KeyboardEvent) => {
 
 // 暴露方法
 defineExpose({
-  focus: () => InputRef.value?.focus(),
-  blur: () => InputRef.value?.blur(),
-  select: () => InputRef.value?.select()
+  focus: () => textareaRef.value?.focus(),
+  blur: () => textareaRef.value?.blur(),
+  select: () => textareaRef.value?.select()
 })
 </script>
 
 <template>
   <Card :class="$style.TextArea" ref="TextAreaRef" type="glass">
-    <textarea :rows="props.minrow" ref="InputRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
+    <textarea :rows="props.minrow" ref="textareaRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionstart="compositionstart" @compositionend="compositionend"
       :placeholder="props.placeholder" />
   </Card>
@@ -89,7 +89,7 @@ defineExpose({
   --border-radius: 20px;
   --font-size: 14px;
   --font-weight: 400;
-  --line-height: normal;
+  --line-height: 18px;
   --placeholder-color: #544957;
 }
 </style>

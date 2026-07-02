@@ -7,7 +7,7 @@ import Input from './components/Input.vue'
 import Select from './components//Select.vue'
 import Modal from './components/Modal.vue'
 import SideBar from './components/SideBar.vue'
-import TabBar from './components/TabBar.vue'
+import TabBar, { type TabItem } from './components/TabBar.vue'
 import TextArea from './components/TextArea.vue'
 
 import '@/assets/styles/reset.css'
@@ -24,6 +24,6 @@ export {
   Select,
   Modal,
   SideBar,
-  TabBar,
+  TabBar, type TabItem,
   TextArea,
 }

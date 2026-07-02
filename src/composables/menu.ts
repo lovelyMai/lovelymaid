@@ -1,9 +1,10 @@
-import { computed, reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { type Menu } from '@/components/common/Menu.vue'
 
 export type MenuManager = {
   visible: boolean
   position: [number, number]
+  close: (e: MouseEvent) => void
   cleanup: () => void
 }
 
@@ -11,7 +12,10 @@ export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu): M
   const visible = ref<boolean>(false)
   const X = ref<number>(0)
   const Y = ref<number>(0)
-  const position = computed<[number, number]>(() => [X.value, Y.value])
+  const position = ref<[number, number]>([X.value, Y.value])
+  watch([X, Y], ([newX, newY]) => {
+    position.value = [newX, newY]
+  })
   const close = (e: MouseEvent) => {
     if (!MenuInstance?.root) return
     if (!MenuInstance.root.contains(e.target as HTMLElement)) {
@@ -37,15 +41,18 @@ export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu): M
     document.removeEventListener('click', close, true)
   }
 
-  return reactive({ visible, position, cleanup })
+  return reactive({ visible, position, close, cleanup })
 }
 
 export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu): MenuManager => {
   const visible = ref<boolean>(false)
+  const parentEl = TriggerEl.parentElement
   const X = ref<number>(0)
   const Y = ref<number>(0)
-  const position = computed<[number, number]>(() => [X.value, Y.value])
-  const parentEl = TriggerEl.parentElement
+  const position = ref<[number, number]>([X.value, Y.value])
+  watch([X, Y], ([newX, newY]) => {
+    position.value = [newX, newY]
+  })
   const change = (e: MouseEvent) => {
     if (!MenuInstance?.root) return
     const target = e.target as HTMLElement
@@ -82,5 +89,5 @@ export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu)
     parentEl?.removeEventListener('mouseover', close)
   }
 
-  return reactive({ visible, position, cleanup })
+  return reactive({ visible, position, close, cleanup })
 }

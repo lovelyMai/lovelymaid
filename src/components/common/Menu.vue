@@ -102,10 +102,12 @@ export type Menu = {
 
 .Menu .item .text {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 450;
 }
-
-.Menu .item :global(.lovely-right-arrow) {
+</style>
+<style scoped>
+.lovely-right-arrow {
+  font-weight: 600;
   transform: translateY(1px);
 }
 </style>

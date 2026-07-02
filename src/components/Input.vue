@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, useSlots, onUnmounted } from 'vue'
+import { onMounted, ref, watch, useSlots, onUnmounted, reactive } from 'vue'
 import Card from './Card.vue'
 import Menu, { type MenuItem } from './common/Menu.vue'
 
 import { watchDOM } from '../utils/common'
 import { createMenuManager, type MenuManager } from '@/composables/menu.js'
+import useCssVar from '@/utils/useCssVar.js'
 
 interface Props {
   /** 输入框类型 */
@@ -32,30 +33,38 @@ const props = withDefaults(defineProps<Props>(), {
 // 初始化
 const slots = useSlots()
 const InputRef = ref<InstanceType<typeof Card> | null>(null)
-const InputHeight = ref<string>('0')
-const inputHeight = ref<string>('0')
-const inputPaddingLeft = computed<string>(() => slots.default ? inputHeight.value : `calc(${inputHeight.value} / 2)`)
+const style = reactive({
+  Input: {
+    height: 0,
+  },
+  input: {
+    height: 0,
+    get paddingLeft() {
+      return slots.default ? style.Input.height : style.Input.height / 2
+    }
+  }
+})
 let cleanup: () => void
 onMounted(() => {
   if (!InputRef.value) return
+  useCssVar(InputRef.value.$el, style)
   cleanup = watchDOM(InputRef.value.$el, ({ height }) => {
-    InputHeight.value = `${height}px`
-    inputHeight.value = `${height - 2}px`
+    style.Input.height = height
+    style.input.height = height - 2
   }, true)
 })
 onUnmounted(() => cleanup())
 
-// 输入值改变事件
+// 文字值改变事件
 const inputRef = ref<HTMLInputElement | null>(null)
 const inputValue = ref<string>(props.value)
 watch(() => props.value, (newValue) => {
   inputValue.value = newValue
 })
-const onInputChange = (e: Event) => {
+const onTextChange = (e: Event) => {
   inputValue.value = (e.target as HTMLInputElement).value
   props.onChange?.(inputValue.value)
 }
-
 // 中文输入法下回车防止搜索
 let isComposing = false;
 const compositionend = () => {
@@ -66,29 +75,42 @@ const compositionend = () => {
 const compositionstart = () => {
   isComposing = true;
 };
-
 // 回车事件
-const enter = async () => {
+const textEnter = (e: KeyboardEvent) => {
   if (isComposing) return
+  e.preventDefault()
   props.onEnter?.(inputValue.value)
 }
 
 // 菜单
 const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
 const selectRef = ref<HTMLElement | null>(null)
-const MenuManager = ref<MenuManager | undefined>(undefined)
+const MenuManagerInstance = ref<MenuManager | undefined>(undefined)
 onMounted(() => {
   if (props.type !== 'select' || !selectRef.value || !MenuRef.value) return
-  MenuManager.value = createMenuManager(selectRef.value, MenuRef.value)
+  MenuManagerInstance.value = createMenuManager(selectRef.value, MenuRef.value)
 })
 onUnmounted(() => {
-  MenuManager.value?.cleanup()
+  MenuManagerInstance.value?.cleanup()
 })
 const onMenuClick = (item: MenuItem, index: number) => {
   if (item.config) return
   inputValue.value = item.name
   props.onChange?.(inputValue.value)
 }
+const selectEnter = (e: KeyboardEvent) => {
+  if (e.key === 'Enter') {
+    props.onEnter?.(inputValue.value)
+  }
+}
+watch(() => MenuManagerInstance.value?.visible, (newVisible) => {
+  if (!MenuManagerInstance.value) return
+  if (newVisible) {
+    document.addEventListener('keydown', selectEnter, true)
+  } else {
+    document.removeEventListener('keydown', selectEnter, true)
+  }
+})
 
 // 清空
 const onInputClear = () => {
@@ -99,25 +121,43 @@ const onInputClear = () => {
 
 // 暴露方法
 defineExpose({
-  focus: () => inputRef.value?.focus(),
-  blur: () => inputRef.value?.blur(),
+  focus: () => {
+    if (props.type === 'text' || props.type === 'number' || props.type === 'password') {
+      inputRef.value?.focus()
+    } else {
+      if (!selectRef.value || !MenuManagerInstance.value) return
+      const rect = selectRef.value.getBoundingClientRect()
+      MenuManagerInstance.value.position = [rect.left + style.input.paddingLeft, rect.top + rect.height + 5]
+      MenuManagerInstance.value.visible = true
+      document.addEventListener('click', MenuManagerInstance.value.close, true)
+    }
+  },
+  blur: () => {
+    if (props.type === 'text' || props.type === 'number' || props.type === 'password') {
+      inputRef.value?.blur()
+    } else {
+      if (!MenuManagerInstance.value) return
+      MenuManagerInstance.value.visible = false
+      MenuManagerInstance.value.cleanup()
+    }
+  },
   select: () => inputRef.value?.select()
 })
 </script>
 
 <template>
-  <Card :class="$style.Input" ref="InputRef" :type="MenuManager?.visible ? 'select' : 'glass'">
+  <Card :class="$style.Input" ref="InputRef" :type="MenuManagerInstance?.visible ? 'select' : 'glass'">
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
     <input :class="$style.input" v-if="props.type === 'text' || props.type === 'number' || props.type === 'password'"
-      ref="inputRef" :type="props.type" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
+      ref="inputRef" :type="props.type" :value="inputValue" @input="onTextChange" @keydown.enter.capture="textEnter"
       :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
       :placeholder="props.placeholder || '输入...'" />
     <div :class="$style.select" ref="selectRef" v-else-if="props.type === 'select'">
       <span :class="$style.text">{{ inputValue || props.placeholder || '选择...' }}</span>
-      <Menu ref="MenuRef" :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]"
-        :config="props.config" :onItemClick="onMenuClick" />
+      <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false"
+        :position="MenuManagerInstance?.position ?? [0, 0]" :config="props.config" :onItemClick="onMenuClick" />
     </div>
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
@@ -130,9 +170,10 @@ defineExpose({
   display: flex;
   position: relative;
   height: 35px;
-  border-radius: calc(v-bind(InputHeight) / 2);
+  border-radius: calc(var(--Input-height) * 0.5px);
   --font-size: 14px;
   --font-weight: 400;
+  --line-height: 18px;
   --clear-color: #767676;
   --placeholder-color: #544957;
 }
@@ -142,9 +183,9 @@ defineExpose({
   justify-content: center;
   align-items: center;
   position: absolute;
-  width: v-bind(inputHeight);
+  width: calc(var(--input-height) * 1px);
   height: 100%;
-  font-size: calc(v-bind(inputHeight) / 2);
+  font-size: calc(var(--input-height) * 0.5px);
   color: #19191a;
   pointer-events: none;
 }
@@ -161,13 +202,14 @@ defineExpose({
 .select {
   flex: 1;
   min-width: 0;
-  padding-left: v-bind(inputPaddingLeft);
-  padding-right: v-bind(inputHeight);
+  padding-left: calc(var(--input-paddingLeft) * 1px);
+  padding-right: calc(var(--input-height) * 1px);
   background-color: transparent;
   border: none;
-  border-radius: calc(v-bind(inputHeight) / 2);
+  border-radius: calc(var(--input-height) * 0.5px);
   font-size: var(--font-size);
   font-weight: var(--font-weight);
+  line-height: var(--line-height);
 }
 
 .input {
@@ -177,8 +219,6 @@ defineExpose({
 }
 
 .input::placeholder {
-  font-size: var(--font-size);
-  font-weight: var(--font-weight);
   color: var(--placeholder-color);
 }
 
@@ -206,7 +246,7 @@ defineExpose({
 </style>
 <style scoped>
 .lovely-clear {
-  font-size: calc(v-bind(inputHeight) / 2);
+  font-size: calc(var(--input-height) * 0.5px);
   color: var(--clear-color);
   cursor: pointer;
   pointer-events: auto;

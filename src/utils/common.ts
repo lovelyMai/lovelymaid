@@ -40,7 +40,6 @@ export function watchDOM(
     })
   }
   const observer = new ResizeObserver(() => {
-    if (!element) return
     callback({
       width: element.offsetWidth,
       height: element.offsetHeight

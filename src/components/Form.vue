@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Input from './Input.vue'
+import TextArea from './TextArea.vue'
 import { type MenuItem } from './common/Menu.vue'
 
 export type FormItem = {
   id: string
   name: string
-  type?: 'text' | 'number' | 'password' | 'select'
+  type?: 'text' | 'number' | 'password' | 'select' | 'textarea'
   value?: string
   config?: MenuItem[]
   placeholder?: string
@@ -25,18 +26,29 @@ const props = defineProps<Props>()
 
 // 回车聚焦下一个输入框
 const InputRefs = ref<Record<string, InstanceType<typeof Input> | null>>({})
+const TextAreaRefs = ref<Record<string, InstanceType<typeof TextArea> | null>>({})
 const onEnter = (index: number) => {
+  InputRefs.value[index]?.blur()
   InputRefs.value[index + 1]?.focus()
+  TextAreaRefs.value[index]?.blur()
+  TextAreaRefs.value[index + 1]?.focus()
 }
 </script>
 <template>
-  <ul :class="$style.Form">
+  <ul :class="$style.Form" ref="FormRef">
     <li :class="$style.FormItem" v-for="(item, index) in props.config" :key="item.id" :style="{
-      width: (item.size?.[0] ?? props.defaultSize?.[0] ?? 150) + 'px',
-      height: (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px'
+      width: item.type === 'textarea' ? '100%' : (item.size?.[0] ?? props.defaultSize?.[0] ?? 150) + 'px',
+      height: item.type === 'textarea' ? 'auto' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px'
     }">
-      <span :class="$style.name">{{ item.name }}</span>
-      <Input :class="$style.Input" :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
+      <span :class="$style.name"
+        :style="{ lineHeight: item.type === 'textarea' ? '42px' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px' }">{{
+          item.name
+        }}</span>
+      <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
+        :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" :value="item.value"
+        :placeholder="item.placeholder" :enterkeyhint="item.enterkeyhint"
+        :onChange="(newValue) => props.onChange?.(newValue, index)" :onEnter="(_) => onEnter(index)" />
+      <Input :class="$style.Input" v-else :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
         :type="item.type" :value="item.value" :placeholder="item.placeholder" :config="item.config"
         :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange?.(newValue, index)"
         :onEnter="(_) => onEnter(index)" />
@@ -53,13 +65,17 @@ const onEnter = (index: number) => {
 
 .FormItem {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
 }
 
-.FormItem .Input {
+.FormItem .Input,
+.FormItem .TextArea {
   flex: 1;
   min-width: 0;
+}
+
+.FormItem .Input {
   height: 100%;
 }
 </style>
