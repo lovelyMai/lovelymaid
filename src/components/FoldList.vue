@@ -6,12 +6,12 @@ import getSlideCount from '../utils/calculateOffsets'
 interface Props {
   /** 标题 */
   title?: string
-  /** 要渲染的列表 */
-  list?: { id: string, name: string, [key: string]: any }[]
+  /** 列表数据 */
+  data: { id: string, name: string, [key: string]: any }[]
   /** 是否展开 */
   isOpen: boolean
   /** 激活项索引 */
-  activeId?: string
+  activeIndex?: number
   /** 折叠按钮点击事件 */
   onButtonClick: () => void
   /** 头部点击事件 */
@@ -21,7 +21,6 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
   title: '标题',
-  list: () => [],
   isOpen: true
 });
 
@@ -40,22 +39,22 @@ const initialize = async () => {
 onMounted(() => {
   initialize()
 })
-watch(() => props.list.length, async () => {
+watch(() => props.data.length, async () => {
   await calculateHeight()
 })
 
 // 列表项动画
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
-const oldList = ref<{ id: string, name: string }[]>(props.list)
-const listSnapshot = computed(() => props.list.map(item => item.id).join(','))
+const oldData = ref<{ id: string, name: string }[]>(props.data)
+const listSnapshot = computed(() => props.data.map(item => item.id).join(','))
 watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
   if (newSnapshot === oldSnapshot) return
   slideAnimating.value = false
-  slideCount.value = getSlideCount(props.list, oldList.value)
+  slideCount.value = getSlideCount(props.data, oldData.value)
   await nextTick()
   slideAnimating.value = true
-  oldList.value = [...props.list]
+  oldData.value = [...props.data]
 }, { deep: true })
 </script>
 
@@ -71,9 +70,9 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
     <div :class="$style.BodyContainer" :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
       <ul :class="[$style.body, { [$style.close]: !isOpen }]" ref="bodyRef">
         <li
-          :class="[$style.item, { [$style.active]: item.id === props.activeId, [$style.slideAnimation]: slideAnimating }]"
-          v-for="(item, index) in props.list" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
-          :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }"
+          :class="[$style.item, { [$style.active]: index === props.activeIndex, [$style.slideAnimation]: slideAnimating }]"
+          v-for="(item, index) in props.data" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
+          :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.data.length - index}` }"
           @animationend="() => slideAnimating = false">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>

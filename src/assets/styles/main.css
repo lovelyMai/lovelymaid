@@ -11,7 +11,7 @@
 }
 
 .lovelymaid-glass-container {
-  background-color: rgba(249, 249, 249, 0.9);
+  background-color: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px) saturate(1.5);
   border: 1px solid #fff;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, .1);

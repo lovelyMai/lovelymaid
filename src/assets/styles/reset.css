@@ -2,7 +2,8 @@
   box-sizing: border-box;
 }
 
-input, textarea {
+input,
+textarea {
   font-family: inherit;
 }
 

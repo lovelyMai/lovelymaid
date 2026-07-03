@@ -26,15 +26,10 @@ const props = withDefaults(defineProps<Props>(), {
 // 输入值改变事件
 const TextAreaRef = ref<InstanceType<typeof Card> | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
-const inputValue = ref<string>(props.value)
-watch(() => props.value, (newValue) => {
-  inputValue.value = newValue
-})
 const onInputChange = (e: Event) => {
-  inputValue.value = (e.target as HTMLInputElement).value
-  props.onChange?.(inputValue.value)
+  props.onChange?.((e.target as HTMLInputElement).value)
 }
-watch(inputValue, async () => {
+watch(() => props.value, async () => {
   await nextTick()
   requestAnimationFrame(autoResize)
 })
@@ -63,7 +58,7 @@ const compositionstart = () => {
 const enter = (e: KeyboardEvent) => {
   if (isComposing || e.shiftKey) return
   e.preventDefault()
-  props.onEnter?.(inputValue.value)
+  props.onEnter?.(props.value)
 }
 
 // 暴露方法
@@ -76,7 +71,7 @@ defineExpose({
 
 <template>
   <Card :class="$style.TextArea" ref="TextAreaRef" type="glass">
-    <textarea :rows="props.minrow" ref="textareaRef" :value="inputValue" @input="onInputChange" @keydown.enter="enter"
+    <textarea :rows="props.minrow" ref="textareaRef" :value="props.value" @input="onInputChange" @keydown.enter="enter"
       :enterkeyhint="props.enterkeyhint" @compositionstart="compositionstart" @compositionend="compositionend"
       :placeholder="props.placeholder" />
   </Card>

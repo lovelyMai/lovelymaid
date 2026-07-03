@@ -41,9 +41,8 @@ const onEnter = (index: number) => {
       height: item.type === 'textarea' ? 'auto' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px'
     }">
       <span :class="$style.name"
-        :style="{ lineHeight: item.type === 'textarea' ? '42px' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px' }">{{
-          item.name
-        }}</span>
+        :style="{ lineHeight: item.type === 'textarea' ? '42px' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px' }">
+        {{ item.name }}</span>
       <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
         :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" :value="item.value"
         :placeholder="item.placeholder" :enterkeyhint="item.enterkeyhint"

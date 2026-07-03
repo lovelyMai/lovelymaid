@@ -55,15 +55,10 @@ onMounted(() => {
 })
 onUnmounted(() => cleanup())
 
-// 文字值改变事件
+// 文字值改变
 const inputRef = ref<HTMLInputElement | null>(null)
-const inputValue = ref<string>(props.value)
-watch(() => props.value, (newValue) => {
-  inputValue.value = newValue
-})
 const onTextChange = (e: Event) => {
-  inputValue.value = (e.target as HTMLInputElement).value
-  props.onChange?.(inputValue.value)
+  props.onChange?.((e.target as HTMLInputElement).value)
 }
 // 中文输入法下回车防止搜索
 let isComposing = false;
@@ -75,11 +70,11 @@ const compositionend = () => {
 const compositionstart = () => {
   isComposing = true;
 };
-// 回车事件
+// 回车
 const textEnter = (e: KeyboardEvent) => {
   if (isComposing) return
   e.preventDefault()
-  props.onEnter?.(inputValue.value)
+  props.onEnter?.(props.value)
 }
 
 // 菜单
@@ -95,12 +90,11 @@ onUnmounted(() => {
 })
 const onMenuClick = (item: MenuItem, index: number) => {
   if (item.config) return
-  inputValue.value = item.name
-  props.onChange?.(inputValue.value)
+  props.onChange?.(item.name)
 }
 const selectEnter = (e: KeyboardEvent) => {
   if (e.key === 'Enter') {
-    props.onEnter?.(inputValue.value)
+    props.onEnter?.(props.value)
   }
 }
 watch(() => MenuManagerInstance.value?.visible, (newVisible) => {
@@ -114,8 +108,7 @@ watch(() => MenuManagerInstance.value?.visible, (newVisible) => {
 
 // 清空
 const onInputClear = () => {
-  inputValue.value = ''
-  props.onChange?.(inputValue.value)
+  props.onChange?.('')
   inputRef.value?.focus()
 }
 
@@ -151,16 +144,16 @@ defineExpose({
       <slot></slot>
     </div>
     <input :class="$style.input" v-if="props.type === 'text' || props.type === 'number' || props.type === 'password'"
-      ref="inputRef" :type="props.type" :value="inputValue" @input="onTextChange" @keydown.enter.capture="textEnter"
+      ref="inputRef" :type="props.type" :value="props.value" @input="onTextChange" @keydown.enter.capture="textEnter"
       :enterkeyhint="props.enterkeyhint" @compositionend="compositionend" @compositionstart="compositionstart"
       :placeholder="props.placeholder || '输入...'" />
     <div :class="$style.select" ref="selectRef" v-else-if="props.type === 'select'">
-      <span :class="$style.text">{{ inputValue || props.placeholder || '选择...' }}</span>
+      <span :class="$style.text">{{ props.value || props.placeholder || '选择...' }}</span>
       <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false"
         :position="MenuManagerInstance?.position ?? [0, 0]" :config="props.config" :onItemClick="onMenuClick" />
     </div>
     <div :class="[$style.icon, $style.clear]">
-      <span class="lovelymai lovely-clear" v-if="inputValue" @click.stop="onInputClear"></span>
+      <span class="lovelymai lovely-clear" v-if="props.value" @click.stop="onInputClear"></span>
     </div>
   </Card>
 </template>
