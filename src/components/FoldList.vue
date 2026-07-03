@@ -12,8 +12,8 @@ interface Props {
   isOpen: boolean
   /** 激活项索引 */
   activeIndex?: number
-  /** 折叠按钮点击事件 */
-  onButtonClick: () => void
+  /** 展开状态改变事件 */
+  onOpenChange: (newOpen: boolean) => void
   /** 头部点击事件 */
   onHeaderClick?: () => void
   /** 列表项点击事件 */
@@ -65,7 +65,7 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
         {{ props.title }}
       </div>
       <span class="lovelymai lovely-right-arrow" :style="{ transform: props.isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
-        :title="isOpen ? '收起列表' : '展开列表'" @click.stop="props.onButtonClick"></span>
+        :title="isOpen ? '收起列表' : '展开列表'" @click.stop="() => onOpenChange(!props.isOpen)"></span>
     </div>
     <div :class="$style.BodyContainer" :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
       <ul :class="[$style.body, { [$style.close]: !isOpen }]" ref="bodyRef">

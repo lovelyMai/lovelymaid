@@ -99,6 +99,7 @@ const getBorderRadius = (index: number): string => {
   padding: 0 8px;
   font-size: 12px;
   line-height: 16px;
+  font-weight: 500;
 }
 
 .header .item:not(:last-child) {

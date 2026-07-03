@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import Card from './Card.vue';
-
 import Button from './Button.vue';
 
 import { debounce } from '@/utils/common';
@@ -70,6 +69,9 @@ watch(() => props.visible, (newVisible) => {
     <div :class="$style.content">
       <slot></slot>
     </div>
+    <div :class="$style.tip">
+      <slot name="tip"></slot>
+    </div>
   </Card>
 </template>
 
@@ -111,5 +113,19 @@ watch(() => props.visible, (newVisible) => {
 .Button {
   margin-top: 10px;
   font-size: 20px;
+}
+
+.content {
+  display: flow-root;
+  position: relative;
+  z-index: 0;
+}
+
+.tip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%)
 }
 </style>

@@ -279,7 +279,6 @@ watch(searchIsActive, (newValue) => {
 }
 
 .Bar {
-  z-index: 1;
   width: calc(var(--Bar-height) * 0.8px);
   height: 80%;
   padding: 2px;
