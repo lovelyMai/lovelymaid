@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 import { watchDOM } from '../utils/common';
 
@@ -29,7 +29,7 @@ onMounted(() => {
     fontSize.value = `${shorter / 2}px`
   }, true)
 })
-onMounted(() => cleanup())
+onUnmounted(() => cleanup?.())
 </script>
 
 <template>

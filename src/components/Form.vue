@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import Input from './Input.vue'
+import Input, { InputOption } from './Input.vue'
 import TextArea from './TextArea.vue'
-import { type MenuItem } from './common/Menu.vue'
 
 export type FormItem = {
   id: string
   name: string
   type?: 'text' | 'number' | 'password' | 'select' | 'textarea'
-  value?: string
-  config?: MenuItem[]
+  value: string
+  options?: InputOption[]
   placeholder?: string
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   size?: [number | string, number | string]
@@ -20,7 +19,7 @@ interface Props {
   /** 表单项默认尺寸 */
   defaultSize?: [number | string, number | string]
   /** 输入改变事件 */
-  onChange?: (newValue: string, index: number) => void
+  onChange: (newValue: string, index: number) => void
 }
 const props = defineProps<Props>()
 
@@ -46,10 +45,10 @@ const onEnter = (index: number) => {
       <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
         :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" :value="item.value"
         :placeholder="item.placeholder" :enterkeyhint="item.enterkeyhint"
-        :onChange="(newValue) => props.onChange?.(newValue, index)" :onEnter="(_) => onEnter(index)" />
+        :onChange="(newValue) => props.onChange(newValue, index)" :onEnter="(_) => onEnter(index)" />
       <Input :class="$style.Input" v-else :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
-        :type="item.type" :value="item.value" :placeholder="item.placeholder" :config="item.config"
-        :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange?.(newValue, index)"
+        :type="item.type" :value="item.value" :placeholder="item.placeholder" :options="item.options"
+        :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange(newValue, index)"
         :onEnter="(_) => onEnter(index)" />
     </li>
   </ul>

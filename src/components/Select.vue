@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import Menu, { type MenuItem } from './common/Menu.vue';
+import Menu from './common/Menu.vue';
+
 import { createMenuManager, type MenuManager } from '@/composables/menu.js';
+import type { Option } from './type'
 
 interface Props {
   /** 选项配置 */
-  config: MenuItem[]
-  /** 列表项点击事件 */
-  onItemClick?: (item: MenuItem, index: number) => void
+  options: Option[]
+  /** 选项点击事件 */
+  onOptionClick?: (item: Option, index: number) => void
 }
 const props = defineProps<Props>()
 
@@ -24,7 +26,7 @@ onMounted(() => {
 <template>
   <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" ref="SelectRef">
     <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false"
-      :position="MenuManagerInstance?.position ?? [0, 0]" :config="props.config" :onItemClick="props.onItemClick"
+      :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options" :onOptionClick="props.onOptionClick"
       v-slot="{ item, index }">
       <slot :item="item" :index="index"></slot>
     </Menu>

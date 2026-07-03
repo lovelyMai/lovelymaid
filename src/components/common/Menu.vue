@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { createSubMenuManager, type MenuManager } from '@/composables/menu.js'
 import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
 
-export type MenuItem = { id: string, name: string, config?: MenuItem[], [key: string]: any }
+import { createSubMenuManager, type MenuManager } from '@/composables/menu.js'
+import type { Option } from '../type'
 interface Props {
   /** 是否显示 */
   visible: boolean
-  /** 菜单配置 */
-  config: MenuItem[]
+  /** 选项 */
+  options: Option[]
   /** 位置 */
   position: [number, number]
-  /** 列表项点击事件 */
-  onItemClick?: (item: MenuItem, index: number) => void
+  /** 选项点击事件 */
+  onOptionClick?: (option: Option, index: number) => void
 }
 const props = defineProps<Props>()
 const isSubMenu = inject('menu-is-sub', false)
@@ -57,14 +57,14 @@ export type Menu = {
     <transition name="lovelymaid-fade-leave">
       <ul :class="$style.Menu" ref="MenuRef" v-if="props.visible"
         :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }" @click.stop>
-        <li :class="$style.item" v-for="(item, index) in props.config" :key="item.id" :data-index="index"
-          :data-has-children="item.config ? 'true' : 'false'" @click="() => props.onItemClick?.(item, index)">
+        <li :class="$style.item" v-for="(item, index) in props.options" :key="item.id" :data-index="index"
+          :data-has-children="item.options ? 'true' : 'false'" @click.stop="() => props.onOptionClick?.(item, index)">
           <slot :item="item" :index="index"></slot>
           <span :class="$style.text">{{ item.name }}</span>
-          <span class="lovelymai lovely-right-arrow" v-if="item.config"></span>
-          <Menu v-if="item.config" :ref="(el) => SubMenuRefs[index] = (el as Menu | null)"
+          <span class="lovelymai lovely-right-arrow" v-if="item.options"></span>
+          <Menu v-if="item.options" :ref="(el) => SubMenuRefs[index] = (el as Menu | null)"
             :visible="MenuManagers[index]?.visible ?? false" :position="MenuManagers[index]?.position ?? [0, 0]"
-            :config="item.config" :onItemClick="props.onItemClick" />
+            :options="item.options" :onOptionClick="props.onOptionClick" />
         </li>
       </ul>
     </transition>

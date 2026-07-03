@@ -6,13 +6,13 @@ interface Props {
   /** 最小行数 */
   minrow?: number
   /** 值 */
-  value?: string
+  value: string
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
-  /** 获得当前输入值 */
-  onChange?: (inputValue: string) => void
+  /** 输入改变事件 */
+  onChange: (inputValue: string) => void
   /** 回车事件 */
   onEnter?: (inputValue: string) => void
 }
@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
 const TextAreaRef = ref<InstanceType<typeof Card> | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const onInputChange = (e: Event) => {
-  props.onChange?.((e.target as HTMLInputElement).value)
+  props.onChange((e.target as HTMLInputElement).value)
 }
 watch(() => props.value, async () => {
   await nextTick()

@@ -7,7 +7,7 @@ interface Props {
   /** 标题 */
   title?: string
   /** 列表数据 */
-  data: { id: string, name: string, [key: string]: any }[]
+  list: { id: string, name: string, [key: string]: any }[]
   /** 是否展开 */
   isOpen: boolean
   /** 激活项索引 */
@@ -39,22 +39,22 @@ const initialize = async () => {
 onMounted(() => {
   initialize()
 })
-watch(() => props.data.length, async () => {
+watch(() => props.list.length, async () => {
   await calculateHeight()
 })
 
 // 列表项动画
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
-const oldData = ref<{ id: string, name: string }[]>(props.data)
-const listSnapshot = computed(() => props.data.map(item => item.id).join(','))
+const oldlist = ref<{ id: string, name: string }[]>(props.list)
+const listSnapshot = computed(() => props.list.map(item => item.id).join(','))
 watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
   if (newSnapshot === oldSnapshot) return
   slideAnimating.value = false
-  slideCount.value = getSlideCount(props.data, oldData.value)
+  slideCount.value = getSlideCount(props.list, oldlist.value)
   await nextTick()
   slideAnimating.value = true
-  oldData.value = [...props.data]
+  oldlist.value = [...props.list]
 }, { deep: true })
 </script>
 
@@ -71,8 +71,8 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
       <ul :class="[$style.body, { [$style.close]: !isOpen }]" ref="bodyRef">
         <li
           :class="[$style.item, { [$style.active]: index === props.activeIndex, [$style.slideAnimation]: slideAnimating }]"
-          v-for="(item, index) in props.data" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
-          :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.data.length - index}` }"
+          v-for="(item, index) in props.list" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
+          :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }"
           @animationend="() => slideAnimating = false">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>

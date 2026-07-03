@@ -51,3 +51,12 @@ export function watchDOM(
   return () => observer.disconnect()
 }
 
+// 清理定时器
+export const clearTimer = (...args: (number | undefined)[]) => {
+  args.forEach(timer => {
+    if (timer) {
+      clearInterval(timer)
+      clearTimeout(timer)
+    }
+  })
+}
