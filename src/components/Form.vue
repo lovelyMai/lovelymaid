@@ -59,6 +59,7 @@ const onEnter = (index: number) => {
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 10px;
+  overflow: hidden;
 }
 
 .FormItem {

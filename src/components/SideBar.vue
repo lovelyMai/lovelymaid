@@ -72,7 +72,7 @@ watch(() => props.visible, (newVisible) => {
         <span class="lovelymai lovely-left-sidebar"></span>
       </div>
     </div>
-    <slot>这是内容</slot>
+    <slot></slot>
   </Card>
 </template>
 
@@ -99,7 +99,7 @@ watch(() => props.visible, (newVisible) => {
   height: 30px;
   border: none;
   border-radius: 15px;
-  background-color: rgba(248, 248, 248, 0.9);
+  background-color: rgba(255, 255, 255, 0.9);
   transform: translateX(v-bind(buttonTransformDistance));
   transition:
     transform .5s,
