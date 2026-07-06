@@ -29,7 +29,7 @@ onMounted(() => {
     fontSize.value = `${shorter / 2}px`
   }, true)
 })
-onUnmounted(() => cleanup?.())
+onUnmounted(() => cleanup())
 </script>
 
 <template>

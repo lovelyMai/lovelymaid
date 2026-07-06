@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, reactive } from 'vue'
 import Card from './Card.vue';
 import Button from './Button.vue';
 
-import { debounce } from '@/utils/common';
+import { debounce, watchDOM } from '@/utils/common';
 import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
+import useCssVar from '@/utils/useCssVar.js';
 
 interface Props {
   /** 是否显示 */
   visible?: boolean;
   /** 是否展开 */
-  isOpen?: boolean;
+  isOpen: boolean;
+  /** 关闭事件 */
+  onClose: () => void;
   /** 标题 */
   title?: string;
-  /** 关闭按钮点击事件 */
-  onCloseClick?: () => void;
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true,
@@ -22,38 +23,56 @@ const props = withDefaults(defineProps<Props>(), {
   title: '标题'
 });
 
-// 计算侧边栏平移距离
+// 初始化
+const style = reactive({
+  ContentBar: {
+    get translateX() {
+      return props.isOpen ? '0' : `${-transformDistance.value}px`
+    },
+    scale: props.visible ? '1' : '0',
+    transition: 'none'
+  }
+})
+onMounted(() => {
+  if (!ContentBarRef.value?.$el) return
+  useCssVar(ContentBarRef.value.$el, style)
+})
+
+// 计算平移距离
 const ContentBarRef = ref<InstanceType<typeof Card> | null>(null)
-const transition = ref<string>('none')
 const transformDistance = ref<number>(0)
-const translateX = computed<string>(() => props.isOpen ? '0' : `${-transformDistance.value}px`)
+let cleanup: () => void
 const calculateTransform = () => {
   if (!ContentBarRef.value) return
   transformDistance.value = getLayoutLeftInViewport(ContentBarRef.value.$el) + ContentBarRef.value.$el.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
+  if (!ContentBarRef.value) return
   calculateTransform()
-  setTimeout(() => transition.value = 'transform .5s', 100)
+  cleanup = watchDOM(ContentBarRef.value.$el, () => {
+    debounceCalculateTransform()
+  })
+  setTimeout(() => style.ContentBar.transition = 'transform .5s', 100)
   window.addEventListener('resize', debounceCalculateTransform)
 })
 onUnmounted(() => {
+  cleanup()
   window.removeEventListener('resize', debounceCalculateTransform)
 })
 
 // 切换 visilble
-const scale = ref<string>(props.visible ? '1' : '0')
 let timer: number | undefined
 watch(() => props.visible, (newVisible) => {
   clearTimeout(timer)
-  transition.value = 'transform .3s'
-  timer = setTimeout(() => transition.value = 'transform .5s', 300)
+  style.ContentBar.transition = 'transform .3s'
+  timer = setTimeout(() => style.ContentBar.transition = 'transform .5s', 300)
   if (newVisible) {
     requestAnimationFrame(() => {
-      scale.value = '1'
+      style.ContentBar.scale = '1'
     })
   } else {
-    scale.value = '0'
+    style.ContentBar.scale = '0'
   }
 })
 </script>
@@ -62,7 +81,7 @@ watch(() => props.visible, (newVisible) => {
   <Card :class="$style.ContentBar" ref="ContentBarRef" type="glass">
     <div :class="$style.header">
       <div :class="$style.title" :title="props.title">{{ props.title }}</div>
-      <Button type="glass" :class="$style.Button" :onClick="props.onCloseClick" title="收起内容栏">
+      <Button type="glass" :class="$style.Button" :onClick="props.onClose" title="收起内容栏">
         <span class="lovelymai lovely-close"></span>
       </Button>
     </div>
@@ -78,8 +97,8 @@ watch(() => props.visible, (newVisible) => {
 <style module>
 .ContentBar {
   border-radius: 20px;
-  transform: translateX(v-bind(translateX)) scale(v-bind(scale));
-  transition: v-bind(transition);
+  transform: translateX(var(--ContentBar-translateX)) scale(var(--ContentBar-scale));
+  transition: var(--ContentBar-transition);
   overflow: auto;
   scrollbar-width: thin;
 }

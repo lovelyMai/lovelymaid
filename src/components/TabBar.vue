@@ -198,6 +198,7 @@ const stopSlide = (e: PointerEvent) => {
     searchIsActive.value = false
     runStopAnimation(props.activeIndex)
   } else {
+    if (!contentRef.value) return
     const clickX = e.clientX - getLayoutLeftInViewport(contentRef.value)
     const index = Math.floor(clickX / style.slide.width)
     const newActiveIndex = index > props.tabs.length - 1 ? props.tabs.length - 1 : index < 0 ? 0 : index

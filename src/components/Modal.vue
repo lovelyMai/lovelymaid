@@ -35,11 +35,7 @@ onUnmounted(() => cleanup())
 // 上下滚动
 const DrawerContainerRef = ref<InstanceType<typeof Card> | null>(null)
 const scroll = ref<any | null>(null)
-const isOpen = ref<boolean>(props.isOpen)
 const isTouching = ref<boolean>(false)
-watch(() => props.isOpen, (newOpen) => {
-  isOpen.value = newOpen
-})
 onMounted(() => {
   if (props.type === 'desktop') return
   scroll.value = checkVerticalScroll(DrawerContainerRef.value!.$el, 0, ref(true), 500)
@@ -66,10 +62,10 @@ onUnmounted(() => {
 <template>
   <div :class="$style.Drawer">
     <transition name="lovelymai-fade">
-      <div :class="$style.mask" v-if="props.showMask && isOpen"></div>
+      <div :class="$style.mask" v-if="props.showMask && props.isOpen"></div>
     </transition>
     <transition name="lovelymai-slide">
-      <Card :class="[$style.DrawerContainer, props.type === 'desktop' ? $style.desktop : $style.mobile]" v-show="isOpen"
+      <Card :class="[$style.DrawerContainer, props.type === 'desktop' ? $style.desktop : $style.mobile]" v-show="props.isOpen"
         ref="DrawerContainerRef" type="common"
         :style="isTouching ? { transform: `translateY(${scroll.distance}px)`, transition: 'none' } : undefined">
         <div :class="$style.header">

@@ -1,65 +1,81 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, reactive } from 'vue'
 import Card from './Card.vue';
 
-import { debounce } from '@/utils/common';
+import { debounce, watchDOM } from '@/utils/common';
 import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
+import useCssVar from '@/utils/useCssVar.js';
 
 interface Props {
   /** 是否显示 */
   visible?: boolean;
   /** 是否展开 */
-  isOpen?: boolean
-  /** 切换按钮点击事件 */
-  onSwitch?: () => void;
+  isOpen: boolean
+  /** 展开改变事件 */
+  onOpenChange: (newOpen: boolean) => void;
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true,
   isOpen: true
 })
 
-// 侧边栏开关状态
-const switchSideBar = () => {
-  props.onSwitch?.();
-}
+// 初始化
+const style = reactive({
+  SideBar: {
+    get translateX() {
+      return props.isOpen ? '0' : `${-TransformDistance.value}px`
+    },
+    scale: props.visible ? '1' : '0',
+    transition: 'none'
+  },
+  button: {
+    get translateX() {
+      return props.isOpen ? '0' : `${TransformDistance.value - SideBarWidth.value + 55}px`
+    }
+  }
+})
+onMounted(() => {
+  if (!SideBarRef.value?.$el) return
+  useCssVar(SideBarRef.value?.$el, style)
+})
 
-// 计算侧边栏平移距离
+// 计算平移距离
 const SideBarRef = ref<InstanceType<typeof Card> | null>(null)
-const ContainerWidth = ref<number>(0)
-const transition = ref<string>('none')
+const SideBarWidth = ref<number>(0)
 const TransformDistance = ref<number>(0)
-const translateX = computed<string>(() => props.isOpen ? '0' : `${-TransformDistance.value}px`)
+let cleanup: () => void
 const calculateTransform = () => {
-  if (!SideBarRef.value) return
-  ContainerWidth.value = SideBarRef.value.$el.offsetWidth
-  TransformDistance.value = getLayoutLeftInViewport(SideBarRef.value.$el) + ContainerWidth.value + 10
+  if (!SideBarRef.value?.$el) return
+  SideBarWidth.value = SideBarRef.value.$el.offsetWidth
+  TransformDistance.value = getLayoutLeftInViewport(SideBarRef.value.$el) + SideBarWidth.value + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
+  if (!SideBarRef.value?.$el) return
   calculateTransform()
-  setTimeout(() => transition.value = 'transform .5s', 100)
+  cleanup = watchDOM(SideBarRef.value.$el, () => {
+    debounceCalculateTransform()
+  })
+  setTimeout(() => style.SideBar.transition = 'transform .5s', 100)
   window.addEventListener('resize', debounceCalculateTransform)
 })
 onUnmounted(() => {
+  cleanup()
   window.removeEventListener('resize', debounceCalculateTransform)
 })
 
-// 计算侧边栏按钮平移距离
-const buttonTransformDistance = computed<string>(() => props.isOpen ? '0' : `${TransformDistance.value - ContainerWidth.value + 55}px`)
-
 // 切换 visilble
-const scale = ref<string>(props.visible ? '1' : '0')
 let timer: number | undefined
 watch(() => props.visible, (newVisible) => {
   clearTimeout(timer)
-  transition.value = 'transform .3s'
-  timer = setTimeout(() => transition.value = 'transform .5s', 300)
+  style.SideBar.transition = 'transform .3s'
+  timer = setTimeout(() => style.SideBar.transition = 'transform .5s', 300)
   if (newVisible) {
     requestAnimationFrame(() => {
-      scale.value = '1'
+      style.SideBar.scale = '1'
     })
   } else {
-    scale.value = '0'
+    style.SideBar.scale = '0'
   }
 })
 </script>
@@ -67,8 +83,8 @@ watch(() => props.visible, (newVisible) => {
 <template>
   <Card :class="$style.SideBar" ref="SideBarRef" type="glass">
     <div :class="$style.header">
-      <div :class="[$style.SwitchButton, { [$style.close]: !props.isOpen }]" @click="switchSideBar"
-        :title="isOpen ? '收起侧边栏' : '展开侧边栏'">
+      <div :class="[$style.SwitchButton, { [$style.close]: !props.isOpen }]" :title="isOpen ? '收起侧边栏' : '展开侧边栏'"
+        @click.stop="() => props.onOpenChange(!props.isOpen)">
         <span class="lovelymai lovely-left-sidebar"></span>
       </div>
     </div>
@@ -79,8 +95,8 @@ watch(() => props.visible, (newVisible) => {
 <style module>
 .SideBar {
   border-radius: 20px;
-  transform: translateX(v-bind(translateX)) scale(v-bind(scale));
-  transition: v-bind(transition);
+  transform: translateX(var(--SideBar-translateX)) scale(var(--SideBar-scale));
+  transition: var(--SideBar-transition);
 }
 
 .header {
@@ -100,7 +116,7 @@ watch(() => props.visible, (newVisible) => {
   border: none;
   border-radius: 15px;
   background-color: rgba(255, 255, 255, 0.9);
-  transform: translateX(v-bind(buttonTransformDistance));
+  transform: translateX(var(--button-translateX));
   transition:
     transform .5s,
     box-shadow .5s;
