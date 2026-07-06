@@ -54,7 +54,7 @@ export type Menu = {
 
 <template>
   <teleport to="body" :disabled="isSubMenu">
-    <transition name="lovelymaid-fade-leave">
+    <transition name="lovelymai-fade-leave">
       <ul :class="$style.Menu" ref="MenuRef" v-if="props.visible"
         :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }" @click.stop>
         <li :class="$style.item" v-for="(item, index) in props.options" :key="item.id" :data-index="index"

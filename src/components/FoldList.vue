@@ -61,9 +61,9 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
 <template>
   <div :class="$style.FoldList">
     <div :class="$style.header" @click="onHeaderClick">
-      <div :class="$style.title">
+      <span :class="$style.title">
         {{ props.title }}
-      </div>
+      </span>
       <span class="lovelymai lovely-right-arrow" :style="{ transform: props.isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
         :title="isOpen ? '收起列表' : '展开列表'" @click.stop="() => onOpenChange(!props.isOpen)"></span>
     </div>
@@ -84,8 +84,8 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
 <style module>
 .FoldList {
   --header-height: 30px;
-  --title-font-size: 12px;
-  --title-color: #767676;
+  --header-font-size: 12px;
+  --header-color: #767676;
   --list-font-size: 14px;
   --list-line-height: 30px;
   --list-color: inherit;
@@ -100,8 +100,8 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
 }
 
 .header .title {
-  font-size: var(--title-font-size);
-  color: var(--title-color);
+  font-size: var(--header-font-size);
+  color: var(--header-color);
   font-weight: 500;
 }
 
@@ -155,7 +155,7 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
 <style scoped>
 .lovely-right-arrow {
   font-size: 16px;
-  color: var(--title-color);
+  color: var(--header-color);
   font-weight: 700;
   transition: transform .3s;
   cursor: pointer;

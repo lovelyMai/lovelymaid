@@ -1,6 +1,6 @@
 @font-face {
   font-family: "lovelymai"; /* Project id 5124876 */
-  src: url('iconfont.ttf?t=1777622576704') format('truetype');
+  src: url('iconfont.ttf?t=1783300735945') format('truetype');
 }
 
 .lovelymai {
@@ -22,7 +22,7 @@
   content: "\e6de";
 }
 
-.lovely-sidebar_left:before {
+.lovely-left-sidebar:before {
   content: "\e898";
 }
 
@@ -34,11 +34,15 @@
   content: "\e600";
 }
 
+.lovely-down-arrow:before {
+  content: "\e89a";
+}
+
 .lovely-left-arrow:before {
   content: "\e899";
 }
 
-.lovely-gou:before {
+.lovely-check:before {
   content: "\e630";
 }
 

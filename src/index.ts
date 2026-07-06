@@ -8,17 +8,16 @@ import Select from './components//Select.vue'
 import Modal from './components/Modal.vue'
 import SideBar from './components/SideBar.vue'
 import TabBar, { type TabItem } from './components/TabBar.vue'
-import Table, { type ColumnConfig } from './components/Table.vue'
+import Table, { type ColumnConfig, type SortConfig } from './components/Table.vue'
 import TextArea from './components/TextArea.vue'
 
-import type { Option } from './components/type.js'
+import type { Item, Option } from './components/type.js'
 
 import '@/assets/styles/reset.css'
 import '@/assets/styles/main.css'
 import '@/assets/icons/iconfont.css'
 
 export {
-  type Option,
   Button,
   Card,
   ContentBar,
@@ -29,6 +28,7 @@ export {
   Modal,
   SideBar,
   TabBar, type TabItem,
-  Table, type ColumnConfig,
+  Table, type ColumnConfig, type SortConfig,
   TextArea,
+  type Item, type Option,
 }

@@ -34,7 +34,7 @@ onUnmounted(() => cleanup?.())
 
 <template>
   <div
-    :class="[$style.Button, { 'lovelymaid-glass-container': props.type === 'glass', [$style.common]: props.type === 'common', }]"
+    :class="[$style.Button, { 'lovelymai-glass-container': props.type === 'glass', [$style.common]: props.type === 'common', }]"
     ref="ButtonRef" @click="props.onClick" :title="props.title">
     <slot></slot>
   </div>
@@ -61,11 +61,11 @@ onUnmounted(() => cleanup?.())
   background-color: var(--background-color);
 }
 
-.Button:active {
-  transform: scale(1.2);
+.Button.lovelymai-glass-container:active {
+  background-color: #fff;
 }
 
-.Button.lovelymaid-glass-container:active {
-  background-color: #fff;
+.Button:active {
+  transform: scale(1.2);
 }
 </style>

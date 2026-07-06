@@ -65,10 +65,10 @@ onUnmounted(() => {
 
 <template>
   <div :class="$style.Drawer">
-    <transition name="lovelymaid-fade">
+    <transition name="lovelymai-fade">
       <div :class="$style.mask" v-if="props.showMask && isOpen"></div>
     </transition>
-    <transition name="lovelymaid-slide">
+    <transition name="lovelymai-slide">
       <Card :class="[$style.DrawerContainer, props.type === 'desktop' ? $style.desktop : $style.mobile]" v-show="isOpen"
         ref="DrawerContainerRef" type="common"
         :style="isTouching ? { transform: `translateY(${scroll.distance}px)`, transition: 'none' } : undefined">
@@ -137,8 +137,8 @@ onUnmounted(() => {
 </style>
 
 <style>
-.lovelymaid-slide-enter-from,
-.lovelymaid-slide-leave-to {
+.lovelymai-slide-enter-from,
+.lovelymai-slide-leave-to {
   transform: translateY(100dvh);
 }
 </style>

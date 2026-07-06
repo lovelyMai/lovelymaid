@@ -7,9 +7,9 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const typeClass = {
-  common: 'lovelymaid-common-container',
-  select: 'lovelymaid-select-container',
-  glass: 'lovelymaid-glass-container'
+  common: 'lovelymai-common-container',
+  select: 'lovelymai-select-container',
+  glass: 'lovelymai-glass-container'
 }
 </script>
 
