@@ -2,16 +2,16 @@
 import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
 
 import { createSubMenuManager, type MenuManager } from '@/composables/menu.js'
-import type { Option } from '../type'
+import type { OptionItem } from '../type'
 interface Props {
   /** 是否显示 */
   visible: boolean
   /** 选项 */
-  options: Option[]
+  options: OptionItem[]
   /** 位置 */
   position: [number, number]
   /** 选项点击事件 */
-  onOptionClick?: (option: Option, index: number) => void
+  onOptionClick?: (option: OptionItem, index: number) => void
 }
 const props = defineProps<Props>()
 const isSubMenu = inject('menu-is-sub', false)

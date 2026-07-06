@@ -3,13 +3,13 @@ import { onMounted, ref } from 'vue';
 import Menu from './common/Menu.vue';
 
 import { createMenuManager, type MenuManager } from '@/composables/menu.js';
-import type { Option } from './type'
+import type { OptionItem } from './type'
 
 interface Props {
   /** 选项配置 */
-  options: Option[]
+  options: OptionItem[]
   /** 选项点击事件 */
-  onOptionClick?: (item: Option, index: number) => void
+  onOptionClick?: (item: OptionItem, index: number) => void
 }
 const props = defineProps<Props>()
 

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
 
 import { watchDOM } from '../utils/common';
+import useCssVar from '@/utils/useCssVar';
 
 interface Props {
   /** 类型 */
@@ -16,18 +17,23 @@ const props = withDefaults(defineProps<Props>(), {
   title: ''
 });
 
-// 计算字体大小
+// 初始化
 const ButtonRef = ref<HTMLElement | null>(null)
-const borderRadius = ref<string>('0')
-const fontSize = ref<string>('0')
+const style = reactive({
+  Button: {
+    'border-radius': '0',
+    'font-size': '0'
+  }
+})
 let cleanup: () => void
 onMounted(() => {
   if (!ButtonRef.value) return
   cleanup = watchDOM(ButtonRef.value, ({ width, height }) => {
     const shorter = Math.min(width, height)
-    borderRadius.value = `${shorter / 2}px`
-    fontSize.value = `${shorter / 2}px`
-  }, true)
+    style.Button['border-radius'] = `${shorter / 2}px`
+    style.Button['font-size'] = `${shorter / 2}px`
+  })
+  useCssVar(ButtonRef.value, style)
 })
 onUnmounted(() => cleanup())
 </script>
@@ -35,7 +41,7 @@ onUnmounted(() => cleanup())
 <template>
   <div
     :class="[$style.Button, { 'lovelymai-glass-container': props.type === 'glass', [$style.common]: props.type === 'common', }]"
-    ref="ButtonRef" @click="props.onClick" :title="props.title">
+    ref="ButtonRef" :title="props.title" @click.stop="() => props.onClick?.()">
     <slot></slot>
   </div>
 </template>
@@ -47,11 +53,11 @@ onUnmounted(() => cleanup())
   align-items: center;
   width: 30px;
   height: 30px;
-  border-radius: v-bind(borderRadius);
+  border-radius: var(--Button-border-radius);
   cursor: pointer;
   touch-action: none;
   transition: transform .2s;
-  font-size: v-bind(fontSize);
+  font-size: var(--Button-font-size);
   font-weight: 500;
   color: #19191a;
   --background-color: #3b86f7;

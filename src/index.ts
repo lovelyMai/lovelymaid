@@ -11,7 +11,7 @@ import TabBar, { type TabItem } from './components/TabBar.vue'
 import Table, { type ColumnConfig, type SortConfig } from './components/Table.vue'
 import TextArea from './components/TextArea.vue'
 
-import type { Item, Option } from './components/type.js'
+import type { Item, ListItem, OptionItem } from './components/type.js'
 
 import '@/assets/styles/reset.css'
 import '@/assets/styles/main.css'
@@ -30,5 +30,5 @@ export {
   TabBar, type TabItem,
   Table, type ColumnConfig, type SortConfig,
   TextArea,
-  type Item, type Option,
+  type Item, type ListItem, type OptionItem,
 }

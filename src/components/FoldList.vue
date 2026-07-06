@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted, watch, computed } from 'vue'
+import { ref, nextTick, onMounted, watch, computed, reactive } from 'vue'
 
 import getSlideCount from '../utils/calculateOffsets'
+import { watchDOM } from '@/utils/common'
+import useCssVar from '@/utils/useCssVar'
+import { ListItem } from './type'
 
 interface Props {
   /** 标题 */
   title?: string
   /** 列表数据 */
-  list: { id: string, name: string, [key: string]: any }[]
+  list: ListItem[]
   /** 是否展开 */
   isOpen: boolean
   /** 激活项索引 */
@@ -17,30 +20,30 @@ interface Props {
   /** 头部点击事件 */
   onHeaderClick?: () => void
   /** 列表项点击事件 */
-  onItemClick?: (item: { id: string, name: string, [key: string]: any }, index: number) => void
+  onItemClick?: (item: ListItem, index: number) => void
 }
 const props = withDefaults(defineProps<Props>(), {
   title: '标题',
   isOpen: true
 });
 
-// 标准流高度动画
-const bodyHeight = ref<number>(0)
-const bodyRef = ref<HTMLElement | null>(null)
-const calculateHeight = async () => {
-  await nextTick()
-  if (bodyRef.value) {
-    bodyHeight.value = bodyRef.value!.offsetHeight
+// 初始化
+const FoldListRef = ref<HTMLElement | null>(null)
+const ListRef = ref<HTMLElement | null>(null)
+const ListHeight = ref<number>(0)
+const style = reactive({
+  container: {
+    get height() {
+      return props.isOpen ? `${ListHeight.value}px` : '0px'
+    }
   }
-}
-const initialize = async () => {
-  await calculateHeight()
-}
-onMounted(() => {
-  initialize()
 })
-watch(() => props.list.length, async () => {
-  await calculateHeight()
+onMounted(() => {
+  if (!FoldListRef.value || !ListRef.value) return
+  watchDOM(ListRef.value, ({ height }) => {
+    ListHeight.value = height
+  })
+  useCssVar(FoldListRef.value, style)
 })
 
 // 列表项动画
@@ -59,7 +62,7 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
 </script>
 
 <template>
-  <div :class="$style.FoldList">
+  <div :class="$style.FoldList" ref="FoldListRef">
     <div :class="$style.header" @click="onHeaderClick">
       <span :class="$style.title">
         {{ props.title }}
@@ -67,13 +70,13 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
       <span class="lovelymai lovely-right-arrow" :style="{ transform: props.isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
         :title="isOpen ? '收起列表' : '展开列表'" @click.stop="() => onOpenChange(!props.isOpen)"></span>
     </div>
-    <div :class="$style.BodyContainer" :style="{ height: isOpen ? `${bodyHeight}px` : '0px' }">
-      <ul :class="[$style.body, { [$style.close]: !isOpen }]" ref="bodyRef">
+    <div :class="$style.container">
+      <ul :class="[$style.list, { [$style.close]: !isOpen }]" ref="ListRef">
         <li
           :class="[$style.item, { [$style.active]: index === props.activeIndex, [$style.slideAnimation]: slideAnimating }]"
-          v-for="(item, index) in props.list" :key="item.id" @click.stop="() => onItemClick?.(item, index)"
+          v-for="(item, index) in props.list" :key="item.id"
           :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }"
-          @animationend="() => slideAnimating = false">
+          @click.stop="() => onItemClick?.(item, index)" @animationend="() => slideAnimating = false">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>
       </ul>
@@ -105,21 +108,22 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
   font-weight: 500;
 }
 
-.BodyContainer {
+.container {
+  height: var(--container-height);
   overflow: hidden;
   transition: height .5s ease;
 }
 
-.body {
+.list {
   transform: translateY(0);
   transition: transform .5s ease;
 }
 
-.body.close {
+.list.close {
   transform: translateY(-100%);
 }
 
-.body .item {
+.list .item {
   position: relative;
   padding: 0 10px;
   border-radius: 6px;
@@ -132,7 +136,7 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
   transition: all .2s;
 }
 
-.body .item.active {
+.list .item.active {
   background-color: rgba(228, 228, 228, 1);
   color: #3b86f7;
 }

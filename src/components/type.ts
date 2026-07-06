@@ -3,9 +3,6 @@ export type Item = {
   [key: string]: any
 }
 
-export type Option = {
-  id: string,
-  name: string,
-  options?: Option[],
-  [key: string]: any
-}
+export type ListItem = Item & { name: string }
+
+export type OptionItem = ListItem & { options?: OptionItem[] }

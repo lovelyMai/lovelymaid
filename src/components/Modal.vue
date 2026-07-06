@@ -28,7 +28,7 @@ onMounted(() => {
   if (!HeaderContainerRef.value) return
   cleanup = watchDOM(HeaderContainerRef.value, ({ height }) => {
     HeaderMarginBottom.value = `${height}px`
-  }, true)
+  })
 })
 onUnmounted(() => cleanup())
 

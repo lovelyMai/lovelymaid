@@ -6,9 +6,9 @@ import Menu from './common/Menu.vue'
 import { watchDOM } from '../utils/common'
 import { createMenuManager, type MenuManager } from '@/composables/menu.js'
 import useCssVar from '@/utils/useCssVar.js'
-import type { Option } from './type.js'
+import type { OptionItem } from './type.js'
 
-export type InputOption = Option & { selectable?: boolean }
+export type InputOption = OptionItem & { selectable?: boolean }
 interface Props {
   /** 输入框类型 */
   type?: "text" | "password" | "number" | "select"
@@ -31,8 +31,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 初始化
-const slots = useSlots()
 const InputRef = ref<InstanceType<typeof Card> | null>(null)
+const slots = useSlots()
 const style = reactive({
   Input: {
     height: 0,
@@ -47,11 +47,11 @@ const style = reactive({
 let cleanup: () => void
 onMounted(() => {
   if (!InputRef.value) return
-  useCssVar(InputRef.value.$el, style)
   cleanup = watchDOM(InputRef.value.$el, ({ height }) => {
     style.Input.height = height
     style.input.height = height - 2
-  }, true)
+  })
+  useCssVar(InputRef.value.$el, style)
 })
 onUnmounted(() => cleanup())
 
@@ -70,19 +70,13 @@ const compositionend = () => {
 const compositionstart = () => {
   isComposing = true;
 };
-// 回车
-const textEnter = () => {
-  if (isComposing) return
-  props.onEnter?.(props.value)
-}
 
 // 菜单
 const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
-const selectRef = ref<HTMLElement | null>(null)
 const MenuManagerInstance = ref<MenuManager | undefined>(undefined)
 onMounted(() => {
-  if (props.type !== 'select' || !selectRef.value || !MenuRef.value) return
-  MenuManagerInstance.value = createMenuManager(selectRef.value, MenuRef.value)
+  if (!inputRef.value || !MenuRef.value) return
+  MenuManagerInstance.value = createMenuManager(inputRef.value, MenuRef.value)
 })
 onUnmounted(() => {
   MenuManagerInstance.value?.cleanup()
@@ -91,19 +85,12 @@ const onOptionClick = (item: InputOption) => {
   if (item.options && !item.selectable) return
   props.onChange(item.name)
 }
-const selectEnter = (e: KeyboardEvent) => {
-  if (e.key === 'Enter') {
-    props.onEnter?.(props.value)
-  }
+
+// 回车
+const enter = () => {
+  if (isComposing) return
+  props.onEnter?.(props.value)
 }
-watch(() => MenuManagerInstance.value?.visible, (newVisible) => {
-  if (!MenuManagerInstance.value) return
-  if (newVisible) {
-    document.addEventListener('keydown', selectEnter, true)
-  } else {
-    document.removeEventListener('keydown', selectEnter, true)
-  }
-})
 
 // 清空
 const onInputClear = () => {
@@ -114,46 +101,31 @@ const onInputClear = () => {
 // 暴露方法
 defineExpose({
   focus: () => {
-    if (props.type === 'text' || props.type === 'number' || props.type === 'password') {
-      inputRef.value?.focus()
-    } else {
-      if (!selectRef.value || !MenuManagerInstance.value) return
-      const rect = selectRef.value.getBoundingClientRect()
-      MenuManagerInstance.value.position = [rect.left + style.input.paddingLeft, rect.top + rect.height + 5]
-      MenuManagerInstance.value.visible = true
-      document.addEventListener('click', MenuManagerInstance.value.close, true)
-    }
+    inputRef.value?.focus()
+    MenuManagerInstance.value?.open()
   },
   blur: () => {
-    if (props.type === 'text' || props.type === 'number' || props.type === 'password') {
-      inputRef.value?.blur()
-    } else {
-      if (!MenuManagerInstance.value) return
-      MenuManagerInstance.value.visible = false
-      MenuManagerInstance.value.cleanup()
-    }
+    inputRef.value?.blur()
+    MenuManagerInstance.value?.close()
   },
   select: () => inputRef.value?.select()
 })
 </script>
 
 <template>
-  <Card :class="$style.Input" ref="InputRef" :type="MenuManagerInstance?.visible ? 'select' : 'glass'">
+  <Card :class="$style.Input" ref="InputRef" type="glass">
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" v-if="props.type === 'text' || props.type === 'number' || props.type === 'password'"
-      ref="inputRef" :type="props.type" :value="props.value" @input="onTextChange"
-      @keydown.enter.prevent="() => textEnter()" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
-      @compositionstart="compositionstart" :placeholder="props.placeholder || '输入...'" />
-    <div :class="$style.select" ref="selectRef" v-else-if="props.type === 'select'">
-      <span :class="$style.text">{{ props.value || props.placeholder || '选择...' }}</span>
-      <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false"
-        :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options" :onOptionClick="onOptionClick" />
-    </div>
+    <input :class="$style.input" ref="inputRef" :type="props.type" :value="props.value"
+      :placeholder="props.placeholder ?? (props.type === 'select' ? '选择...' : '输入...')" @input="onTextChange"
+      @keydown.enter.prevent="() => enter()" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
+      @compositionstart="compositionstart" />
     <div :class="[$style.icon, $style.clear]">
-      <span class="lovelymai lovely-clear" v-if="props.value" @click.stop="onInputClear"></span>
+      <span class="lovelymai lovely-clear" v-show="props.value" @click.stop="onInputClear"></span>
     </div>
+    <Menu ref="MenuRef" v-if="props.type === 'select'" :visible="MenuManagerInstance?.visible ?? false"
+      :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options" :onOptionClick="onOptionClick" />
   </Card>
 </template>
 
@@ -190,8 +162,7 @@ defineExpose({
   right: 0;
 }
 
-.input,
-.select {
+.input {
   flex: 1;
   min-width: 0;
   padding-left: calc(var(--input-paddingLeft) * 1px);
@@ -220,20 +191,6 @@ defineExpose({
 
 .input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
-}
-
-.select {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.select .text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 </style>
 <style scoped>

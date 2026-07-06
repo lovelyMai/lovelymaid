@@ -13,7 +13,7 @@ interface Props {
   /** 是否展开 */
   isOpen: boolean;
   /** 关闭事件 */
-  onClose: () => void;
+  onCloseClick: () => void;
   /** 标题 */
   title?: string;
 }
@@ -81,7 +81,7 @@ watch(() => props.visible, (newVisible) => {
   <Card :class="$style.ContentBar" ref="ContentBarRef" type="glass">
     <div :class="$style.header">
       <div :class="$style.title" :title="props.title">{{ props.title }}</div>
-      <Button type="glass" :class="$style.Button" :onClick="props.onClose" title="收起内容栏">
+      <Button type="glass" :class="$style.Button" :onClick="props.onCloseClick" title="收起内容栏">
         <span class="lovelymai lovely-close"></span>
       </Button>
     </div>

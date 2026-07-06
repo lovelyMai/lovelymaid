@@ -87,7 +87,7 @@ onMounted(() => {
     maxDistance.value = (style.Bar.width - 6) * (props.tabs.length - 1) / props.tabs.length
     style.slide.translateX = props.activeIndex * style.slide.width
     style.slide.center = style.slide.translateX + style.slide.width / 2
-  }, true)
+  })
   setTimeout(() => {
     style.Bar.transition = 'width .3s, height .3s, transform .2s'
   }, 500)
