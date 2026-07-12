@@ -64,7 +64,7 @@ export type Menu = {
           <span class="lovelymai lovely-right-arrow" v-if="item.options"></span>
           <Menu v-if="item.options" :ref="(el) => SubMenuRefs[index] = (el as Menu | null)"
             :visible="MenuManagers[index]?.visible ?? false" :position="MenuManagers[index]?.position ?? [0, 0]"
-            :options="item.options" :onOptionClick="props.onOptionClick" />
+            :options="item.options" :on-option-click="props.onOptionClick" />
         </li>
       </ul>
     </transition>

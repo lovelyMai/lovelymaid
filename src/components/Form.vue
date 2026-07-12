@@ -45,11 +45,11 @@ const onEnter = (index: number) => {
       <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
         :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" :value="item.value"
         :placeholder="item.placeholder" :enterkeyhint="item.enterkeyhint"
-        :onInput="(newValue) => props.onInput(newValue, index)" :onEnter="(_) => onEnter(index)" />
+        :on-input="(newValue) => props.onInput(newValue, index)" :on-enter="(_) => onEnter(index)" />
       <Input :class="$style.Input" v-else :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
         :type="item.type" :value="item.value" :placeholder="item.placeholder" :options="item.options"
-        :enterkeyhint="item.enterkeyhint" :onInput="(newValue) => props.onInput(newValue, index)"
-        :onEnter="(_) => onEnter(index)" />
+        :enterkeyhint="item.enterkeyhint" :on-input="(newValue) => props.onInput(newValue, index)"
+        :on-enter="(_) => onEnter(index)" />
     </li>
   </ul>
 </template>

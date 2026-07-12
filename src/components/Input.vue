@@ -123,7 +123,7 @@ defineExpose({
       <span class="lovelymai lovely-clear" v-show="props.value" @click.stop="() => clear()"></span>
     </div>
     <Menu ref="MenuRef" v-if="props.type === 'select'" :visible="MenuManagerInstance?.visible ?? false"
-      :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options" :onOptionClick="onOptionClick" />
+      :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options" :on-option-click="onOptionClick" />
   </Card>
 </template>
 

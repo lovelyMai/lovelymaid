@@ -65,8 +65,8 @@ onUnmounted(() => {
       <div :class="$style.mask" v-if="props.showMask && props.isOpen"></div>
     </transition>
     <transition name="lovelymai-slide">
-      <Card :class="[$style.DrawerContainer, props.type === 'desktop' ? $style.desktop : $style.mobile]" v-show="props.isOpen"
-        ref="DrawerContainerRef" type="common"
+      <Card :class="[$style.DrawerContainer, props.type === 'desktop' ? $style.desktop : $style.mobile]"
+        v-show="props.isOpen" ref="DrawerContainerRef" type="common"
         :style="isTouching ? { transform: `translateY(${scroll.distance}px)`, transition: 'none' } : undefined">
         <div :class="$style.header">
           <div ref="HeaderContainerRef">

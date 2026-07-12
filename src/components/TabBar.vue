@@ -256,11 +256,11 @@ watch(searchIsActive, (newValue) => {
       </ul>
     </Card>
     <div :class="[$style.search, { [$style.active]: searchIsActive }]" v-if="props.showSearch">
-      <Button type="glass" :class="$style.Button" v-show="!searchIsShow" :onClick="clickSearch">
+      <Button type="glass" :class="$style.Button" v-show="!searchIsShow" :on-click="clickSearch">
         <span class="lovelymai lovely-search button"></span>
       </Button>
-      <Input :class="$style.Input" v-show="searchIsShow" type="text" :value="props.value" :onInput="props.onInput"
-        :placeholder="props.placeholder" enterkeyhint="search" :onEnter="props.onSearch">
+      <Input :class="$style.Input" v-show="searchIsShow" type="text" :value="props.value" :on-input="props.onInput"
+        :placeholder="props.placeholder" enterkeyhint="search" :on-enter="props.onSearch">
         <span class="lovelymai lovely-search input"></span>
       </Input>
     </div>

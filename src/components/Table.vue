@@ -122,7 +122,7 @@ sortByColumn(props.sort.id, props.sort.order)
     </ul>
     <ul :class="$style.list" @pointerdown.stop.prevent="handleRowPointerDown">
       <li :class="$style.item" v-for="(row, index) in props.rows" :key="row.id"
-        :style="{ backgroundColor: props.activeIndexes?.has(index) ? '#2962D9' : undefined, borderRadius: getBorderRadius(index) }"
+        :style="{ backgroundColor: props.activeIndexes?.has(index) ? '#2962D9' : '', borderRadius: getBorderRadius(index) }"
         :data-index="index">
         <span :class="$style.text" v-for="column in props.columns" :key="column.id"
           :style="{ width: column.width + 'px', color: props.activeIndexes?.has(index) ? (props.sort.id === column.id ? '#fff' : '#bfd0f4') : (props.sort.id === column.id ? '#000' : '#808080') }">{{

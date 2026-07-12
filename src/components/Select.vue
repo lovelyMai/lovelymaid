@@ -26,8 +26,8 @@ onMounted(() => {
 <template>
   <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" ref="SelectRef">
     <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false"
-      :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options" :onOptionClick="props.onOptionClick"
-      v-slot="{ item, index }">
+      :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options"
+      :on-option-click="props.onOptionClick" v-slot="{ item, index }">
       <slot :item="item" :index="index"></slot>
     </Menu>
   </span>
