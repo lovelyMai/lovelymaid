@@ -24,7 +24,7 @@ interface Props {
   /** 排序 */
   sort: SortConfig
   /** 排序项改变事件 */
-  onSortChange: (newSortConfig: SortConfig, newData: Item[]) => void
+  onSortChange: (newSort: SortConfig, newRows: Item[]) => void
 }
 const props = withDefaults(defineProps<Props>(), {
   activeIndexes: () => new Set()
@@ -86,7 +86,7 @@ const handleRowPointerDown = (e: PointerEvent) => {
 // 表头排序
 const sortByColumn = (id: string, order: 'asc' | 'desc') => {
   const sortProp = props.columns.find(column => column.id === id)!.prop
-  const newData = [...props.rows].sort((a, b) => {
+  const newRows = [...props.rows].sort((a, b) => {
     if (order === 'asc') {
       return a[sortProp].localeCompare(b[sortProp], undefined, { numeric: true });
     } else {
@@ -96,12 +96,12 @@ const sortByColumn = (id: string, order: 'asc' | 'desc') => {
   const newActiveIndexes = new Set<number>()
   for (const oldIndex of props.activeIndexes) {
     const oldRow = props.rows[oldIndex]
-    const newIndex = newData.findIndex(newItem => newItem.id === oldRow.id)
+    const newIndex = newRows.findIndex(newItem => newItem.id === oldRow.id)
     if (newIndex !== -1) {
       newActiveIndexes.add(newIndex)
     }
   }
-  props.onSortChange({ id, order }, newData)
+  props.onSortChange({ id, order }, newRows)
   props.onActiveChange?.(newActiveIndexes)
 }
 sortByColumn(props.sort.id, props.sort.order)

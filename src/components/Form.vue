@@ -37,7 +37,7 @@ const onEnter = (index: number) => {
   <ul :class="$style.Form" ref="FormRef">
     <li :class="$style.FormItem" v-for="(item, index) in props.config" :key="item.id" :style="{
       width: item.type === 'textarea' ? '100%' : (item.size?.[0] ?? props.defaultSize?.[0] ?? 150) + 'px',
-      height: item.type === 'textarea' ? 'auto' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px'
+      height: item.type === 'textarea' ? '' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px'
     }">
       <span :class="$style.name"
         :style="{ lineHeight: item.type === 'textarea' ? '42px' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px' }">

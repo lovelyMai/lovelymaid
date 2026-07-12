@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, useSlots, onUnmounted, reactive } from 'vue'
+import { onMounted, ref, useSlots, onUnmounted, reactive } from 'vue'
 import Card from './Card.vue'
 import Menu from './common/Menu.vue'
 
@@ -32,6 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 初始化
 const InputRef = ref<InstanceType<typeof Card> | null>(null)
+const inputRef = ref<HTMLInputElement | null>(null)
 const slots = useSlots()
 const style = reactive({
   Input: {
@@ -55,11 +56,6 @@ onMounted(() => {
 })
 onUnmounted(() => cleanup())
 
-// 文字值改变
-const inputRef = ref<HTMLInputElement | null>(null)
-const onTextChange = (e: Event) => {
-  props.onChange?.((e.target as HTMLInputElement).value)
-}
 // 中文输入法下回车防止搜索
 let isComposing = false;
 const compositionend = () => {
@@ -73,7 +69,7 @@ const compositionstart = () => {
 
 // 菜单
 const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
-const MenuManagerInstance = ref<MenuManager | undefined>(undefined)
+const MenuManagerInstance = ref<MenuManager | null>(null)
 onMounted(() => {
   if (!inputRef.value || !MenuRef.value) return
   MenuManagerInstance.value = createMenuManager(inputRef.value, MenuRef.value)
@@ -81,9 +77,9 @@ onMounted(() => {
 onUnmounted(() => {
   MenuManagerInstance.value?.cleanup()
 })
-const onOptionClick = (item: InputOption) => {
-  if (item.options && !item.selectable) return
-  props.onChange(item.name)
+const onOptionClick = (option: InputOption) => {
+  if (option.options && !option.selectable) return
+  props.onChange(option.name)
 }
 
 // 回车
@@ -93,7 +89,7 @@ const enter = () => {
 }
 
 // 清空
-const onInputClear = () => {
+const clear = () => {
   props.onChange?.('')
   inputRef.value?.focus()
 }
@@ -118,11 +114,11 @@ defineExpose({
       <slot></slot>
     </div>
     <input :class="$style.input" ref="inputRef" :type="props.type" :value="props.value"
-      :placeholder="props.placeholder ?? (props.type === 'select' ? '选择...' : '输入...')" @input="onTextChange"
-      @keydown.enter.prevent="() => enter()" :enterkeyhint="props.enterkeyhint" @compositionend="compositionend"
-      @compositionstart="compositionstart" />
+      :placeholder="props.placeholder ?? (props.type === 'select' ? '选择...' : '输入...')"
+      :enterkeyhint="props.enterkeyhint" @input="(e) => props.onChange((e.target as HTMLInputElement).value)"
+      @keydown.enter.prevent="() => enter()" @compositionstart="compositionstart" @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
-      <span class="lovelymai lovely-clear" v-show="props.value" @click.stop="onInputClear"></span>
+      <span class="lovelymai lovely-clear" v-show="props.value" @click.stop="() => clear()"></span>
     </div>
     <Menu ref="MenuRef" v-if="props.type === 'select'" :visible="MenuManagerInstance?.visible ?? false"
       :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options" :onOptionClick="onOptionClick" />
