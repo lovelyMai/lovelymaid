@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import Card from './Card.vue';
 
-import { watchDOM } from '@/utils/common.js';
+import { watchDOM } from '@/utils/common';
 import { checkVerticalScroll } from '@/utils/checkScroll';
 
 interface Props {

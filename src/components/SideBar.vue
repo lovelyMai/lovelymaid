@@ -4,7 +4,7 @@ import Card from './Card.vue';
 
 import { debounce, watchDOM } from '@/utils/common';
 import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
-import useCssVar from '@/utils/useCssVar.js';
+import useCssVar from '@/utils/useCssVar';
 
 interface Props {
   /** 是否显示 */

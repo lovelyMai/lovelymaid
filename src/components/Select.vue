@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import Menu from './common/Menu.vue';
 
-import { createMenuManager, type MenuManager } from '@/composables/menu.js';
+import { createMenuManager, type MenuManager } from '@/composables/menu';
 import type { OptionItem } from './type'
 
 interface Props {

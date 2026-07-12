@@ -4,9 +4,9 @@ import Card from './Card.vue'
 import Menu from './common/Menu.vue'
 
 import { watchDOM } from '../utils/common'
-import { createMenuManager, type MenuManager } from '@/composables/menu.js'
-import useCssVar from '@/utils/useCssVar.js'
-import type { OptionItem } from './type.js'
+import { createMenuManager, type MenuManager } from '@/composables/menu'
+import useCssVar from '@/utils/useCssVar'
+import type { OptionItem } from './type'
 
 export type InputOption = OptionItem & { selectable?: boolean }
 interface Props {

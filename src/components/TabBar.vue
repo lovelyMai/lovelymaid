@@ -6,7 +6,7 @@ import Input from './Input.vue'
 
 import { clearTimer, watchDOM } from '@/utils/common';
 import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
-import useCssVar from '@/utils/useCssVar.js';
+import useCssVar from '@/utils/useCssVar';
 
 export type TabItem = { id: string, name?: string, [key: string]: any }
 interface Props {
