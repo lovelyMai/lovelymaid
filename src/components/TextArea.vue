@@ -21,9 +21,6 @@ const inputValue = defineModel<string>('value', { required: true })
 // 输入输入事件
 const TextAreaRef = ref<InstanceType<typeof Card> | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
-const onInputChange = (e: Event) => {
-  inputValue.value = (e.target as HTMLTextAreaElement).value
-}
 watch(inputValue, async () => {
   await nextTick()
   autoResize()
@@ -43,7 +40,6 @@ const compositionend = () => {
   setTimeout(() => {
     isComposing = false;
   }, 10)
-
 };
 const compositionstart = () => {
   isComposing = true;
@@ -65,9 +61,10 @@ defineExpose({
 
 <template>
   <Card :class="$style.TextArea" ref="TextAreaRef" type="glass">
-    <textarea :rows="props.minrow" ref="textareaRef" :value="inputValue" :placeholder="props.placeholder"
-      :enterkeyhint="props.enterkeyhint" @input="onInputChange" @keydown.enter.prevent="enter"
-      @compositionstart="compositionstart" @compositionend="compositionend" />
+    <textarea :rows="props.minrow" ref="textareaRef" :value="inputValue"
+      @input="(e) => inputValue = (e.target as HTMLTextAreaElement).value" :placeholder="props.placeholder"
+      :enterkeyhint="props.enterkeyhint" @keydown.enter.prevent="enter" @compositionstart="compositionstart"
+      @compositionend="compositionend" />
   </Card>
 </template>
 

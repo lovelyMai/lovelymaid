@@ -113,9 +113,10 @@ defineExpose({
       <slot></slot>
     </div>
     <input :class="$style.input" ref="inputRef" :type="props.type" :value="inputValue"
+      @input="(e) => inputValue = (e.target as HTMLInputElement).value"
       :placeholder="props.placeholder ?? (props.type === 'select' ? '选择...' : '输入...')"
-      :enterkeyhint="props.enterkeyhint" @input="(e) => inputValue = (e.target as HTMLInputElement).value"
-      @keydown.enter.prevent="enter" @compositionstart="compositionstart" @compositionend="compositionend" />
+      :enterkeyhint="props.enterkeyhint" @keydown.enter.prevent="enter" @compositionstart="compositionstart"
+      @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-show="inputValue" @click.stop="() => clear()"></span>
     </div>

@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
   title: '标题'
 })
 const isOpen = defineModel<boolean>('open', { required: true })
-const activeIndex = defineModel<number>('activeIndex', { default: -1 })
+const activeIndex = defineModel<number>('active-index', { default: -1 })
 
 // 初始化
 const FoldListRef = ref<HTMLElement | null>(null)
