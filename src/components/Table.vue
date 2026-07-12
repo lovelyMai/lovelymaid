@@ -15,26 +15,17 @@ export type SortConfig = {
 interface Props {
   /** 表格列 */
   columns: ColumnConfig[]
-  /** 表格行 */
-  rows: Item[]
-  /** 激活项索引 */
-  activeIndexes?: Set<number>
-  /** 激活项改变事件 */
-  onActiveChange?: (newActiveIndexes: Set<number>) => void
-  /** 排序 */
-  sort: SortConfig
-  /** 排序项改变事件 */
-  onSortChange: (newSort: SortConfig, newRows: Item[]) => void
 }
-const props = withDefaults(defineProps<Props>(), {
-  activeIndexes: () => new Set()
-})
+const props = defineProps<Props>()
+const rows = defineModel<Item[]>('rows', { required: true })
+const sort = defineModel<SortConfig>('sort', { required: true })
+const activeIndexes = defineModel<Set<number>>('active-indexes', { default: () => new Set() })
 
 // 样式
 const getBorderRadius = (index: number): string => {
-  if (!props.activeIndexes?.has(index)) return '8px';
-  const hasPrev = props.activeIndexes.has(index - 1);
-  const hasNext = props.activeIndexes.has(index + 1);
+  if (!activeIndexes.value?.has(index)) return '8px';
+  const hasPrev = activeIndexes.value.has(index - 1);
+  const hasNext = activeIndexes.value.has(index + 1);
   if (!hasPrev && !hasNext) return '8px';
   if (hasPrev && hasNext) return '0';
   if (!hasPrev && hasNext) return '8px 8px 0 0';
@@ -53,15 +44,15 @@ const removeContinuous = (set: Set<number>): Set<number> => {
   return result;
 }
 const activateItem = (e: PointerEvent, index: number) => {
-  let newIndexes = new Set(props.activeIndexes)
+  let newIndexes = new Set(activeIndexes.value)
   if (e.getModifierState('Meta')) {
-    if (props.activeIndexes.has(index)) {
+    if (activeIndexes.value.has(index)) {
       newIndexes.delete(index)
     } else {
       newIndexes.add(index)
       lastActiveIndex = index
     }
-  } else if (e.getModifierState('Shift') && props.activeIndexes.size > 0) {
+  } else if (e.getModifierState('Shift') && activeIndexes.value.size > 0) {
     newIndexes = removeContinuous(newIndexes)
     const minIndex = Math.min(lastActiveIndex ?? 0, index)
     const maxIndex = Math.max(lastActiveIndex ?? 0, index)
@@ -72,7 +63,7 @@ const activateItem = (e: PointerEvent, index: number) => {
     newIndexes = new Set([index])
     lastActiveIndex = index
   }
-  props.onActiveChange?.(newIndexes)
+  activeIndexes.value = newIndexes
 }
 const handleRowPointerDown = (e: PointerEvent) => {
   const target = e.target as HTMLElement
@@ -86,7 +77,7 @@ const handleRowPointerDown = (e: PointerEvent) => {
 // 表头排序
 const sortByColumn = (id: string, order: 'asc' | 'desc') => {
   const sortProp = props.columns.find(column => column.id === id)!.prop
-  const newRows = [...props.rows].sort((a, b) => {
+  const newRows = [...rows.value].sort((a, b) => {
     if (order === 'asc') {
       return a[sortProp].localeCompare(b[sortProp], undefined, { numeric: true });
     } else {
@@ -94,38 +85,39 @@ const sortByColumn = (id: string, order: 'asc' | 'desc') => {
     }
   })
   const newActiveIndexes = new Set<number>()
-  for (const oldIndex of props.activeIndexes) {
-    const oldRow = props.rows[oldIndex]
+  for (const oldIndex of activeIndexes.value) {
+    const oldRow = rows.value[oldIndex]
     const newIndex = newRows.findIndex(newItem => newItem.id === oldRow.id)
     if (newIndex !== -1) {
       newActiveIndexes.add(newIndex)
     }
   }
-  props.onSortChange({ id, order }, newRows)
-  props.onActiveChange?.(newActiveIndexes)
+  rows.value = newRows
+  sort.value = { id, order }
+  activeIndexes.value = newActiveIndexes
 }
-sortByColumn(props.sort.id, props.sort.order)
+sortByColumn(sort.value.id, sort.value.order)
 </script>
 
 <template>
   <div :class="$style.Table">
     <ul :class="$style.header">
       <li :class="$style.item" v-for="column in props.columns" :key="column.id"
-        :style="{ width: column.width + 'px', color: props.sort.id === column.id ? '#000' : '#808080' }"
-        @click.stop="() => sortByColumn(column.id, props.sort.order === 'asc' ? 'desc' : 'asc')">
+        :style="{ width: column.width + 'px', color: sort.id === column.id ? '#000' : '#808080' }"
+        @click.stop="() => sortByColumn(column.id, sort.order === 'asc' ? 'desc' : 'asc')">
         <div :class="$style.container">
           <span :class="$style.text">{{ column.name }}</span>
-          <span class="lovelymai lovely-down-arrow" v-show="column.id === props.sort.id"
-            :style="{ transform: props.sort.order === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)' }"></span>
+          <span class="lovelymai lovely-down-arrow" v-show="column.id === sort.id"
+            :style="{ transform: sort.order === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)' }"></span>
         </div>
       </li>
     </ul>
     <ul :class="$style.list" @pointerdown.stop.prevent="handleRowPointerDown">
-      <li :class="$style.item" v-for="(row, index) in props.rows" :key="row.id"
-        :style="{ backgroundColor: props.activeIndexes?.has(index) ? '#2962D9' : '', borderRadius: getBorderRadius(index) }"
+      <li :class="$style.item" v-for="(row, index) in rows" :key="row.id"
+        :style="{ backgroundColor: activeIndexes.has(index) ? '#2962D9' : '', borderRadius: getBorderRadius(index) }"
         :data-index="index">
         <span :class="$style.text" v-for="column in props.columns" :key="column.id"
-          :style="{ width: column.width + 'px', color: props.activeIndexes?.has(index) ? (props.sort.id === column.id ? '#fff' : '#bfd0f4') : (props.sort.id === column.id ? '#000' : '#808080') }">{{
+          :style="{ width: column.width + 'px', color: activeIndexes.has(index) ? (sort.id === column.id ? '#fff' : '#bfd0f4') : (sort.id === column.id ? '#000' : '#808080') }">{{
             row[column.prop] }}</span>
       </li>
     </ul>

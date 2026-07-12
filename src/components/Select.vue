@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import Menu from './common/Menu.vue';
 
 import { createMenuManager, type MenuManager } from '@/composables/menu';
@@ -20,6 +20,9 @@ const MenuManagerInstance = ref<MenuManager | null>(null)
 onMounted(() => {
   if (!SelectRef.value || !MenuRef.value) return
   MenuManagerInstance.value = createMenuManager(SelectRef.value, MenuRef.value)
+})
+onUnmounted(() => {
+  MenuManagerInstance.value?.cleanup()
 })
 </script>
 

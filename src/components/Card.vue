@@ -18,5 +18,3 @@ const typeClass = {
     <slot></slot>
   </div>
 </template>
-
-<style module></style>

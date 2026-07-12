@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import Input, { InputOption } from './Input.vue'
+import Input, { type InputOption } from './Input.vue'
 import TextArea from './TextArea.vue'
 
 export type FormItem = {
@@ -14,14 +14,11 @@ export type FormItem = {
   size?: [number | string, number | string]
 }
 interface Props {
-  /** 表单项 */
-  items: FormItem[]
-  /** 表单项输入事件 */
-  onInput: (newValue: string, index: number) => void
   /** 表单项默认尺寸 */
   defaultSize?: [number | string, number | string]
 }
 const props = defineProps<Props>()
+const items = defineModel<FormItem[]>('items', { required: true })
 
 // 回车聚焦下一个输入框
 const InputRefs = ref<Record<string, InstanceType<typeof Input> | null>>({})
@@ -35,7 +32,7 @@ const onEnter = (index: number) => {
 </script>
 <template>
   <ul :class="$style.Form" ref="FormRef">
-    <li :class="$style.FormItem" v-for="(item, index) in props.items" :key="item.id" :style="{
+    <li :class="$style.FormItem" v-for="(item, index) in items" :key="item.id" :style="{
       width: item.type === 'textarea' ? '100%' : (item.size?.[0] ?? props.defaultSize?.[0] ?? 150) + 'px',
       height: item.type === 'textarea' ? '' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px'
     }">
@@ -43,13 +40,11 @@ const onEnter = (index: number) => {
         :style="{ lineHeight: item.type === 'textarea' ? '42px' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px' }">
         {{ item.name }}</span>
       <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
-        :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" :value="item.value"
-        :placeholder="item.placeholder" :enterkeyhint="item.enterkeyhint"
-        :on-input="(newValue) => props.onInput(newValue, index)" :on-enter="(_) => onEnter(index)" />
+        :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" v-model:value="item.value"
+        :placeholder="item.placeholder" :enterkeyhint="item.enterkeyhint" :on-enter="() => onEnter(index)" />
       <Input :class="$style.Input" v-else :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
-        :type="item.type" :value="item.value" :placeholder="item.placeholder" :options="item.options"
-        :enterkeyhint="item.enterkeyhint" :on-input="(newValue) => props.onInput(newValue, index)"
-        :on-enter="(_) => onEnter(index)" />
+        :type="item.type" v-model:value="item.value" :placeholder="item.placeholder" :options="item.options"
+        :enterkeyhint="item.enterkeyhint" :on-enter="() => onEnter(index)" />
     </li>
   </ul>
 </template>

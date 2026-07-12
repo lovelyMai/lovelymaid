@@ -5,29 +5,26 @@ import Card from './Card.vue'
 interface Props {
   /** 最小行数 */
   minrow?: number
-  /** 值 */
-  value: string
-  /** 输入事件 */
-  onInput: (inputValue: string) => void
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   /** 回车事件 */
-  onEnter?: (inputValue: string) => void
+  onEnter?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
   minrow: 1,
   placeholder: '输入...'
-});
+})
+const inputValue = defineModel<string>('value', { required: true })
 
 // 输入输入事件
 const TextAreaRef = ref<InstanceType<typeof Card> | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const onInputChange = (e: Event) => {
-  props.onInput((e.target as HTMLInputElement).value)
+  inputValue.value = (e.target as HTMLTextAreaElement).value
 }
-watch(() => props.value, async () => {
+watch(inputValue, async () => {
   await nextTick()
   autoResize()
 })
@@ -55,7 +52,7 @@ const compositionstart = () => {
 // 回车事件
 const enter = (e: KeyboardEvent) => {
   if (isComposing || e.shiftKey) return
-  props.onEnter?.(props.value)
+  props.onEnter?.()
 }
 
 // 暴露方法
@@ -68,7 +65,7 @@ defineExpose({
 
 <template>
   <Card :class="$style.TextArea" ref="TextAreaRef" type="glass">
-    <textarea :rows="props.minrow" ref="textareaRef" :value="props.value" :placeholder="props.placeholder"
+    <textarea :rows="props.minrow" ref="textareaRef" :value="inputValue" :placeholder="props.placeholder"
       :enterkeyhint="props.enterkeyhint" @input="onInputChange" @keydown.enter.prevent="enter"
       @compositionstart="compositionstart" @compositionend="compositionend" />
   </Card>

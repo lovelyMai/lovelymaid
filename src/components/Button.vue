@@ -25,7 +25,7 @@ const style = reactive({
     'font-size': '0'
   }
 })
-let cleanup: () => void
+let cleanup: (() => void) | undefined
 onMounted(() => {
   if (!ButtonRef.value) return
   cleanup = watchDOM(ButtonRef.value, ({ width, height }) => {
@@ -35,7 +35,9 @@ onMounted(() => {
   })
   useCssVar(ButtonRef.value, style)
 })
-onUnmounted(() => cleanup())
+onUnmounted(() => {
+  cleanup?.()
+})
 </script>
 
 <template>

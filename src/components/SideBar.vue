@@ -9,28 +9,24 @@ import useCssVar from '@/utils/useCssVar';
 interface Props {
   /** 是否显示 */
   visible?: boolean;
-  /** 是否展开 */
-  isOpen: boolean
-  /** 展开改变事件 */
-  onOpenChange: (newOpen: boolean) => void;
 }
 const props = withDefaults(defineProps<Props>(), {
-  visible: true,
-  isOpen: true
+  visible: true
 })
+const isOpen = defineModel<boolean>('open', { required: true })
 
 // 初始化
 const style = reactive({
   SideBar: {
     get translateX() {
-      return props.isOpen ? '0' : `${-TransformDistance.value}px`
+      return isOpen.value ? '0' : `${-TransformDistance.value}px`
     },
     scale: props.visible ? '1' : '0',
     transition: 'none'
   },
   button: {
     get translateX() {
-      return props.isOpen ? '0' : `${TransformDistance.value - SideBarWidth.value + 55}px`
+      return isOpen.value ? '0' : `${TransformDistance.value - SideBarWidth.value + 55}px`
     }
   }
 })
@@ -83,8 +79,8 @@ watch(() => props.visible, (newVisible) => {
 <template>
   <Card :class="$style.SideBar" ref="SideBarRef" type="glass">
     <div :class="$style.header">
-      <div :class="[$style.SwitchButton, { [$style.close]: !props.isOpen }]" :title="isOpen ? '收起侧边栏' : '展开侧边栏'"
-        @click.stop="() => props.onOpenChange(!props.isOpen)">
+      <div :class="[$style.SwitchButton, { [$style.close]: !isOpen }]" :title="isOpen ? '收起侧边栏' : '展开侧边栏'"
+        @click.stop="() => isOpen = !isOpen">
         <span class="lovelymai lovely-left-sidebar"></span>
       </div>
     </div>

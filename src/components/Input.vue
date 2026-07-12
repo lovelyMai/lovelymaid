@@ -12,10 +12,6 @@ export type InputOption = OptionItem & { selectable?: boolean }
 interface Props {
   /** 输入框类型 */
   type?: "text" | "password" | "number" | "select"
-  /** 值 */
-  value: string
-  /** 输入事件 */
-  onInput: (newValue: string) => void
   /** 选项 */
   options?: InputOption[]
   /** 输入框提示词 */
@@ -23,12 +19,13 @@ interface Props {
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   /** 回车事件 */
-  onEnter?: (inputValue: string) => void
+  onEnter?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   options: () => []
-});
+})
+const inputValue = defineModel<string>('value', { required: true })
 
 // 初始化
 const InputRef = ref<InstanceType<typeof Card> | null>(null)
@@ -80,18 +77,18 @@ onUnmounted(() => {
 const onOptionClick = (option: InputOption) => {
   inputRef.value?.focus()
   if (option.options && !option.selectable) return
-  props.onInput(option.name)
+  inputValue.value = option.name
 }
 
 // 回车
 const enter = () => {
   if (isComposing) return
-  props.onEnter?.(props.value)
+  props.onEnter?.()
 }
 
 // 清空
 const clear = () => {
-  props.onInput?.('')
+  inputValue.value = ''
   inputRef.value?.focus()
   MenuManagerInstance.value?.open()
 }
@@ -115,12 +112,12 @@ defineExpose({
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" ref="inputRef" :type="props.type" :value="props.value"
+    <input :class="$style.input" ref="inputRef" :type="props.type" :value="inputValue"
       :placeholder="props.placeholder ?? (props.type === 'select' ? '选择...' : '输入...')"
-      :enterkeyhint="props.enterkeyhint" @input="(e) => props.onInput((e.target as HTMLInputElement).value)"
+      :enterkeyhint="props.enterkeyhint" @input="(e) => inputValue = (e.target as HTMLInputElement).value"
       @keydown.enter.prevent="enter" @compositionstart="compositionstart" @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
-      <span class="lovelymai lovely-clear" v-show="props.value" @click.stop="() => clear()"></span>
+      <span class="lovelymai lovely-clear" v-show="inputValue" @click.stop="() => clear()"></span>
     </div>
     <Menu ref="MenuRef" v-if="props.type === 'select'" :visible="MenuManagerInstance?.visible ?? false"
       :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options" :on-option-click="onOptionClick" />

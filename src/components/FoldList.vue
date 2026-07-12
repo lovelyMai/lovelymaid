@@ -4,28 +4,23 @@ import { ref, nextTick, onMounted, watch, computed, reactive } from 'vue'
 import getSlideCount from '../utils/calculateOffsets'
 import { watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/useCssVar'
-import { ListItem } from './type'
+import type { ListItem } from './type'
 
 interface Props {
   /** 标题 */
   title?: string
   /** 列表数据 */
   list: ListItem[]
-  /** 是否展开 */
-  isOpen: boolean
-  /** 激活项索引 */
-  activeIndex?: number
-  /** 展开状态改变事件 */
-  onOpenChange: (newOpen: boolean) => void
   /** 头部点击事件 */
   onHeaderClick?: () => void
   /** 列表项点击事件 */
   onItemClick?: (item: ListItem, index: number) => void
 }
 const props = withDefaults(defineProps<Props>(), {
-  title: '标题',
-  isOpen: true
-});
+  title: '标题'
+})
+const isOpen = defineModel<boolean>('open', { required: true })
+const activeIndex = defineModel<number>('activeIndex', { default: -1 })
 
 // 初始化
 const FoldListRef = ref<HTMLElement | null>(null)
@@ -34,7 +29,7 @@ const ListHeight = ref<number>(0)
 const style = reactive({
   container: {
     get height() {
-      return props.isOpen ? `${ListHeight.value}px` : '0px'
+      return isOpen.value ? `${ListHeight.value}px` : '0px'
     }
   }
 })
@@ -59,6 +54,12 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
   slideAnimating.value = true
   oldlist.value = [...props.list]
 }, { deep: true })
+
+// 列表项点击事件
+const onItemClick = (item: ListItem, index: number) => {
+  activeIndex.value = index
+  props.onItemClick?.(item, index)
+}
 </script>
 
 <template>
@@ -67,16 +68,15 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
       <span :class="$style.title">
         {{ props.title }}
       </span>
-      <span class="lovelymai lovely-right-arrow" :style="{ transform: props.isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
-        :title="isOpen ? '收起列表' : '展开列表'" @click.stop="() => onOpenChange(!props.isOpen)"></span>
+      <span class="lovelymai lovely-right-arrow" :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
+        :title="isOpen ? '收起列表' : '展开列表'" @click.stop="() => isOpen = !isOpen"></span>
     </div>
     <div :class="$style.container">
       <ul :class="[$style.list, { [$style.close]: !isOpen }]" ref="ListRef">
-        <li
-          :class="[$style.item, { [$style.active]: index === props.activeIndex, [$style.slideAnimation]: slideAnimating }]"
+        <li :class="[$style.item, { [$style.active]: index === activeIndex, [$style.slideAnimation]: slideAnimating }]"
           v-for="(item, index) in props.list" :key="item.id"
           :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }"
-          @click.stop="() => onItemClick?.(item, index)" @animationend="() => slideAnimating = false">
+          @click.stop="() => onItemClick(item, index)" @animationend="() => slideAnimating = false">
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>
       </ul>

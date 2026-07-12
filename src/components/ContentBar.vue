@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
   visible: true,
   isOpen: true,
   title: '标题'
-});
+})
 
 // 初始化
 const style = reactive({

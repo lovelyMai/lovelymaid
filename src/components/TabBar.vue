@@ -12,25 +12,18 @@ export type TabItem = { id: string, name?: string, [key: string]: any }
 interface Props {
   /** 标签 */
   tabs: TabItem[]
-  /** 激活索引 */
-  activeIndex: number
   /** 是否启用搜索按钮 */
   showSearch?: boolean
   /** 输入框提示词 */
   placeholder?: string
-  /** 列表项点击事件 */
-  onTabClick: (newTab: TabItem, newIndex: number) => void
-  /** 搜索值 */
-  value?: string
-  /** 搜索输入事件 */
-  onInput?: (newValue: string) => void
+  /** 列表项按压事件 */
+  onActiveTabPress?: (newIndex: number) => void
   /** 搜索事件 */
-  onSearch?: (inputValue: string) => void
+  onSearch?: () => void
 }
-const props = withDefaults(defineProps<Props>(), {
-  value: '',
-  onInput: () => { }
-})
+const props = defineProps<Props>()
+const activeIndex = defineModel<number>('active-index', { required: true })
+const inputValue = defineModel<string>('value', { default: '' })
 
 // 初始化
 const TabBarRef = ref<HTMLElement | null>(null)
@@ -75,19 +68,19 @@ let calculatePosTimer: number | undefined
 let backgroundTimer: number | undefined
 onMounted(() => {
   if (!TabBarRef.value) return
-  useCssVar(TabBarRef.value, style)
   cleanup = watchDOM(TabBarRef.value, () => {
     style.Bar.width = props.showSearch ? TabBarRef.value!.offsetWidth - style.Bar.height - 5 : TabBarRef.value!.offsetWidth
     style.Bar.height = TabBarRef.value!.offsetHeight
     style.search.width = TabBarRef.value!.offsetWidth - style.Bar.height * 0.8 - 5
     style.Bar['border-radius'] = style.Bar.height / 2
     style.slide.width = (style.Bar.width - 6) / props.tabs.length
-    style['content-top'].clipLeft = props.activeIndex * style.slide.width
+    style['content-top'].clipLeft = activeIndex.value * style.slide.width
     style['content-top'].clipRight = style['content-top'].clipLeft + style.slide.width
     maxDistance.value = (style.Bar.width - 6) * (props.tabs.length - 1) / props.tabs.length
-    style.slide.translateX = props.activeIndex * style.slide.width
+    style.slide.translateX = activeIndex.value * style.slide.width
     style.slide.center = style.slide.translateX + style.slide.width / 2
   })
+  useCssVar(TabBarRef.value, style)
   setTimeout(() => {
     style.Bar.transition = 'width .3s, height .3s, transform .2s'
   }, 500)
@@ -99,6 +92,7 @@ onUnmounted(() => {
 
 // 滑块动画
 let followed = false
+let moved = false
 let startTime: number
 const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   if (!SlideRef.value || !contentRef.value) return
@@ -179,15 +173,23 @@ const startSlide = (e: PointerEvent) => {
 }
 const moveSlide = (e: PointerEvent) => {
   if (moveSlideTimer) return
-  if (searchIsActive.value) return searchIsActive.value = false
+  moved = true
+  if (searchIsActive.value) {
+    searchIsActive.value = false
+    return
+  }
   clearTimer(calculatePosTimer)
   calculateTargetPos(e, 'move')
   clearTimer(virtualTimer1, virtualTimer2)
   updateVirtualPos(undefined)
-  moveSlideTimer = setTimeout(() => moveSlideTimer = undefined, 8)
+  moveSlideTimer = setTimeout(() => {
+    moveSlideTimer = undefined
+  }, 8)
 }
 const stopSlide = (e: PointerEvent) => {
-  if ((Date.now() - startTime) < 100) clearTimer(backgroundTimer)
+  if ((Date.now() - startTime) < 100) {
+    clearTimer(backgroundTimer)
+  }
   style.slide.background = '#e4e4e6'
   style.Bar['background-color'] = 'rgba(249, 249, 249, 0.9)'
   style.slide.border = 'none'
@@ -196,22 +198,27 @@ const stopSlide = (e: PointerEvent) => {
   style.slide.scale = 1
   if (searchIsActive.value) {
     searchIsActive.value = false
-    runStopAnimation(props.activeIndex)
+    runStopAnimation(activeIndex.value)
   } else {
     if (!contentRef.value) return
     const clickX = e.clientX - getLayoutLeftInViewport(contentRef.value)
     const index = Math.floor(clickX / style.slide.width)
+    const oldActiveIndex = activeIndex.value
     const newActiveIndex = index > props.tabs.length - 1 ? props.tabs.length - 1 : index < 0 ? 0 : index
-    props.onTabClick(props.tabs[newActiveIndex], newActiveIndex)
-    if (newActiveIndex === props.activeIndex) {
-      runStopAnimation(props.activeIndex)
+    activeIndex.value = newActiveIndex
+    if (oldActiveIndex === newActiveIndex) {
+      runStopAnimation(newActiveIndex)
+      if (!moved) {
+        props.onActiveTabPress?.(newActiveIndex)
+      }
     }
   }
+  moved = false
   followed = false
   document.removeEventListener('pointermove', moveSlide)
   document.removeEventListener('pointerup', stopSlide)
 }
-watch(() => props.activeIndex, (newIndex) => {
+watch(activeIndex, (newIndex) => {
   runStopAnimation(newIndex)
 })
 watch(() => props.tabs.length, () => {
@@ -238,7 +245,7 @@ watch(searchIsActive, (newValue) => {
 <template>
   <div :class="$style.TabBar" ref="TabBarRef">
     <Card :class="[$style.Bar, { [$style.active]: !searchIsActive }]" type="glass">
-      <ul :class="$style.content" ref="contentRef" @pointerdown="startSlide">
+      <ul :class="$style.content" ref="contentRef" @pointerdown.prevent="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
           <slot :item="props.tabs[activeIndex]" :index="activeIndex"></slot>
         </li>
@@ -259,7 +266,7 @@ watch(searchIsActive, (newValue) => {
       <Button type="glass" :class="$style.Button" v-show="!searchIsShow" :on-click="clickSearch">
         <span class="lovelymai lovely-search button"></span>
       </Button>
-      <Input :class="$style.Input" v-show="searchIsShow" type="text" :value="props.value" :on-input="props.onInput"
+      <Input :class="$style.Input" v-show="searchIsShow" type="text" v-model:value="inputValue"
         :placeholder="props.placeholder" enterkeyhint="search" :on-enter="props.onSearch">
         <span class="lovelymai lovely-search input"></span>
       </Input>

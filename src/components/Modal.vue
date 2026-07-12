@@ -8,17 +8,16 @@ import { checkVerticalScroll } from '@/utils/checkScroll';
 interface Props {
   /** 类型 */
   type?: 'desktop' | 'mobile'
-  /** 是否展开 */
-  isOpen: boolean
   /** 是否显示遮罩 */
   showMask?: boolean
-  /** 滑动关闭 */
+  /** 滑动关闭事件 */
   onSlideClose?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'desktop',
   showMask: false
-});
+})
+const isOpen = defineModel<boolean>('open', { required: true })
 
 // Header 高度自适应
 const HeaderContainerRef = ref<HTMLElement | null>(null)
@@ -62,11 +61,11 @@ onUnmounted(() => {
 <template>
   <div :class="$style.Drawer">
     <transition name="lovelymai-fade">
-      <div :class="$style.mask" v-if="props.showMask && props.isOpen"></div>
+      <div :class="$style.mask" v-if="props.showMask && isOpen"></div>
     </transition>
     <transition name="lovelymai-slide">
       <Card :class="[$style.DrawerContainer, props.type === 'desktop' ? $style.desktop : $style.mobile]"
-        v-show="props.isOpen" ref="DrawerContainerRef" type="common"
+        v-show="isOpen" ref="DrawerContainerRef" type="common"
         :style="isTouching ? { transform: `translateY(${scroll.distance}px)`, transition: 'none' } : undefined">
         <div :class="$style.header">
           <div ref="HeaderContainerRef">
