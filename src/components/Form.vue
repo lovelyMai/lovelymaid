@@ -14,12 +14,12 @@ export type FormItem = {
   size?: [number | string, number | string]
 }
 interface Props {
-  /** 表单配置 */
-  config: FormItem[]
+  /** 表单项 */
+  items: FormItem[]
+  /** 表单项输入事件 */
+  onInput: (newValue: string, index: number) => void
   /** 表单项默认尺寸 */
   defaultSize?: [number | string, number | string]
-  /** 输入改变事件 */
-  onChange: (newValue: string, index: number) => void
 }
 const props = defineProps<Props>()
 
@@ -35,7 +35,7 @@ const onEnter = (index: number) => {
 </script>
 <template>
   <ul :class="$style.Form" ref="FormRef">
-    <li :class="$style.FormItem" v-for="(item, index) in props.config" :key="item.id" :style="{
+    <li :class="$style.FormItem" v-for="(item, index) in props.items" :key="item.id" :style="{
       width: item.type === 'textarea' ? '100%' : (item.size?.[0] ?? props.defaultSize?.[0] ?? 150) + 'px',
       height: item.type === 'textarea' ? '' : (item.size?.[1] ?? props.defaultSize?.[1] ?? 35) + 'px'
     }">
@@ -45,10 +45,10 @@ const onEnter = (index: number) => {
       <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
         :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" :value="item.value"
         :placeholder="item.placeholder" :enterkeyhint="item.enterkeyhint"
-        :onChange="(newValue) => props.onChange(newValue, index)" :onEnter="(_) => onEnter(index)" />
+        :onInput="(newValue) => props.onInput(newValue, index)" :onEnter="(_) => onEnter(index)" />
       <Input :class="$style.Input" v-else :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
         :type="item.type" :value="item.value" :placeholder="item.placeholder" :options="item.options"
-        :enterkeyhint="item.enterkeyhint" :onChange="(newValue) => props.onChange(newValue, index)"
+        :enterkeyhint="item.enterkeyhint" :onInput="(newValue) => props.onInput(newValue, index)"
         :onEnter="(_) => onEnter(index)" />
     </li>
   </ul>

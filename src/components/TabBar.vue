@@ -16,20 +16,20 @@ interface Props {
   activeIndex: number
   /** 是否启用搜索按钮 */
   showSearch?: boolean
-  /** 值 */
-  value?: string
   /** 输入框提示词 */
   placeholder?: string
   /** 列表项点击事件 */
   onTabClick: (newTab: TabItem, newIndex: number) => void
-  /** 输入改变事件 */
-  onChange?: (newValue: string) => void
+  /** 搜索值 */
+  value?: string
+  /** 搜索输入事件 */
+  onInput?: (newValue: string) => void
   /** 搜索事件 */
   onSearch?: (inputValue: string) => void
 }
 const props = withDefaults(defineProps<Props>(), {
   value: '',
-  onChange: () => { }
+  onInput: () => { }
 })
 
 // 初始化
@@ -259,8 +259,8 @@ watch(searchIsActive, (newValue) => {
       <Button type="glass" :class="$style.Button" v-show="!searchIsShow" :onClick="clickSearch">
         <span class="lovelymai lovely-search button"></span>
       </Button>
-      <Input :class="$style.Input" v-show="searchIsShow" type="text" :value="props.value"
-        :placeholder="props.placeholder" enterkeyhint="search" :onChange="props.onChange" :onEnter="props.onSearch">
+      <Input :class="$style.Input" v-show="searchIsShow" type="text" :value="props.value" :onInput="props.onInput"
+        :placeholder="props.placeholder" enterkeyhint="search" :onEnter="props.onSearch">
         <span class="lovelymai lovely-search input"></span>
       </Input>
     </div>

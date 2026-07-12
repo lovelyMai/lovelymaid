@@ -7,31 +7,29 @@ interface Props {
   minrow?: number
   /** 值 */
   value: string
+  /** 输入事件 */
+  onInput: (inputValue: string) => void
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
-  /** 输入改变事件 */
-  onChange: (inputValue: string) => void
   /** 回车事件 */
   onEnter?: (inputValue: string) => void
 }
-
 const props = withDefaults(defineProps<Props>(), {
   minrow: 1,
-  value: '',
   placeholder: '输入...'
 });
 
-// 输入值改变事件
+// 输入输入事件
 const TextAreaRef = ref<InstanceType<typeof Card> | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const onInputChange = (e: Event) => {
-  props.onChange((e.target as HTMLInputElement).value)
+  props.onInput((e.target as HTMLInputElement).value)
 }
 watch(() => props.value, async () => {
   await nextTick()
-  requestAnimationFrame(autoResize)
+  autoResize()
 })
 const autoResize = () => {
   const currentHeight = textareaRef.value!.clientHeight + 2
@@ -57,7 +55,6 @@ const compositionstart = () => {
 // 回车事件
 const enter = (e: KeyboardEvent) => {
   if (isComposing || e.shiftKey) return
-  e.preventDefault()
   props.onEnter?.(props.value)
 }
 
@@ -71,9 +68,9 @@ defineExpose({
 
 <template>
   <Card :class="$style.TextArea" ref="TextAreaRef" type="glass">
-    <textarea :rows="props.minrow" ref="textareaRef" :value="props.value" @input="onInputChange" @keydown.enter="enter"
-      :enterkeyhint="props.enterkeyhint" @compositionstart="compositionstart" @compositionend="compositionend"
-      :placeholder="props.placeholder" />
+    <textarea :rows="props.minrow" ref="textareaRef" :value="props.value" :placeholder="props.placeholder"
+      :enterkeyhint="props.enterkeyhint" @input="onInputChange" @keydown.enter.prevent="enter"
+      @compositionstart="compositionstart" @compositionend="compositionend" />
   </Card>
 </template>
 

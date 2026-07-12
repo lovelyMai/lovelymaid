@@ -14,14 +14,14 @@ interface Props {
   type?: "text" | "password" | "number" | "select"
   /** 值 */
   value: string
+  /** 输入事件 */
+  onInput: (newValue: string) => void
   /** 选项 */
   options?: InputOption[]
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
-  /** 输入改变事件 */
-  onChange: (newValue: string) => void
   /** 回车事件 */
   onEnter?: (inputValue: string) => void
 }
@@ -78,8 +78,9 @@ onUnmounted(() => {
   MenuManagerInstance.value?.cleanup()
 })
 const onOptionClick = (option: InputOption) => {
+  inputRef.value?.focus()
   if (option.options && !option.selectable) return
-  props.onChange(option.name)
+  props.onInput(option.name)
 }
 
 // 回车
@@ -90,8 +91,9 @@ const enter = () => {
 
 // 清空
 const clear = () => {
-  props.onChange?.('')
+  props.onInput?.('')
   inputRef.value?.focus()
+  MenuManagerInstance.value?.open()
 }
 
 // 暴露方法
@@ -115,8 +117,8 @@ defineExpose({
     </div>
     <input :class="$style.input" ref="inputRef" :type="props.type" :value="props.value"
       :placeholder="props.placeholder ?? (props.type === 'select' ? '选择...' : '输入...')"
-      :enterkeyhint="props.enterkeyhint" @input="(e) => props.onChange((e.target as HTMLInputElement).value)"
-      @keydown.enter.prevent="() => enter()" @compositionstart="compositionstart" @compositionend="compositionend" />
+      :enterkeyhint="props.enterkeyhint" @input="(e) => props.onInput((e.target as HTMLInputElement).value)"
+      @keydown.enter.prevent="enter" @compositionstart="compositionstart" @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-show="props.value" @click.stop="() => clear()"></span>
     </div>
