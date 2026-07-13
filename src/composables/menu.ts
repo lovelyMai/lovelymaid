@@ -10,27 +10,43 @@ export type MenuManager = {
   cleanup: () => void
 }
 
-export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu): MenuManager => {
+export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu, type: 'fixed' | 'flex' = 'fixed', method: 'click' | 'contextmenu' = 'click'): MenuManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
-  const calcPos = () => {
-    const rect = TriggerEl.getBoundingClientRect()
-    const X = rect.left + Math.min(rect.width, rect.height) / 2
-    const Y = rect.top + rect.height + 2
+  const calcPos = (e?: MouseEvent) => {
+    let X: number = 0
+    let Y: number = 0
+    if (type === 'fixed') {
+      const rect = TriggerEl.getBoundingClientRect()
+      X = rect.left + Math.min(rect.width, rect.height) / 2
+      Y = rect.top + rect.height + 2
+    } else {
+      if (!e) {
+        console.error('flex 模式下 open 必须传入 event 事件对象')
+        return
+      }
+      X = e.clientX
+      Y = e.clientY
+    }
     position.value = [X, Y]
   }
-  const open = () => {
+  const open = (e?: MouseEvent) => {
     if (visible.value) return
-    calcPos()
+    calcPos(e)
     document.documentElement.style.overflow = 'hidden'
     visible.value = true
     document.addEventListener('click', onDocClick, true)
   }
-  const onTriggerClick = (e: MouseEvent) => {
+  const onTrigger = (e: MouseEvent) => {
     e.stopPropagation()
-    open()
+    e.preventDefault()
+    open(e)
   }
-  TriggerEl.addEventListener('click', onTriggerClick)
+  if (method === 'click') {
+    TriggerEl.addEventListener('click', onTrigger)
+  } else {
+    TriggerEl.addEventListener('contextmenu', onTrigger)
+  }
   const close = () => {
     document.documentElement.style.overflow = ''
     visible.value = false
@@ -47,7 +63,8 @@ export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu): M
     close()
   }
   const cleanup = () => {
-    TriggerEl.removeEventListener('click', onTriggerClick)
+    TriggerEl.removeEventListener('click', onTrigger)
+    TriggerEl.removeEventListener('contextmenu', onTrigger)
     document.removeEventListener('click', onDocClick, true)
   }
 

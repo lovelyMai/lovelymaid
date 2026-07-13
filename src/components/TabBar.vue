@@ -281,7 +281,7 @@ watch(searchIsActive, (newValue) => {
   height: 50px;
   user-select: none;
   -webkit-user-select: none;
-  --font-size: 8px;
+  --font-size: 10px;
   --top-color: #0067EC;
 }
 

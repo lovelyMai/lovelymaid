@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
   title: '标题'
 })
 const isOpen = defineModel<boolean>('open', { required: true })
-const activeIndex = defineModel<number>('active-index', { default: -1 })
+const activeId = defineModel<string>('active-id')
 
 // 初始化
 const FoldListRef = ref<HTMLElement | null>(null)
@@ -57,7 +57,7 @@ watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
 
 // 列表项点击事件
 const onItemClick = (item: ListItem, index: number) => {
-  activeIndex.value = index
+  activeId.value = item.id
   props.onItemClick?.(item, index)
 }
 </script>
@@ -73,7 +73,7 @@ const onItemClick = (item: ListItem, index: number) => {
     </div>
     <div :class="$style.container">
       <ul :class="[$style.list, { [$style.close]: !isOpen }]" ref="ListRef">
-        <li :class="[$style.item, { [$style.active]: index === activeIndex, [$style.slideAnimation]: slideAnimating }]"
+        <li :class="[$style.item, { [$style.active]: item.id === activeId, [$style.slideAnimation]: slideAnimating }]"
           v-for="(item, index) in props.list" :key="item.id"
           :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }"
           @click.stop="() => onItemClick(item, index)" @animationend="() => slideAnimating = false">

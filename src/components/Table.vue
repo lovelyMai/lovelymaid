@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import Menu from './common/Menu.vue'
+
+import { createMenuManager, type MenuManager } from '@/composables/menu'
 import type { Item } from './type'
 export type ColumnConfig = {
   id: string
@@ -13,26 +17,36 @@ export type SortConfig = {
   order: 'asc' | 'desc'
 }
 interface Props {
-  /** 表格列 */
+  /** 列 */
   columns: ColumnConfig[]
+  /** 行 */
+  rows: Item[]
 }
 const props = defineProps<Props>()
-const rows = defineModel<Item[]>('rows', { required: true })
-const sort = defineModel<SortConfig>('sort', { required: true })
-const activeIndexes = defineModel<Set<number>>('active-indexes', { default: () => new Set() })
+const sort = defineModel<SortConfig>('sort')
+const activeIds = defineModel<Set<string>>('active-ids', { default: () => new Set() })
 
-// 样式
-const getBorderRadius = (index: number): string => {
-  if (!activeIndexes.value?.has(index)) return '8px';
-  const hasPrev = activeIndexes.value.has(index - 1);
-  const hasNext = activeIndexes.value.has(index + 1);
-  if (!hasPrev && !hasNext) return '8px';
-  if (hasPrev && hasNext) return '0';
-  if (!hasPrev && hasNext) return '8px 8px 0 0';
-  return '0 0 8px 8px';
-};
+// 表头排序
+const sortedRows = computed<Item[]>(() => {
+  if (!sort.value) return props.rows
+  const sortProp = props.columns.find(column => column.id === sort.value!.id)!.prop
+  return [...props.rows].sort((a, b) => {
+    if (sort.value!.order === 'asc') {
+      return a[sortProp].localeCompare(b[sortProp], undefined, { numeric: true });
+    } else {
+      return b[sortProp].localeCompare(a[sortProp], undefined, { numeric: true });
+    }
+  })
+})
+watch(sortedRows, (newSortedRows) => {
+  activeIndexes.value = new Set(newSortedRows.map((row, index) => activeIds.value.has(row.id) ? index : -1).filter(index => index !== -1))
+})
 
 // 列表项激活
+const activeIndexes = ref<Set<number>>(new Set())
+watch(activeIds, (newActiveIds) => {
+  activeIndexes.value = new Set(sortedRows.value.map((row, index) => newActiveIds.has(row.id) ? index : -1).filter(index => index !== -1))
+}, { immediate: true })
 let lastActiveIndex: number | undefined = undefined
 const removeContinuous = (set: Set<number>): Set<number> => {
   const result = new Set<number>();
@@ -44,26 +58,25 @@ const removeContinuous = (set: Set<number>): Set<number> => {
   return result;
 }
 const activateItem = (e: PointerEvent, index: number) => {
-  let newIndexes = new Set(activeIndexes.value)
   if (e.getModifierState('Meta')) {
     if (activeIndexes.value.has(index)) {
-      newIndexes.delete(index)
+      activeIndexes.value.delete(index)
     } else {
-      newIndexes.add(index)
+      activeIndexes.value.add(index)
       lastActiveIndex = index
     }
   } else if (e.getModifierState('Shift') && activeIndexes.value.size > 0) {
-    newIndexes = removeContinuous(newIndexes)
+    activeIndexes.value = removeContinuous(activeIndexes.value)
     const minIndex = Math.min(lastActiveIndex ?? 0, index)
     const maxIndex = Math.max(lastActiveIndex ?? 0, index)
     for (let i = minIndex; i <= maxIndex; i++) {
-      newIndexes.add(i)
+      activeIndexes.value.add(i)
     }
   } else {
-    newIndexes = new Set([index])
+    activeIndexes.value = new Set([index])
     lastActiveIndex = index
   }
-  activeIndexes.value = newIndexes
+  activeIds.value = new Set(Array.from(activeIndexes.value).map(index => sortedRows.value[index].id))
 }
 const handleRowPointerDown = (e: PointerEvent) => {
   const target = e.target as HTMLElement
@@ -73,51 +86,51 @@ const handleRowPointerDown = (e: PointerEvent) => {
   if (index === undefined) return
   activateItem(e, Number(index))
 }
+const getBorderRadius = (index: number): string => {
+  if (!activeIndexes.value?.has(index)) return '8px';
+  const hasPrev = activeIndexes.value.has(index - 1);
+  const hasNext = activeIndexes.value.has(index + 1);
+  if (!hasPrev && !hasNext) return '8px';
+  if (hasPrev && hasNext) return '0';
+  if (!hasPrev && hasNext) return '8px 8px 0 0';
+  return '0 0 8px 8px';
+};
 
-// 表头排序
-const sortByColumn = (id: string, order: 'asc' | 'desc') => {
-  const sortProp = props.columns.find(column => column.id === id)!.prop
-  const newRows = [...rows.value].sort((a, b) => {
-    if (order === 'asc') {
-      return a[sortProp].localeCompare(b[sortProp], undefined, { numeric: true });
-    } else {
-      return b[sortProp].localeCompare(a[sortProp], undefined, { numeric: true });
-    }
-  })
-  const newActiveIndexes = new Set<number>()
-  for (const oldIndex of activeIndexes.value) {
-    const oldRow = rows.value[oldIndex]
-    const newIndex = newRows.findIndex(newItem => newItem.id === oldRow.id)
-    if (newIndex !== -1) {
-      newActiveIndexes.add(newIndex)
-    }
-  }
-  rows.value = newRows
-  sort.value = { id, order }
-  activeIndexes.value = newActiveIndexes
-}
-sortByColumn(sort.value.id, sort.value.order)
+// 启用/关闭排序
+const headerRef = ref<HTMLElement | null>(null)
+const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
+const MenuManagerInstance = ref<MenuManager | null>(null)
+onMounted(() => {
+  if (!headerRef.value || !MenuRef.value) return
+  MenuManagerInstance.value = createMenuManager(headerRef.value, MenuRef.value, 'flex', 'contextmenu')
+})
+onUnmounted(() => {
+  MenuManagerInstance.value?.cleanup()
+})
 </script>
 
 <template>
   <div :class="$style.Table">
-    <ul :class="$style.header">
-      <li :class="$style.item" v-for="column in props.columns" :key="column.id"
-        :style="{ width: column.width + 'px', color: sort.id === column.id ? '#000' : '#808080' }"
-        @click.stop="() => sortByColumn(column.id, sort.order === 'asc' ? 'desc' : 'asc')">
+    <ul :class="$style.header" ref="headerRef">
+      <li :class="$style.column" v-for="column in props.columns" :key="column.id"
+        :style="{ width: column.width + 'px', color: sort?.id === column.id ? '#000' : '#808080' }"
+        @click.stop="() => sort = { id: column.id, order: sort?.order === 'asc' ? 'desc' : 'asc' }">
         <div :class="$style.container">
           <span :class="$style.text">{{ column.name }}</span>
-          <span class="lovelymai lovely-down-arrow" v-show="column.id === sort.id"
-            :style="{ transform: sort.order === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)' }"></span>
+          <span class="lovelymai lovely-down-arrow" v-show="column.id === sort?.id"
+            :style="{ transform: sort?.order === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)' }"></span>
         </div>
       </li>
+      <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false"
+        :position="MenuManagerInstance?.position ?? [0, 0]" :options="[{ id: '1', name: '关闭排序' }]"
+        :on-option-click="() => sort = undefined" />
     </ul>
     <ul :class="$style.list" @pointerdown.stop.prevent="handleRowPointerDown">
-      <li :class="$style.item" v-for="(row, index) in rows" :key="row.id"
+      <li :class="$style.row" v-for="(row, index) in sortedRows" :key="row.id"
         :style="{ backgroundColor: activeIndexes.has(index) ? '#2962D9' : '', borderRadius: getBorderRadius(index) }"
         :data-index="index">
         <span :class="$style.text" v-for="column in props.columns" :key="column.id"
-          :style="{ width: column.width + 'px', color: activeIndexes.has(index) ? (sort.id === column.id ? '#fff' : '#bfd0f4') : (sort.id === column.id ? '#000' : '#808080') }">{{
+          :style="{ width: column.width + 'px', color: activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : '#808080') }">{{
             row[column.prop] }}</span>
       </li>
     </ul>
@@ -130,25 +143,27 @@ sortByColumn(sort.value.id, sort.value.order)
   margin-bottom: 4px;
   height: 28px;
   border-bottom: 0.5px solid #808080;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.header .item {
+.header .column {
   padding: 6px 0;
   cursor: pointer;
 }
 
-.header .item .container {
+.header .column .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 8px;
 }
 
-.header .item:not(:last-child) .container {
+.header .column:not(:last-child) .container {
   border-right: 0.5px solid #808080;
 }
 
-.header .item .container .text {
+.header .column .container .text {
   font-size: 12px;
   line-height: 16px;
   font-weight: 500;
@@ -157,16 +172,16 @@ sortByColumn(sort.value.id, sort.value.order)
   text-overflow: ellipsis;
 }
 
-.list .item {
+.list .row {
   display: flex;
   height: 35px;
 }
 
-.list .item:nth-child(even) {
+.list .row:nth-child(even) {
   background-color: #f5f5f5;
 }
 
-.list .item .text {
+.list .row .text {
   padding: 0 8px;
   font-size: 16px;
   line-height: 35px;
