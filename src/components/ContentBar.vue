@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
 import Card from './Card.vue';
 import Button from './Button.vue';
 
@@ -63,14 +63,13 @@ onUnmounted(() => {
 
 // 切换 visilble
 let timer: number | undefined
-watch(() => props.visible, (newVisible) => {
+watch(() => props.visible, async (newVisible) => {
   clearTimeout(timer)
   style.ContentBar.transition = 'transform .3s'
   timer = setTimeout(() => style.ContentBar.transition = 'transform .5s', 300)
   if (newVisible) {
-    requestAnimationFrame(() => {
-      style.ContentBar.scale = '1'
-    })
+    await nextTick()
+    style.ContentBar.scale = '1'
   } else {
     style.ContentBar.scale = '0'
   }

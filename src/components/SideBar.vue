@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
 import Card from './Card.vue';
 
 import { debounce, watchDOM } from '@/utils/common';
@@ -9,8 +9,8 @@ import useCssVar from '@/utils/useCssVar';
 interface Props {
   /** 是否显示 */
   visible?: boolean;
-  /** 按钮点击事件 */
-  onButtonClick?: () => void
+  /** 点击事件 */
+  onClick?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true
@@ -64,14 +64,13 @@ onUnmounted(() => {
 
 // 切换 visilble
 let timer: number | undefined
-watch(() => props.visible, (newVisible) => {
+watch(() => props.visible, async (newVisible) => {
   clearTimeout(timer)
   style.SideBar.transition = 'transform .3s'
   timer = setTimeout(() => style.SideBar.transition = 'transform .5s', 300)
   if (newVisible) {
-    requestAnimationFrame(() => {
-      style.SideBar.scale = '1'
-    })
+    await nextTick()
+    style.SideBar.scale = '1'
   } else {
     style.SideBar.scale = '0'
   }
@@ -81,9 +80,9 @@ watch(() => props.visible, (newVisible) => {
 <template>
   <Card :class="$style.SideBar" ref="SideBarRef" type="glass">
     <div :class="$style.header">
-      <div :class="[$style.SwitchButton, { [$style.close]: !isOpen }]" :title="isOpen ? '收起侧边栏' : '展开侧边栏'" @click.stop="() => {
+      <div :class="[$style.button, { [$style.close]: !isOpen }]" :title="isOpen ? '收起侧边栏' : '展开侧边栏'" @click.stop="() => {
         isOpen = !isOpen
-        props.onButtonClick?.()
+        props.onClick?.()
       }">
         <span class="lovelymai lovely-left-sidebar"></span>
       </div>
@@ -104,7 +103,7 @@ watch(() => props.visible, (newVisible) => {
   height: 50px;
 }
 
-.SwitchButton {
+.button {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -115,20 +114,18 @@ watch(() => props.visible, (newVisible) => {
   height: 30px;
   border: none;
   border-radius: 15px;
-  background-color: rgba(255, 255, 255, 0.9);
   transform: translateX(var(--button-translateX));
-  transition:
-    transform .5s,
-    box-shadow .5s;
+  transition: transform .5s, box-shadow .5s;
   cursor: pointer;
 }
 
-.SwitchButton.close {
+.button.close {
   border: 1px solid #fff;
+  background-color: rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.1);
 }
 
-.SwitchButton:hover {
+.button:hover {
   background-color: #eee;
 }
 </style>
