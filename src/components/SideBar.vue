@@ -9,8 +9,8 @@ import useCssVar from '@/utils/useCssVar';
 interface Props {
   /** 是否显示 */
   visible?: boolean;
-  /** 点击事件 */
-  onClick?: () => void
+  /** 按钮点击事件 */
+  onButtonClick?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true
@@ -82,7 +82,7 @@ watch(() => props.visible, async (newVisible) => {
     <div :class="$style.header">
       <div :class="[$style.button, { [$style.close]: !isOpen }]" :title="isOpen ? '收起侧边栏' : '展开侧边栏'" @click.stop="() => {
         isOpen = !isOpen
-        props.onClick?.()
+        props.onButtonClick?.()
       }">
         <span class="lovelymai lovely-left-sidebar"></span>
       </div>
