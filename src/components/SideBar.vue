@@ -21,14 +21,14 @@ const isOpen = defineModel<boolean>('open', { required: true })
 const style = reactive({
   SideBar: {
     get translateX() {
-      return isOpen.value ? '0' : `${-TransformDistance.value}px`
+      return isOpen.value ? '0' : `${-transformDistance.value}px`
     },
     scale: props.visible ? '1' : '0',
     transition: 'none'
   },
   button: {
     get translateX() {
-      return isOpen.value ? '0' : `${TransformDistance.value - SideBarWidth.value + 55}px`
+      return isOpen.value ? '0' : `${transformDistance.value - (SideBarRef.value?.$el.offsetWidth ?? 0) + 55}px`
     }
   }
 })
@@ -39,13 +39,11 @@ onMounted(() => {
 
 // 计算平移距离
 const SideBarRef = ref<InstanceType<typeof Card> | null>(null)
-const SideBarWidth = ref<number>(0)
-const TransformDistance = ref<number>(0)
+const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
   if (!SideBarRef.value?.$el) return
-  SideBarWidth.value = SideBarRef.value.$el.offsetWidth
-  TransformDistance.value = getLayoutLeftInViewport(SideBarRef.value.$el) + SideBarWidth.value + 10
+  transformDistance.value = getLayoutLeftInViewport(SideBarRef.value.$el) + SideBarRef.value.$el.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
