@@ -21,11 +21,7 @@ provide('menu-is-sub', true)
 const MenuRef = ref<HTMLElement | null>(null)
 const SubMenuRefs = ref<Record<string, Menu | null>>({})
 const SubMenuManagers = ref<Record<string, MenuManager>>({})
-const clearSubManagers = () => {
-  Object.values(SubMenuManagers.value).forEach(manager => manager.cleanup())
-  SubMenuManagers.value = {}
-}
-const initManagers = async () => {
+const initSubManagers = async () => {
   await nextTick()
   if (!MenuRef.value) return
   MenuRef.value.querySelectorAll('[data-has-children="true"]').forEach(el => {
@@ -34,9 +30,13 @@ const initManagers = async () => {
     SubMenuManagers.value[index] = createSubMenuManager(el as HTMLElement, SubMenuRefs.value[index])
   })
 }
+const clearSubManagers = () => {
+  Object.values(SubMenuManagers.value).forEach(manager => manager.cleanup())
+  SubMenuManagers.value = {}
+}
 watch(() => props.visible, (visible) => {
   if (visible) {
-    initManagers()
+    initSubManagers()
   } else {
     clearSubManagers()
   }
@@ -44,7 +44,7 @@ watch(() => props.visible, (visible) => {
 watch(() => props.options, () => {
   if (props.visible) {
     clearSubManagers()
-    initManagers()
+    initSubManagers()
   }
 }, { deep: true })
 onUnmounted(() => {
