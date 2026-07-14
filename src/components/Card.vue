@@ -1,6 +1,6 @@
 <script setup lang="ts">
 interface Props {
-  type?: 'common' | 'select' | 'glass'
+  type?: 'common' | 'glass'
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'common'
@@ -8,7 +8,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const typeClass = {
   common: 'lovelymai-common-container',
-  select: 'lovelymai-select-container',
   glass: 'lovelymai-glass-container'
 }
 </script>
