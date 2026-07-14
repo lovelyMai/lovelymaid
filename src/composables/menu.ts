@@ -33,8 +33,8 @@ export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu, ty
   const open = (e?: MouseEvent) => {
     if (visible.value) return
     calcPos(e)
-    document.documentElement.style.overflow = 'hidden'
     visible.value = true
+    document.documentElement.style.overflow = 'hidden'
     document.addEventListener('click', onDocClick, true)
   }
   const onTrigger = (e: MouseEvent) => {
@@ -48,12 +48,13 @@ export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu, ty
     TriggerEl.addEventListener('contextmenu', onTrigger)
   }
   const close = () => {
-    document.documentElement.style.overflow = ''
+    if (!visible.value) return
     visible.value = false
+    document.documentElement.style.overflow = ''
     document.removeEventListener('click', onDocClick, true)
   }
   const onDocClick = (e: MouseEvent) => {
-    if (!MenuInstance?.root) return
+    if (!MenuInstance.root) return
     if (!MenuInstance.root.contains(e.target as HTMLElement)) {
       e.stopPropagation()
     }
@@ -101,9 +102,10 @@ export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu)
     }
   }
   const close = () => {
+    if (!visible.value || !parentEl) return
     visible.value = false
-    parentEl?.removeEventListener('mouseover', onParentOverToChange)
-    parentEl?.removeEventListener('mouseover', onParentOverToClose)
+    parentEl.removeEventListener('mouseover', onParentOverToChange)
+    parentEl.removeEventListener('mouseover', onParentOverToClose)
   }
   const onParentOverToClose = (e: MouseEvent) => {
     if (!parentEl) return

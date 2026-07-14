@@ -20,28 +20,35 @@ provide('menu-is-sub', true)
 // 子菜单
 const MenuRef = ref<HTMLElement | null>(null)
 const SubMenuRefs = ref<Record<string, Menu | null>>({})
-const MenuManagers = ref<Record<string, MenuManager>>({})
-watch(() => props.visible, async (visible) => {
+const SubMenuManagers = ref<Record<string, MenuManager>>({})
+const clearSubManagers = () => {
+  Object.values(SubMenuManagers.value).forEach(manager => manager.cleanup())
+  SubMenuManagers.value = {}
+}
+const initManagers = async () => {
   await nextTick()
+  if (!MenuRef.value) return
+  MenuRef.value.querySelectorAll('[data-has-children="true"]').forEach(el => {
+    const index = Number((el as HTMLElement).dataset.index)
+    if (SubMenuManagers.value[index] || !SubMenuRefs.value[index]) return
+    SubMenuManagers.value[index] = createSubMenuManager(el as HTMLElement, SubMenuRefs.value[index])
+  })
+}
+watch(() => props.visible, (visible) => {
   if (visible) {
-    if (!MenuRef.value) return
-    const items = MenuRef.value.querySelectorAll('[data-has-children="true"]')
-    items.forEach((el) => {
-      const index = Number((el as HTMLElement).dataset.index)
-      if (MenuManagers.value[index] || !SubMenuRefs.value[index]) return
-      MenuManagers.value[index] = createSubMenuManager(el as HTMLElement, SubMenuRefs.value[index])
-    })
+    initManagers()
   } else {
-    for (const manager of Object.values(MenuManagers.value)) {
-      manager.cleanup()
-    }
-    MenuManagers.value = {}
+    clearSubManagers()
   }
 }, { immediate: true })
-onUnmounted(() => {
-  for (const manager of Object.values(MenuManagers.value)) {
-    manager.cleanup()
+watch(() => props.options, () => {
+  if (props.visible) {
+    clearSubManagers()
+    initManagers()
   }
+}, { deep: true })
+onUnmounted(() => {
+  clearSubManagers()
 })
 
 // 暴露菜单
@@ -55,15 +62,15 @@ export type Menu = {
 <template>
   <teleport to="body" :disabled="isSubMenu">
     <transition name="lovelymai-fade-leave">
-      <ul :class="$style.Menu" ref="MenuRef" v-if="props.visible"
-        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }" @click.stop>
+      <ul :class="$style.Menu" ref="MenuRef" v-if="props.visible && props.options.length > 0"
+        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }">
         <li :class="$style.item" v-for="(item, index) in props.options" :key="item.id" :data-index="index"
           :data-has-children="item.options ? 'true' : 'false'" @click.stop="() => props.onOptionClick?.(item, index)">
           <slot :item="item" :index="index"></slot>
           <span :class="$style.text">{{ item.name }}</span>
           <span class="lovelymai lovely-right-arrow" v-if="item.options"></span>
           <Menu v-if="item.options" :ref="(el) => SubMenuRefs[index] = (el as Menu | null)"
-            :visible="MenuManagers[index]?.visible ?? false" :position="MenuManagers[index]?.position ?? [0, 0]"
+            :visible="SubMenuManagers[index]?.visible ?? false" :position="SubMenuManagers[index]?.position ?? [0, 0]"
             :options="item.options" :on-option-click="props.onOptionClick" />
         </li>
       </ul>

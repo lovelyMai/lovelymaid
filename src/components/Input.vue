@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, useSlots, onUnmounted, reactive } from 'vue'
+import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
 import Card from './Card.vue'
 import Menu from './common/Menu.vue'
 
@@ -77,6 +77,7 @@ onUnmounted(() => {
 const onOptionClick = (option: InputOption) => {
   inputRef.value?.focus()
   if (option.options && !option.selectable) return
+  isOptionClick = true
   inputValue.value = option.name
 }
 
@@ -92,6 +93,32 @@ const clear = () => {
   inputRef.value?.focus()
   MenuManagerInstance.value?.open()
 }
+
+// 根据输入值过滤选项
+let isOptionClick: boolean = false
+function filterOptions(options: InputOption[], keyword: string): InputOption[] {
+  return options.reduce<InputOption[]>((acc, option) => {
+    if (option.name.includes(keyword)) {
+      acc.push(option)
+    } else if (option.options) {
+      const children = filterOptions(option.options, keyword)
+      if (children.length > 0) acc.push({ ...option, options: children })
+    }
+    return acc
+  }, [])
+}
+const filteredOptions = computed<InputOption[]>(() => {
+  const keyword = inputValue.value.trim()
+  return keyword ? filterOptions(props.options, keyword) : props.options
+})
+watch(filteredOptions, () => {
+  if (!MenuManagerInstance.value) return
+  if (isOptionClick) {
+    isOptionClick = false
+  } else {
+    MenuManagerInstance.value.open()
+  }
+})
 
 // 暴露方法
 defineExpose({
@@ -121,7 +148,7 @@ defineExpose({
       <span class="lovelymai lovely-clear" v-show="inputValue" @click.stop="() => clear()"></span>
     </div>
     <Menu ref="MenuRef" v-if="props.type === 'select'" :visible="MenuManagerInstance?.visible ?? false"
-      :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options" :on-option-click="onOptionClick" />
+      :position="MenuManagerInstance?.position ?? [0, 0]" :options="filteredOptions" :on-option-click="onOptionClick" />
   </Card>
 </template>
 
