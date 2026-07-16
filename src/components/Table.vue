@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Menu from './common/Menu.vue'
 
 import { createMenuManager, type MenuManager } from '@/composables/menu'
+import { createActivationManager, type ActivationManager } from '@/composables/activation'
+
 import type { Item } from './type'
+
 export type ColumnConfig = {
   id: string
   name: string
@@ -38,58 +41,21 @@ const sortedRows = computed<Item[]>(() => {
     }
   })
 })
-watch(sortedRows, (newSortedRows) => {
-  activeIndexes.value = new Set(newSortedRows.map((row, index) => activeIds.value.has(row.id) ? index : -1).filter(index => index !== -1))
-})
 
 // 列表项激活
-const activeIndexes = ref<Set<number>>(new Set())
-watch(activeIds, (newActiveIds) => {
-  activeIndexes.value = new Set(sortedRows.value.map((row, index) => newActiveIds.has(row.id) ? index : -1).filter(index => index !== -1))
-}, { immediate: true })
-let lastActiveIndex: number | undefined = undefined
-const removeContinuous = (set: Set<number>): Set<number> => {
-  const result = new Set<number>();
-  for (const num of set) {
-    if (!set.has(num - 1) && !set.has(num + 1)) {
-      result.add(num);
-    }
-  }
-  return result;
-}
-const activateItem = (e: PointerEvent, index: number) => {
-  if (e.getModifierState('Meta')) {
-    if (activeIndexes.value.has(index)) {
-      activeIndexes.value.delete(index)
-    } else {
-      activeIndexes.value.add(index)
-      lastActiveIndex = index
-    }
-  } else if (e.getModifierState('Shift') && activeIndexes.value.size > 0) {
-    activeIndexes.value = removeContinuous(activeIndexes.value)
-    const minIndex = Math.min(lastActiveIndex ?? 0, index)
-    const maxIndex = Math.max(lastActiveIndex ?? 0, index)
-    for (let i = minIndex; i <= maxIndex; i++) {
-      activeIndexes.value.add(i)
-    }
-  } else {
-    activeIndexes.value = new Set([index])
-    lastActiveIndex = index
-  }
-  activeIds.value = new Set(Array.from(activeIndexes.value).map(index => sortedRows.value[index].id))
-}
-const handleRowPointerDown = (e: PointerEvent) => {
-  const target = e.target as HTMLElement
-  const li = target.closest('li')
-  if (!li) return
-  const index = li.dataset.index
-  if (index === undefined) return
-  activateItem(e, Number(index))
-}
+const ListRef = ref<HTMLElement | null>(null)
+const ActivationManagerInstance = ref<ActivationManager | null>(null)
+onMounted(() => {
+  if (!ListRef.value) return
+  ActivationManagerInstance.value = createActivationManager(sortedRows, activeIds, ListRef.value)
+})
+onUnmounted(() => {
+  ActivationManagerInstance.value?.cleanup()
+})
 const getBorderRadius = (index: number): string => {
-  if (!activeIndexes.value?.has(index)) return '8px';
-  const hasPrev = activeIndexes.value.has(index - 1);
-  const hasNext = activeIndexes.value.has(index + 1);
+  if (!ActivationManagerInstance.value?.activeIndexes.has(index)) return '8px';
+  const hasPrev = ActivationManagerInstance.value.activeIndexes.has(index - 1);
+  const hasNext = ActivationManagerInstance.value.activeIndexes.has(index + 1);
   if (!hasPrev && !hasNext) return '8px';
   if (hasPrev && hasNext) return '0';
   if (!hasPrev && hasNext) return '8px 8px 0 0';
@@ -125,12 +91,11 @@ onUnmounted(() => {
         :position="MenuManagerInstance?.position ?? [0, 0]" :options="[{ id: '1', name: '关闭排序' }]"
         :on-option-click="() => sort = undefined" />
     </ul>
-    <ul :class="$style.list" @pointerdown.stop.prevent="handleRowPointerDown">
+    <ul :class="$style.list" ref="ListRef">
       <li :class="$style.row" v-for="(row, index) in sortedRows" :key="row.id"
-        :style="{ backgroundColor: activeIndexes.has(index) ? '#2962D9' : '', borderRadius: getBorderRadius(index) }"
-        :data-index="index">
+        :style="{ backgroundColor: ActivationManagerInstance?.activeIndexes.has(index) ? '#2962D9' : '', borderRadius: getBorderRadius(index) }">
         <span :class="$style.text" v-for="column in props.columns" :key="column.id"
-          :style="{ width: column.width + 'px', color: activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : '#808080') }">{{
+          :style="{ width: column.width + 'px', color: ActivationManagerInstance?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : '#808080') }">{{
             row[column.prop] }}</span>
       </li>
     </ul>
