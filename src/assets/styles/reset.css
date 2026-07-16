@@ -12,3 +12,12 @@ ul {
   padding: 0;
   list-style: none;
 }
+
+/* 移动端防止 input/textarea 聚焦时自动缩放页面 */
+@media (pointer: coarse) {
+
+  input,
+  textarea {
+    font-size: 16px !important;
+  }
+}

@@ -123,8 +123,10 @@ watch(() => props.visible, async (newVisible) => {
   box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.1);
 }
 
-.button:hover {
-  background-color: #eee;
+@media (hover: hover) {
+  .button:hover {
+    background-color: #eee;
+  }
 }
 </style>
 <style scoped>

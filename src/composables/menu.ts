@@ -18,8 +18,10 @@ export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu, ty
     let Y: number = 0
     if (type === 'fixed') {
       const rect = TriggerEl.getBoundingClientRect()
-      X = rect.left + Math.min(rect.width, rect.height) / 2
-      Y = rect.top + rect.height + 2
+      const offsetX = window.visualViewport?.offsetLeft ?? 0
+      const offsetY = window.visualViewport?.offsetTop ?? 0
+      X = rect.left + Math.min(rect.width, rect.height) / 2 + offsetX
+      Y = rect.top + rect.height + 2 + offsetY
     } else {
       if (!e) {
         console.error('flex 模式下 open 必须传入 event 事件对象')
@@ -78,8 +80,10 @@ export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu)
   const position = ref<[number, number]>([0, 0])
   const calcPos = () => {
     const rect = TriggerEl.getBoundingClientRect()
-    const X = rect.right
-    const Y = rect.top - 5
+    const offsetX = window.visualViewport?.offsetLeft ?? 0
+    const offsetY = window.visualViewport?.offsetTop ?? 0
+    const X = rect.right + offsetX
+    const Y = rect.top - 5 + offsetY
     position.value = [X, Y]
   }
   const open = () => {

@@ -102,9 +102,11 @@ export type Menu = {
   cursor: pointer;
 }
 
-.Menu .item:hover {
-  background-color: #3b86f7;
-  color: #fff;
+@media (hover: hover) {
+  .Menu .item:hover {
+    background-color: #3b86f7;
+    color: #fff;
+  }
 }
 
 .Menu .item .text {
