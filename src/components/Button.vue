@@ -56,12 +56,14 @@ onUnmounted(() => {
   width: 30px;
   height: 30px;
   border-radius: var(--Button-border-radius);
-  cursor: pointer;
-  touch-action: none;
-  transition: transform .2s;
   font-size: var(--Button-font-size);
   font-weight: 500;
   color: #19191a;
+  transition: transform .2s;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   --background-color: #3b86f7;
 }
 

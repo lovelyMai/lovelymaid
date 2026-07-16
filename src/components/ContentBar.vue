@@ -19,8 +19,7 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true,
-  isOpen: true,
-  title: '标题'
+  isOpen: true
 })
 
 // 初始化
