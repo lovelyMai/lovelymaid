@@ -2,26 +2,28 @@
 import ContentBar from './ContentBar.vue';
 
 interface Props {
-  /** 类型 */
-  type?: 'desktop' | 'mobile'
   /** 标题 */
   title?: string
   /** 关闭事件 */
   onClose?: () => void
 }
-const props = withDefaults(defineProps<Props>(), {
-  type: 'desktop'
-})
+const props = defineProps<Props>()
 const visible = defineModel<boolean>('visible', { required: true })
+
+// 关闭
+const close = () => {
+  visible.value = false
+  props.onClose?.()
+}
 </script>
 
 <template>
   <teleport to="body">
     <div :class="$style.Modal">
       <transition name="lovelymai-fade">
-        <div :class="$style.mask" v-if="visible" @click.capture.stop="() => visible = false"></div>
+        <div :class="$style.mask" v-if="visible" @click.capture.stop="close"></div>
       </transition>
-      <ContentBar :class="$style.ContentBar" :visible="visible" :is-open="true" :on-close-click="() => visible = false"
+      <ContentBar :class="$style.ContentBar" :visible="visible" :is-open="true" :on-close-click="close"
         :title="props.title">
         <slot></slot>
         <template #tip>
