@@ -1,4 +1,6 @@
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -8,12 +10,9 @@ textarea {
 }
 
 ul {
-  margin: 0;
-  padding: 0;
   list-style: none;
 }
 
-/* 移动端防止 input/textarea 聚焦时自动缩放页面 */
 @media (pointer: coarse) {
 
   input,

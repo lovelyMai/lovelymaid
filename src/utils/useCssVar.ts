@@ -2,10 +2,7 @@ import { watch } from 'vue'
 
 type StyleObject = Record<string, Record<string, string | number>>
 
-const useCssVar = <T extends StyleObject>(
-  el: HTMLElement,
-  styles: T
-) => {
+const useCssVar = <T extends StyleObject>(el: HTMLElement, styles: T) => {
   const applyStyles = () => {
     if (!el) return
     Object.entries(styles).forEach(([key, value]) => {

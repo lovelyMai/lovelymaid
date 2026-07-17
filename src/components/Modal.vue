@@ -1,14 +1,44 @@
 <script setup lang="ts">
+import { onMounted, reactive, ref } from 'vue';
 import ContentBar from './ContentBar.vue';
+
+import useCssVar from '@/utils/useCssVar.js';
 
 interface Props {
   /** 标题 */
   title?: string
+  /** 宽 */
+  width?: string
+  /** 高 */
+  height?: string
   /** 关闭事件 */
   onClose?: () => void
 }
 const props = defineProps<Props>()
 const visible = defineModel<boolean>('visible', { required: true })
+
+// 初始化
+const ModalRef = ref<HTMLElement | null>(null)
+const style = reactive({
+  ContentBar: {
+    get left() {
+      return `calc(50% - ${this.width} / 2)`
+    },
+    get top() {
+      return `calc(50% - ${this.height} / 2)`
+    },
+    get width() {
+      return props.width ?? '50dvw'
+    },
+    get height() {
+      return props.height ?? '90dvh'
+    }
+  }
+})
+onMounted(() => {
+  if (!ModalRef.value) return
+  useCssVar(ModalRef.value, style)
+})
 
 // 关闭
 const close = () => {
@@ -19,7 +49,7 @@ const close = () => {
 
 <template>
   <teleport to="body">
-    <div :class="$style.Modal">
+    <div :class="$style.Modal" ref="ModalRef">
       <transition name="lovelymai-fade">
         <div :class="$style.mask" v-if="visible" @click.capture.stop="close"></div>
       </transition>
@@ -38,8 +68,6 @@ const close = () => {
 .Modal {
   position: relative;
   z-index: 10;
-  --width: 50dvw;
-  --height: 90dvh;
 }
 
 .mask {
@@ -53,9 +81,9 @@ const close = () => {
 
 .ContentBar {
   position: fixed;
-  top: calc(50% - var(--height) / 2);
-  left: calc(50% - var(--width) / 2);
-  width: var(--width);
-  height: var(--height);
+  left: var(--ContentBar-left);
+  top: var(--ContentBar-top);
+  width: var(--ContentBar-width);
+  height: var(--ContentBar-height);
 }
 </style>
