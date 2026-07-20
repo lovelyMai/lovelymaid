@@ -10,7 +10,6 @@ export type FormItem = {
   value: string
   options?: InputOption[]
   placeholder?: string
-  enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   size?: [number | string, number | string]
 }
 interface Props {
@@ -41,10 +40,11 @@ const onEnter = (index: number) => {
         {{ item.name }}</span>
       <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
         :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" v-model:value="item.value"
-        :placeholder="item.placeholder" :enterkeyhint="item.enterkeyhint" :on-enter="() => onEnter(index)" />
+        :placeholder="item.placeholder" :enterkeyhint="index === items.length - 1 ? 'done' : 'next'"
+        :on-enter="() => onEnter(index)" />
       <Input :class="$style.Input" v-else :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
         :type="item.type" v-model:value="item.value" :placeholder="item.placeholder" :options="item.options"
-        :enterkeyhint="item.enterkeyhint" :on-enter="() => onEnter(index)" />
+        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :on-enter="() => onEnter(index)" />
     </li>
   </ul>
 </template>
