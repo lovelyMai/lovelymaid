@@ -19,7 +19,7 @@ const MenuRef = ref<HTMLElement | null>(null)
 const MenuManager = ref<WindowManager | null>(null)
 onMounted(() => {
   if (!SelectRef.value) return
-  MenuManager.value = createWindowManager(SelectRef.value, MenuRef, 'fixed', 'click', () => MenuManager.value?.close())
+  MenuManager.value = createWindowManager(SelectRef.value, MenuRef, 'fixed', 'click')
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()
@@ -29,8 +29,10 @@ onUnmounted(() => {
 <template>
   <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" ref="SelectRef">
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" :visible="MenuManager?.visible ?? false"
-      :position="MenuManager?.position ?? [0, 0]" :options="props.options" :on-option-click="props.onOptionClick"
-      v-slot="{ item, index }">
+      :position="MenuManager?.position ?? [0, 0]" :options="props.options" :on-option-click="() => {
+        props.onOptionClick
+        MenuManager?.close()
+      }" v-slot="{ item, index }">
       <slot :item="item" :index="index"></slot>
     </Menu>
   </span>

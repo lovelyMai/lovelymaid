@@ -8,7 +8,7 @@ export type WindowManager = {
   cleanup: () => void
 }
 
-export const createWindowManager = (TriggerEl: HTMLElement, MenuRef: Ref<HTMLElement | null>, type: 'fixed' | 'flex' = 'fixed', method: 'click' | 'contextmenu' = 'click', onWindowClick: (e: MouseEvent) => void = () => { }): WindowManager => {
+export const createWindowManager = (TriggerEl: HTMLElement, MenuRef: Ref<HTMLElement | null>, type: 'fixed' | 'flex' = 'fixed', method: 'click' | 'contextmenu' = 'click'): WindowManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
   const calcPos = (e?: MouseEvent) => {
@@ -54,10 +54,9 @@ export const createWindowManager = (TriggerEl: HTMLElement, MenuRef: Ref<HTMLEle
   }
   const onDocClick = (e: MouseEvent) => {
     if (!MenuRef.value) return
-    if (!MenuRef.value.contains(e.target as HTMLElement)) {
-      e.stopPropagation()
-    }
-    onWindowClick(e)
+    if (MenuRef.value.contains(e.target as HTMLElement)) return
+    e.stopPropagation()
+    close()
   }
   const cleanup = () => {
     TriggerEl.removeEventListener('click', onTrigger)

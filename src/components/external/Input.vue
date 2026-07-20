@@ -69,13 +69,7 @@ const MenuRef = ref<HTMLElement | null>(null)
 const MenuManager = ref<WindowManager | null>(null)
 onMounted(() => {
   if (!inputRef.value) return
-  const onMenuClick = (e: MouseEvent) => {
-    // 点击的是有子菜单的项，不关闭
-    const targetEl = (e.target as HTMLElement).closest('[data-has-children]') as HTMLElement | null
-    if (targetEl && targetEl.dataset.hasChildren === 'true') return
-    MenuManager.value?.close()
-  }
-  MenuManager.value = createWindowManager(inputRef.value, MenuRef, 'fixed', 'click', onMenuClick)
+  MenuManager.value = createWindowManager(inputRef.value, MenuRef, 'fixed', 'click')
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()
@@ -85,6 +79,7 @@ const onOptionClick = (option: InputOption) => {
   if (option.options && !option.selectable) return
   isSelecting = true
   inputValue.value = option.name
+  MenuManager.value?.close()
 }
 
 // 回车

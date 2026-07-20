@@ -68,7 +68,7 @@ const MenuRef = ref<HTMLElement | null>(null)
 const MenuManager = ref<WindowManager | null>(null)
 onMounted(() => {
   if (!headerRef.value) return
-  MenuManager.value = createWindowManager(headerRef.value, MenuRef, 'flex', 'contextmenu', () => MenuManager.value?.close())
+  MenuManager.value = createWindowManager(headerRef.value, MenuRef, 'flex', 'contextmenu')
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()
@@ -89,7 +89,10 @@ onUnmounted(() => {
       </li>
       <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null"
         :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]"
-        :options="[{ id: '1', name: '关闭排序' }]" :on-option-click="() => sort = undefined" />
+        :options="[{ id: '1', name: '关闭排序' }]" :on-option-click="() => {
+          sort = undefined
+          MenuManager?.close()
+        }" />
     </ul>
     <ul :class="$style.list" ref="ListRef">
       <li :class="$style.row" v-for="(row, index) in sortedRows" :key="row.id"
