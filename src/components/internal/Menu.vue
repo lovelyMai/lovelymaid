@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
 
-import { createSubMenuManager, type MenuManager } from '@/composables/menu'
+import { createSubMenuManager } from '@/composables/menu'
 import type { OptionItem } from '../type'
+import { type WindowManager } from '@/composables/window'
 
 interface Props {
   /** 是否显示 */
@@ -21,7 +22,7 @@ provide('menu-is-sub', true)
 // 子菜单
 const MenuRef = ref<HTMLElement | null>(null)
 const SubMenuInstances = ref<Record<string, MenuInstance | null>>({})
-const SubMenuManagers = ref<Record<string, MenuManager>>({})
+const SubMenuManagers = ref<Record<string, WindowManager>>({})
 const initSubManagers = async () => {
   await nextTick()
   if (!MenuRef.value) return

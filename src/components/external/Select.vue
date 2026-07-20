@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import Menu, { type MenuInstance } from '../internal/Menu.vue';
 
-import { createMenuManager, type MenuManager } from '@/composables/menu';
+import { createWindowManager, type WindowManager } from '@/composables/window';
 import type { OptionItem } from '../type.js'
 
 interface Props {
@@ -15,11 +15,11 @@ const props = defineProps<Props>()
 
 // 菜单
 const SelectRef = ref<HTMLElement | null>(null)
-const MenuInstance = ref<MenuInstance | null>(null)
-const MenuManager = ref<MenuManager | null>(null)
+const MenuRef = ref<HTMLElement | null>(null)
+const MenuManager = ref<WindowManager | null>(null)
 onMounted(() => {
-  if (!SelectRef.value || !MenuInstance.value) return
-  MenuManager.value = createMenuManager(SelectRef.value, MenuInstance.value)
+  if (!SelectRef.value) return
+  MenuManager.value = createWindowManager(SelectRef.value, MenuRef, 'fixed', 'click', () => MenuManager.value?.close())
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()
@@ -28,7 +28,7 @@ onUnmounted(() => {
 
 <template>
   <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" ref="SelectRef">
-    <Menu :ref="(ins) => MenuInstance = (ins as MenuInstance | null)" :visible="MenuManager?.visible ?? false"
+    <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" :visible="MenuManager?.visible ?? false"
       :position="MenuManager?.position ?? [0, 0]" :options="props.options" :on-option-click="props.onOptionClick"
       v-slot="{ item, index }">
       <slot :item="item" :index="index"></slot>

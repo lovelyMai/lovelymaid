@@ -5,7 +5,7 @@ import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
 import { watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/useCssVar'
-import { createMenuManager, type MenuManager } from '@/composables/menu'
+import { createWindowManager, type WindowManager } from '@/composables/window'
 import type { OptionItem } from '../type.js'
 
 export type InputOption = OptionItem & { selectable?: boolean }
@@ -65,11 +65,17 @@ const compositionstart = () => {
 };
 
 // 菜单
-const MenuInstance = ref<MenuInstance | null>(null)
-const MenuManager = ref<MenuManager | null>(null)
+const MenuRef = ref<HTMLElement | null>(null)
+const MenuManager = ref<WindowManager | null>(null)
 onMounted(() => {
-  if (!inputRef.value || !MenuInstance.value ) return
-  MenuManager.value = createMenuManager(inputRef.value, MenuInstance.value)
+  if (!inputRef.value) return
+  const onMenuClick = (e: MouseEvent) => {
+    // 点击的是有子菜单的项，不关闭
+    const targetEl = (e.target as HTMLElement).closest('[data-has-children]') as HTMLElement | null
+    if (targetEl && targetEl.dataset.hasChildren === 'true') return
+    MenuManager.value?.close()
+  }
+  MenuManager.value = createWindowManager(inputRef.value, MenuRef, 'fixed', 'click', onMenuClick)
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()
@@ -159,7 +165,7 @@ defineExpose({
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-show="inputValue" @click.stop="() => clear()"></span>
     </div>
-    <Menu :ref="(ins) => MenuInstance = (ins as MenuInstance | null)" v-if="props.type === 'select'"
+    <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'select'"
       :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="filteredOptions"
       :on-option-click="onOptionClick" />
   </Card>

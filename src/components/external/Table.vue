@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
-import { createMenuManager, type MenuManager } from '@/composables/menu'
+import { createWindowManager, type WindowManager } from '@/composables/window'
 import { createActivationManager, type ActivationManager } from '@/composables/activation'
 
 import type { Item } from '../type.js'
@@ -64,11 +64,11 @@ const getBorderRadius = (index: number): string => {
 
 // 启用/关闭排序
 const headerRef = ref<HTMLElement | null>(null)
-const MenuInstance = ref<MenuInstance | null>(null)
-const MenuManager = ref<MenuManager | null>(null)
+const MenuRef = ref<HTMLElement | null>(null)
+const MenuManager = ref<WindowManager | null>(null)
 onMounted(() => {
-  if (!headerRef.value || !MenuInstance.value) return
-  MenuManager.value = createMenuManager(headerRef.value, MenuInstance.value, 'flex', 'contextmenu')
+  if (!headerRef.value) return
+  MenuManager.value = createWindowManager(headerRef.value, MenuRef, 'flex', 'contextmenu', () => MenuManager.value?.close())
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()
@@ -87,9 +87,9 @@ onUnmounted(() => {
             :style="{ transform: sort?.order === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)' }"></span>
         </div>
       </li>
-      <Menu :ref="(ins) => MenuInstance = (ins as MenuInstance | null)" :visible="MenuManager?.visible ?? false"
-        :position="MenuManager?.position ?? [0, 0]" :options="[{ id: '1', name: '关闭排序' }]"
-        :on-option-click="() => sort = undefined" />
+      <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null"
+        :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]"
+        :options="[{ id: '1', name: '关闭排序' }]" :on-option-click="() => sort = undefined" />
     </ul>
     <ul :class="$style.list" ref="ListRef">
       <li :class="$style.row" v-for="(row, index) in sortedRows" :key="row.id"

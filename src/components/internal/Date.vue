@@ -18,12 +18,19 @@ const props = defineProps<Props>()
 const date = defineModel<DateItem>('date', { default: () => formatDate(Date.now()) })
 
 // 初始化
+const today = formatDate(Date.now())
 const weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-const months: ListItem[] = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'].map(name => ({ id: name, name }))
-const years: ListItem[] = Array.from({ length: 200 }, (_, i) => ({ id: `${1900 + i}年`, name: `${1900 + i}年` }))
+const months: ListItem[] = Array(12).fill(null).map((_, index) => ({ id: String(index + 1), name: `${index + 1}月` }))
+const years: ListItem[] = Array(200).fill(null).map((_, index) => ({ id: String(1900 + index), name: `${1900 + index}年` }))
 
-
-// 月份加减
+// 年月切换
+const scrollIsOpen = ref<boolean>(false)
+const activeIds = computed<[string, string]>({
+  get: () => [String(date.value[0]), String(date.value[1])] as [string, string],
+  set: ([year, month]) => {
+    date.value = [Number(year), Number(month), date.value[2]]
+  }
+})
 const decreaseMonth = () => {
   const [year, month, day] = date.value
   let newYear = year
@@ -45,7 +52,7 @@ const increaseMonth = () => {
   date.value = [newYear, newMonth, day]
 }
 
-// 生成日历网格
+// 日历网格
 const calendarDays = computed<string[]>(() => {
   const [year, month] = date.value
   const firstDay = (new Date(year, month - 1, 1).getDay() + 6) % 7
@@ -57,9 +64,11 @@ const calendarDays = computed<string[]>(() => {
   }
   return days
 })
-
-// 年月切换
-const switchIsOpen = ref<boolean>(false)
+const onDayClick = (e: MouseEvent) => {
+  const targetEl = (e.target as HTMLElement).closest('[data-day]') as HTMLElement | null
+  if (!targetEl) return
+  date.value = [date.value[0], date.value[1], Number(targetEl.dataset.day)]
+}
 </script>
 
 <template>
@@ -68,10 +77,10 @@ const switchIsOpen = ref<boolean>(false)
       <Card :class="$style.Date" ref="DateRef" v-if="props.visible" type="glass"
         :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }">
         <div :class="$style.header">
-          <h5 :class="$style.date" @click.stop="() => switchIsOpen = !switchIsOpen">
-            <span :style="{ color: switchIsOpen ? '#0067EC' : '' }">{{ `${date[0]} 年 ${date[1]} 月` }}</span>
+          <h5 :class="$style.date" @click.stop="() => scrollIsOpen = !scrollIsOpen">
+            <span :style="{ color: scrollIsOpen ? '#0067EC' : '' }">{{ `${date[0]} 年 ${date[1]} 月` }}</span>
             <span :class="['lovelymai', 'lovely-right-arrow', $style.arrow]"
-              :style="{ transform: switchIsOpen ? 'translateY(1px) rotate(90deg)' : 'translateY(1px) rotate(0deg)' }"></span>
+              :style="{ transform: scrollIsOpen ? 'translateY(1px) rotate(90deg)' : 'translateY(1px) rotate(0deg)' }"></span>
           </h5>
           <div :class="$style.button">
             <span :class="['lovelymai', 'lovely-left-arrow', $style.arrow]" @click.stop="() => decreaseMonth()"></span>
@@ -79,15 +88,16 @@ const switchIsOpen = ref<boolean>(false)
           </div>
         </div>
         <transition name="lovelymai-fade" mode="out-in">
-          <Scroll v-if="switchIsOpen" :lists="[years, months]" />
+          <Scroll v-if="scrollIsOpen" :lists="[years, months]" v-model:active-ids="activeIds" />
           <div :class="$style.days" v-else>
             <ul :class="$style.weekdays">
               <li v-for="(weekday) in weekDays">{{ weekday }}</li>
             </ul>
-            <ul :class="$style.monthDays">
+            <ul :class="$style.monthDays" @click="onDayClick">
               <li v-for="(day, index) in calendarDays" :key="index" :class="$style.dayCell">
-                <span v-if="day" :class="[$style.day, Number(day) === date[2] ? $style.today : '']">{{
-                  day }}</span>
+                <span
+                  :class="[$style.day, date[0] === today[0] && date[1] === today[1] && Number(day) === today[2] ? $style.today : '']"
+                  v-if="day" :data-day="day">{{ day }}</span>
               </li>
             </ul>
           </div>
@@ -182,6 +192,11 @@ const switchIsOpen = ref<boolean>(false)
     background-color: #3b86f7;
     color: #fff;
   }
+}
+
+.days .day:active {
+  background-color: #3b86f7;
+  color: #fff;
 }
 </style>
 <style scoped>
