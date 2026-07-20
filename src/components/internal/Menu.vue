@@ -87,7 +87,7 @@ defineExpose<MenuInstance>({
 <style module>
 .Menu {
   position: fixed;
-  z-index: 999;
+  z-index: 0;
   padding: 4px;
   background-color: #f3f6f6;
   border: 1px solid #fff;

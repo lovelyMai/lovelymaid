@@ -67,7 +67,7 @@ const close = () => {
 <style module>
 .Modal {
   position: relative;
-  z-index: 10;
+  z-index: 0;
 }
 
 .mask {

@@ -9,7 +9,7 @@ import type { ListItem } from '../type'
 interface Props {
   /** 标题 */
   title?: string
-  /** 列表数据 */
+  /** 列表 */
   list: ListItem[]
   /** 头部点击事件 */
   onHeaderClick?: () => void

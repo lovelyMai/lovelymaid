@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onUnmounted, ref, watch, nextTick, reactive, onMounted, computed } from 'vue'
+import { ref, computed } from 'vue'
 import Card from '../external/Card.vue'
+import Scroll from '../internal/Scroll.vue'
 
 import { formatDate } from '@/utils/common.js'
-import useCssVar from '@/utils/useCssVar.js'
-import { DateItem } from '../type.js'
+import { ListItem, DateItem } from '../type.js'
 
 interface Props {
   /** 是否显示 */
@@ -18,7 +18,10 @@ const props = defineProps<Props>()
 const date = defineModel<DateItem>('date', { default: () => formatDate(Date.now()) })
 
 // 初始化
-const weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+const weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+const months: ListItem[] = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'].map(name => ({ id: name, name }))
+const years: ListItem[] = Array.from({ length: 200 }, (_, i) => ({ id: `${1900 + i}年`, name: `${1900 + i}年` }))
+
 
 // 月份加减
 const decreaseMonth = () => {
@@ -75,20 +78,20 @@ const switchIsOpen = ref<boolean>(false)
             <span :class="['lovelymai', 'lovely-right-arrow', $style.arrow]" @click.stop="() => increaseMonth()"></span>
           </div>
         </div>
-        <div :class="$style.switch" v-if="switchIsOpen">
-
-        </div>
-        <div :class="$style.days" v-else>
-          <ul :class="$style.weekdays">
-            <li v-for="(weekday) in weekDays">{{ weekday }}</li>
-          </ul>
-          <ul :class="$style.monthDays">
-            <li v-for="(day, index) in calendarDays" :key="index" :class="$style.dayCell">
-              <span v-if="day" :class="[$style.day, Number(day) === date[2] ? $style.today : '']">{{
-                day }}</span>
-            </li>
-          </ul>
-        </div>
+        <transition name="lovelymai-fade" mode="out-in">
+          <Scroll v-if="switchIsOpen" :lists="[years, months]" />
+          <div :class="$style.days" v-else>
+            <ul :class="$style.weekdays">
+              <li v-for="(weekday) in weekDays">{{ weekday }}</li>
+            </ul>
+            <ul :class="$style.monthDays">
+              <li v-for="(day, index) in calendarDays" :key="index" :class="$style.dayCell">
+                <span v-if="day" :class="[$style.day, Number(day) === date[2] ? $style.today : '']">{{
+                  day }}</span>
+              </li>
+            </ul>
+          </div>
+        </transition>
       </Card>
     </transition>
   </teleport>
@@ -97,7 +100,7 @@ const switchIsOpen = ref<boolean>(false)
 <style module>
 .Date {
   position: fixed;
-  z-index: 999;
+  z-index: 0;
   width: 250px;
   padding: 14px;
   border-radius: 16px;
@@ -164,6 +167,7 @@ const switchIsOpen = ref<boolean>(false)
   width: 28px;
   height: 28px;
   font-size: 14px;
+  font-weight: 450;
   border-radius: 50%;
   cursor: pointer;
   transition: background-color .2s;
@@ -173,13 +177,11 @@ const switchIsOpen = ref<boolean>(false)
   color: #3b86f7;
 }
 
-.days .day:hover {
-  background-color: #3b86f7;
-  color: #fff;
-}
-
-.switch {
-  padding: 30px;
+@media (hover: hover) {
+  .days .day:hover {
+    background-color: #3b86f7;
+    color: #fff;
+  }
 }
 </style>
 <style scoped>
