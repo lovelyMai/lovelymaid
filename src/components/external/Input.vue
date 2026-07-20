@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
+import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch, nextTick } from 'vue'
 import Card from './Card.vue'
-import Menu from './common/Menu.vue'
+import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
 import { watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/useCssVar'
 import { createMenuManager, type MenuManager } from '@/composables/menu'
-import type { OptionItem } from './type'
+import type { OptionItem } from '../type.js'
 
 export type InputOption = OptionItem & { selectable?: boolean }
 interface Props {
@@ -65,14 +65,14 @@ const compositionstart = () => {
 };
 
 // 菜单
-const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
-const MenuManagerInstance = ref<MenuManager | null>(null)
+const MenuInstance = ref<MenuInstance | null>(null)
+const MenuManager = ref<MenuManager | null>(null)
 onMounted(() => {
-  if (!inputRef.value || !MenuRef.value) return
-  MenuManagerInstance.value = createMenuManager(inputRef.value, MenuRef.value)
+  if (!inputRef.value || !MenuInstance.value ) return
+  MenuManager.value = createMenuManager(inputRef.value, MenuInstance.value)
 })
 onUnmounted(() => {
-  MenuManagerInstance.value?.cleanup()
+  MenuManager.value?.cleanup()
 })
 const onOptionClick = (option: InputOption) => {
   inputRef.value?.focus()
@@ -91,7 +91,7 @@ const enter = () => {
 const clear = () => {
   inputValue.value = ''
   inputRef.value?.focus()
-  MenuManagerInstance.value?.open()
+  MenuManager.value?.open()
 }
 
 // 根据输入值过滤选项
@@ -113,34 +113,34 @@ const filteredOptions = computed<InputOption[]>(() => {
   return keyword ? filterOptions(props.options, keyword) : props.options
 })
 watch(filteredOptions, () => {
-  if (!MenuManagerInstance.value) return
+  if (!MenuManager.value) return
   if (isSelecting) {
     isSelecting = false
   } else {
-    MenuManagerInstance.value.open()
+    MenuManager.value.open()
   }
 })
 
 // Tab 补全
 const collectSelectable = (options: InputOption[]): InputOption[] => options.flatMap(option => option.options && !option.selectable ? collectSelectable(option.options) : [option])
 const tab = () => {
-  if (!MenuManagerInstance.value) return
+  if (!MenuManager.value) return
   const selectable = collectSelectable(filteredOptions.value)
   if (selectable.length !== 1) return
   isSelecting = true
   inputValue.value = selectable[0].name
-  MenuManagerInstance.value.close()
+  MenuManager.value.close()
 }
 
 // 暴露方法
 defineExpose({
   focus: () => {
     inputRef.value?.focus()
-    MenuManagerInstance.value?.open()
+    MenuManager.value?.open()
   },
   blur: () => {
     inputRef.value?.blur()
-    MenuManagerInstance.value?.close()
+    MenuManager.value?.close()
   },
   select: () => inputRef.value?.select()
 })
@@ -159,8 +159,9 @@ defineExpose({
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-show="inputValue" @click.stop="() => clear()"></span>
     </div>
-    <Menu ref="MenuRef" v-if="props.type === 'select'" :visible="MenuManagerInstance?.visible ?? false"
-      :position="MenuManagerInstance?.position ?? [0, 0]" :options="filteredOptions" :on-option-click="onOptionClick" />
+    <Menu :ref="(ins) => MenuInstance = (ins as MenuInstance | null)" v-if="props.type === 'select'"
+      :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="filteredOptions"
+      :on-option-click="onOptionClick" />
   </Card>
 </template>
 

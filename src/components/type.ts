@@ -6,3 +6,5 @@ export type Item = {
 export type ListItem = Item & { name: string }
 
 export type OptionItem = ListItem & { options?: OptionItem[] }
+
+export type DateItem = [number, number, number]

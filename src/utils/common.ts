@@ -1,3 +1,5 @@
+import { DateItem } from "@/components/type"
+
 // 通用防抖函数
 export function debounce<T extends (...args: any[]) => any>(
   fn: T,
@@ -56,3 +58,9 @@ export const clearTimer = (...args: (number | undefined)[]) => {
     }
   })
 }
+
+// 格式化时间
+export function formatDate(date: number | Date): DateItem {
+  const d = typeof date === 'number' ? new Date(date) : date
+  return [d.getFullYear(), d.getMonth() + 1, d.getDate()]
+} 

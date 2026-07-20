@@ -1,6 +1,6 @@
 import { reactive, ref } from 'vue'
 
-import { type Menu } from '@/components/common/Menu.vue'
+import { type MenuInstance } from '@/components/internal/Menu.vue'
 
 export type MenuManager = {
   readonly visible: boolean
@@ -10,7 +10,7 @@ export type MenuManager = {
   cleanup: () => void
 }
 
-export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu, type: 'fixed' | 'flex' = 'fixed', method: 'click' | 'contextmenu' = 'click'): MenuManager => {
+export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: MenuInstance, type: 'fixed' | 'flex' = 'fixed', method: 'click' | 'contextmenu' = 'click'): MenuManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
   const calcPos = (e?: MouseEvent) => {
@@ -74,7 +74,7 @@ export const createMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu, ty
   return reactive({ visible, position, open, close, cleanup })
 }
 
-export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: Menu): MenuManager => {
+export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: MenuInstance): MenuManager => {
   const visible = ref<boolean>(false)
   const parentEl = TriggerEl.parentElement
   const position = ref<[number, number]>([0, 0])

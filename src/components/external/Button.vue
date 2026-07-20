@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 
-import { watchDOM } from '../utils/common';
+import { watchDOM } from '../../utils/common';
 import useCssVar from '@/utils/useCssVar';
 
 interface Props {

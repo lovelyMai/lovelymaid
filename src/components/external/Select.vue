@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
-import Menu from './common/Menu.vue';
+import Menu, { type MenuInstance } from '../internal/Menu.vue';
 
 import { createMenuManager, type MenuManager } from '@/composables/menu';
-import type { OptionItem } from './type'
+import type { OptionItem } from '../type.js'
 
 interface Props {
   /** 选项配置 */
@@ -14,23 +14,23 @@ interface Props {
 const props = defineProps<Props>()
 
 // 菜单
-const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
 const SelectRef = ref<HTMLElement | null>(null)
-const MenuManagerInstance = ref<MenuManager | null>(null)
+const MenuInstance = ref<MenuInstance | null>(null)
+const MenuManager = ref<MenuManager | null>(null)
 onMounted(() => {
-  if (!SelectRef.value || !MenuRef.value) return
-  MenuManagerInstance.value = createMenuManager(SelectRef.value, MenuRef.value)
+  if (!SelectRef.value || !MenuInstance.value) return
+  MenuManager.value = createMenuManager(SelectRef.value, MenuInstance.value)
 })
 onUnmounted(() => {
-  MenuManagerInstance.value?.cleanup()
+  MenuManager.value?.cleanup()
 })
 </script>
 
 <template>
   <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" ref="SelectRef">
-    <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false"
-      :position="MenuManagerInstance?.position ?? [0, 0]" :options="props.options"
-      :on-option-click="props.onOptionClick" v-slot="{ item, index }">
+    <Menu :ref="(ins) => MenuInstance = (ins as MenuInstance | null)" :visible="MenuManager?.visible ?? false"
+      :position="MenuManager?.position ?? [0, 0]" :options="props.options" :on-option-click="props.onOptionClick"
+      v-slot="{ item, index }">
       <slot :item="item" :index="index"></slot>
     </Menu>
   </span>

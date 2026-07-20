@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import Menu from './common/Menu.vue'
+import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
 import { createMenuManager, type MenuManager } from '@/composables/menu'
 import { createActivationManager, type ActivationManager } from '@/composables/activation'
 
-import type { Item } from './type'
+import type { Item } from '../type.js'
 
 export type ColumnConfig = {
   id: string
@@ -64,14 +64,14 @@ const getBorderRadius = (index: number): string => {
 
 // 启用/关闭排序
 const headerRef = ref<HTMLElement | null>(null)
-const MenuRef = ref<InstanceType<typeof Menu> | null>(null)
-const MenuManagerInstance = ref<MenuManager | null>(null)
+const MenuInstance = ref<MenuInstance | null>(null)
+const MenuManager = ref<MenuManager | null>(null)
 onMounted(() => {
-  if (!headerRef.value || !MenuRef.value) return
-  MenuManagerInstance.value = createMenuManager(headerRef.value, MenuRef.value, 'flex', 'contextmenu')
+  if (!headerRef.value || !MenuInstance.value) return
+  MenuManager.value = createMenuManager(headerRef.value, MenuInstance.value, 'flex', 'contextmenu')
 })
 onUnmounted(() => {
-  MenuManagerInstance.value?.cleanup()
+  MenuManager.value?.cleanup()
 })
 </script>
 
@@ -87,8 +87,8 @@ onUnmounted(() => {
             :style="{ transform: sort?.order === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)' }"></span>
         </div>
       </li>
-      <Menu ref="MenuRef" :visible="MenuManagerInstance?.visible ?? false"
-        :position="MenuManagerInstance?.position ?? [0, 0]" :options="[{ id: '1', name: '关闭排序' }]"
+      <Menu :ref="(ins) => MenuInstance = (ins as MenuInstance | null)" :visible="MenuManager?.visible ?? false"
+        :position="MenuManager?.position ?? [0, 0]" :options="[{ id: '1', name: '关闭排序' }]"
         :on-option-click="() => sort = undefined" />
     </ul>
     <ul :class="$style.list" ref="ListRef">

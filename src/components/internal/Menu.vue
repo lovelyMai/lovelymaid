@@ -3,6 +3,7 @@ import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
 
 import { createSubMenuManager, type MenuManager } from '@/composables/menu'
 import type { OptionItem } from '../type'
+
 interface Props {
   /** 是否显示 */
   visible: boolean
@@ -19,15 +20,15 @@ provide('menu-is-sub', true)
 
 // 子菜单
 const MenuRef = ref<HTMLElement | null>(null)
-const SubMenuRefs = ref<Record<string, Menu | null>>({})
+const SubMenuInstances = ref<Record<string, MenuInstance | null>>({})
 const SubMenuManagers = ref<Record<string, MenuManager>>({})
 const initSubManagers = async () => {
   await nextTick()
   if (!MenuRef.value) return
   MenuRef.value.querySelectorAll('[data-has-children="true"]').forEach(el => {
     const index = Number((el as HTMLElement).dataset.index)
-    if (SubMenuManagers.value[index] || !SubMenuRefs.value[index]) return
-    SubMenuManagers.value[index] = createSubMenuManager(el as HTMLElement, SubMenuRefs.value[index])
+    if (SubMenuManagers.value[index] || !SubMenuInstances.value[index]) return
+    SubMenuManagers.value[index] = createSubMenuManager(el as HTMLElement, SubMenuInstances.value[index])
   })
 }
 const clearSubManagers = () => {
@@ -52,11 +53,16 @@ onUnmounted(() => {
 })
 
 // 暴露菜单
-defineExpose({ root: MenuRef, props })
-export type Menu = {
+export type MenuInstance = {
   root: HTMLElement | null
   props: Props
 }
+defineExpose<MenuInstance>({
+  get root() {
+    return MenuRef.value
+  },
+  props
+})
 </script>
 
 <template>
@@ -69,7 +75,7 @@ export type Menu = {
           <slot :item="item" :index="index"></slot>
           <span :class="$style.text">{{ item.name }}</span>
           <span class="lovelymai lovely-right-arrow" v-if="item.options"></span>
-          <Menu v-if="item.options" :ref="(el) => SubMenuRefs[index] = (el as Menu | null)"
+          <Menu v-if="item.options" :ref="(ins) => SubMenuInstances[index] = (ins as MenuInstance | null)"
             :visible="SubMenuManagers[index]?.visible ?? false" :position="SubMenuManagers[index]?.position ?? [0, 0]"
             :options="item.options" :on-option-click="props.onOptionClick" />
         </li>
