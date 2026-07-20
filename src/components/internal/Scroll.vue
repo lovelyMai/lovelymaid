@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { ListItem } from '../type';
 import { debounce } from '@/utils/common';
@@ -41,27 +41,42 @@ onMounted(() => {
 onUnmounted(() => {
   stopWatch?.()
 })
+
+// 点击滚动
+const scrollToCenter = (container: HTMLElement, index: number) => {
+  container.scrollTo({ top: 24 * index, behavior: 'smooth' })
+}
+const onListClick = (e: MouseEvent, side: 'left' | 'right') => {
+  const li = (e.target as HTMLElement).closest('li')
+  if (!li) return
+  const index = li.dataset.index
+  if (index === undefined) return
+  const container = side === 'left' ? leftRef.value : rightRef.value
+  if (container) scrollToCenter(container, Number(index))
+}
 </script>
 
 <template>
   <div :class="$style.Scroll">
     <div :class="$style.selected"></div>
-    <ul :class="[$style.list, $style.left]" ref="leftRef" @scroll="() => delayCalculateActiveIds('left')">
+    <ul :class="[$style.list, $style.left]" ref="leftRef" @scroll="() => delayCalculateActiveIds('left')"
+      @click="(e) => onListClick(e, 'left')">
       <li :class="$style.item" v-for="item in Array(3).fill('')">
         <span>{{ item }}</span>
       </li>
-      <li :class="$style.item" v-for="item in props.lists[0]">
+      <li :class="$style.item" v-for="(item, index) in props.lists[0]" :data-index="index">
         <span>{{ item.name }}</span>
       </li>
       <li :class="$style.item" v-for="item in Array(3).fill('')">
         <span>{{ item }}</span>
       </li>
     </ul>
-    <ul :class="[$style.list, $style.right]" ref="rightRef" @scroll="() => delayCalculateActiveIds('right')">
+    <ul :class="[$style.list, $style.right]" ref="rightRef" @scroll="() => delayCalculateActiveIds('right')"
+      @click="(e) => onListClick(e, 'right')">
       <li :class="$style.item" v-for="item in Array(3).fill('')">
         <span>{{ item }}</span>
       </li>
-      <li :class="$style.item" v-for="item in props.lists[1]">
+      <li :class="$style.item" v-for="(item, index) in props.lists[1]" :data-index="index">
         <span>{{ item.name }}</span>
       </li>
       <li :class="$style.item" v-for="item in Array(3).fill('')">
