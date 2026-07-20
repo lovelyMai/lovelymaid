@@ -5,7 +5,7 @@ import Button from './Button.vue'
 import Input from './Input.vue'
 
 import { clearTimer, watchDOM } from '@/utils/common';
-import { getLayoutLeftInViewport } from '@/utils/getOffsetInViewport';
+import getLayoutLeft from '@/utils/getLayoutLeft.js';
 import useCssVar from '@/utils/useCssVar';
 
 export type TabItem = { id: string, name?: string, [key: string]: any }
@@ -96,7 +96,7 @@ let moved = false
 let startTime: number
 const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
   if (!SlideRef.value || !contentRef.value) return
-  const clickX = e.clientX - getLayoutLeftInViewport(contentRef.value)
+  const clickX = e.pageX - getLayoutLeft(contentRef.value)
   const clickLeft = clickX - style.slide.width / 2
   const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value).transform).m41
   const targetLeft = clickLeft < 0 ? 0 : clickLeft > (props.tabs.length - 1) * style.slide.width ? (props.tabs.length - 1) * style.slide.width : clickLeft
@@ -201,7 +201,7 @@ const stopSlide = (e: PointerEvent) => {
     runStopAnimation(activeIndex.value)
   } else {
     if (!contentRef.value) return
-    const clickX = e.clientX - getLayoutLeftInViewport(contentRef.value)
+    const clickX = e.pageX - getLayoutLeft(contentRef.value)
     const index = Math.floor(clickX / style.slide.width)
     const oldActiveIndex = activeIndex.value
     const newActiveIndex = index > props.tabs.length - 1 ? props.tabs.length - 1 : index < 0 ? 0 : index
