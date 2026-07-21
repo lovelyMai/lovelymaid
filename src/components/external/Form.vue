@@ -11,6 +11,7 @@ export type FormItem = {
   type?: 'text' | 'number' | 'password' | 'select' | 'textarea' | 'date'
   value: string
   placeholder?: string
+  disabled?: boolean
   width?: string
   height?: string
   options?: InputOption[]
@@ -47,11 +48,11 @@ const onEnter = (index: number) => {
       <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
         :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" v-model:value="item.value"
         :placeholder="item.placeholder" :enterkeyhint="index === items.length - 1 ? 'done' : 'next'"
-        :on-enter="() => onEnter(index)" />
+        :disabled="item.disabled" :on-enter="() => onEnter(index)" />
       <Input :class="$style.Input" v-else :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
         :type="item.type" v-model:value="item.value" :placeholder="item.placeholder"
-        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :options="item.options" :format="item.format"
-        :on-enter="() => onEnter(index)" />
+        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled" :options="item.options"
+        :format="item.format" :on-enter="() => onEnter(index)" />
     </li>
   </ul>
 </template>

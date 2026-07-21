@@ -17,6 +17,8 @@ interface Props {
   placeholder?: string
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
+  /** 是否禁用 */
+  disabled?: boolean
   /** 选项 (仅 type 为 select 时有效) */
   options?: InputOption[]
   /** 格式化 (仅 type 为 date 时有效) */
@@ -26,6 +28,7 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
+  disabled: false,
   options: () => [],
   format: ([year, month, day]: DateItem) => `${year}/${month}/${day}`
 })
@@ -188,10 +191,10 @@ defineExpose({
       :type="props.type === 'select' || props.type === 'date' ? 'text' : props.type" :value="inputValue"
       @input="(e) => inputValue = (e.target as HTMLInputElement).value"
       :placeholder="props.placeholder ?? (props.type === 'select' || props.type === 'date' ? '选择...' : '输入...')"
-      :enterkeyhint="props.enterkeyhint" @keydown.enter.prevent="enter" @keydown.tab.prevent="tab"
-      @compositionstart="compositionstart" @compositionend="compositionend" />
+      :enterkeyhint="props.enterkeyhint" :disabled="props.disabled" @keydown.enter.prevent="enter"
+      @keydown.tab.prevent="tab" @compositionstart="compositionstart" @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
-      <span class="lovelymai lovely-clear" v-show="inputValue" @click.stop="() => clear()"></span>
+      <span class="lovelymai lovely-clear" v-show="inputValue && !props.disabled" @click.stop="() => clear()"></span>
     </div>
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'select'"
       :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="filteredOptions"

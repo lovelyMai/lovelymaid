@@ -9,11 +9,14 @@ interface Props {
   placeholder?: string
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
+  /** 是否禁用 */
+  disabled?: boolean
   /** 回车事件 */
   onEnter?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
   minrow: 1,
+  disabled: false,
   placeholder: '输入...'
 })
 const inputValue = defineModel<string>('value', { required: true })
@@ -63,8 +66,8 @@ defineExpose({
   <Card :class="$style.TextArea" ref="TextAreaRef" type="glass">
     <textarea :rows="props.minrow" ref="textareaRef" :value="inputValue"
       @input="(e) => inputValue = (e.target as HTMLTextAreaElement).value" :placeholder="props.placeholder"
-      :enterkeyhint="props.enterkeyhint" @keydown.enter.prevent="enter" @compositionstart="compositionstart"
-      @compositionend="compositionend" />
+      :enterkeyhint="props.enterkeyhint" :disabled="props.disabled" @keydown.enter.prevent="enter"
+      @compositionstart="compositionstart" @compositionend="compositionend" />
   </Card>
 </template>
 
