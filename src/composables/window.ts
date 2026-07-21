@@ -1,4 +1,4 @@
-import { reactive, ref, type Ref } from 'vue'
+import { nextTick, reactive, ref, type Ref } from 'vue'
 
 export type WindowManager = {
   readonly visible: boolean
@@ -30,9 +30,11 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     }
     position.value = [X, Y]
   }
-  const open = (e?: MouseEvent) => {
+  const open = async (e?: MouseEvent) => {
     calcPos(e)
     visible.value = true
+    await nextTick()
+    if (!WindowRef.value) return
     document.documentElement.style.overflow = 'hidden'
     document.addEventListener('click', onDocClick, true)
   }
