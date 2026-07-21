@@ -4,7 +4,7 @@ import Card from '../external/Card.vue'
 import Scroll from '../internal/Scroll.vue'
 
 import { formatDate } from '@/utils/common.js'
-import { ListItem, DateItem } from '../type.js'
+import type { ListItem, DateItem } from '../type.js'
 
 interface Props {
   /** 是否显示 */
@@ -12,7 +12,7 @@ interface Props {
   /** 位置 */
   position: [number, number]
   /** 日期点击事件 */
-  onDateClick?: (date: DateItem, index: number) => void
+  onDateClick?: () => void
 }
 const props = defineProps<Props>()
 const date = defineModel<DateItem>('date', { default: () => formatDate(Date.now()) })
@@ -24,39 +24,29 @@ const months: ListItem[] = Array(12).fill(null).map((_, index) => ({ id: String(
 const years: ListItem[] = Array(200).fill(null).map((_, index) => ({ id: String(1900 + index), name: `${1900 + index}年` }))
 
 // 年月切换
+const year = ref<number>(today[0])
+const month = ref<number>(today[1])
 const scrollIsOpen = ref<boolean>(false)
 const activeIds = computed<[string, string]>({
-  get: () => [String(date.value[0]), String(date.value[1])] as [string, string],
-  set: ([year, month]) => {
-    date.value = [Number(year), Number(month), date.value[2]]
+  get: () => [String(year.value), String(month.value)] as [string, string],
+  set: ([newYearId, newMonthId]: [string, string]) => {
+    year.value = Number(newYearId)
+    month.value = Number(newMonthId)
   }
 })
 const decreaseMonth = () => {
-  const [year, month, day] = date.value
-  let newYear = year
-  let newMonth = month - 1
-  if (newMonth < 1) {
-    newYear -= 1
-    newMonth = 12
-  }
-  date.value = [newYear, newMonth, day]
+  month.value = month.value - 1 >= 1 ? month.value - 1 : 12
+  year.value = month.value === 12 ? year.value - 1 : year.value
 }
 const increaseMonth = () => {
-  const [year, month, day] = date.value
-  let newYear = year
-  let newMonth = month + 1
-  if (newMonth > 12) {
-    newYear += 1
-    newMonth = 1
-  }
-  date.value = [newYear, newMonth, day]
+  month.value = month.value + 1 > 12 ? 1 : month.value + 1
+  year.value = month.value === 1 ? year.value + 1 : year.value
 }
 
 // 日历网格
 const calendarDays = computed<string[]>(() => {
-  const [year, month] = date.value
-  const firstDay = (new Date(year, month - 1, 1).getDay() + 6) % 7
-  const totalDays = new Date(year, month, 0).getDate()
+  const firstDay = (new Date(year.value, month.value - 1, 1).getDay() + 6) % 7
+  const totalDays = new Date(year.value, month.value, 0).getDate()
   const totalCells = Math.ceil((firstDay + totalDays) / 7) * 7
   const days: string[] = new Array(totalCells).fill('')
   for (let d = 1; d <= totalDays; d++) {
@@ -67,18 +57,32 @@ const calendarDays = computed<string[]>(() => {
 const onDayClick = (e: MouseEvent) => {
   const targetEl = (e.target as HTMLElement).closest('[data-day]') as HTMLElement | null
   if (!targetEl) return
-  date.value = [date.value[0], date.value[1], Number(targetEl.dataset.day)]
+  date.value = [year.value, month.value, Number(targetEl.dataset.day)]
+  props.onDateClick?.()
 }
+
+// 暴露日历
+const DateRef = ref<HTMLElement | null>(null)
+export type DateInstance = {
+  root: HTMLElement | null
+  props: Props
+}
+defineExpose<DateInstance>({
+  get root() {
+    return DateRef.value
+  },
+  props
+})
 </script>
 
 <template>
   <teleport to="body">
     <transition name="lovelymai-fade-leave">
-      <Card :class="$style.Date" ref="DateRef" v-if="props.visible" type="glass"
-        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }">
+      <Card :class="$style.Date" :ref="(ins) => DateRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null"
+        v-if="props.visible" type="glass" :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }">
         <div :class="$style.header">
           <h5 :class="$style.date" @click.stop="() => scrollIsOpen = !scrollIsOpen">
-            <span :style="{ color: scrollIsOpen ? '#0067EC' : '' }">{{ `${date[0]} 年 ${date[1]} 月` }}</span>
+            <span :style="{ color: scrollIsOpen ? '#0067EC' : '' }">{{ `${year} 年 ${month} 月` }}</span>
             <span :class="['lovelymai', 'lovely-right-arrow', $style.arrow]"
               :style="{ transform: scrollIsOpen ? 'translateY(1px) rotate(90deg)' : 'translateY(1px) rotate(0deg)' }"></span>
           </h5>
@@ -93,10 +97,10 @@ const onDayClick = (e: MouseEvent) => {
             <ul :class="$style.weekdays">
               <li v-for="(weekday) in weekDays">{{ weekday }}</li>
             </ul>
-            <ul :class="$style.monthDays" @click="onDayClick">
+            <ul :class="$style.monthDays" @click.stop="onDayClick">
               <li v-for="(day, index) in calendarDays" :key="index" :class="$style.dayCell">
                 <span
-                  :class="[$style.day, date[0] === today[0] && date[1] === today[1] && Number(day) === today[2] ? $style.today : '']"
+                  :class="[$style.day, { [$style.today]: year === today[0] && month === today[1] && Number(day) === today[2], [$style.active]: year === date[0] && month === date[1] && Number(day) === date[2] }]"
                   v-if="day" :data-day="day">{{ day }}</span>
               </li>
             </ul>
@@ -187,14 +191,7 @@ const onDayClick = (e: MouseEvent) => {
   color: #3b86f7;
 }
 
-@media (hover: hover) {
-  .days .day:hover {
-    background-color: #3b86f7;
-    color: #fff;
-  }
-}
-
-.days .day:active {
+.days .day.active {
   background-color: #3b86f7;
   color: #fff;
 }

@@ -1,29 +1,33 @@
 <script setup lang="ts">
-import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch, nextTick } from 'vue'
+import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
 import Card from './Card.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
+import DateWindow, { type DateInstance } from '../internal/DateWindow.vue'
 
-import { watchDOM } from '@/utils/common'
+import { formatDate, watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/useCssVar'
 import { createWindowManager, type WindowManager } from '@/composables/window'
-import type { OptionItem } from '../type.js'
+import type { OptionItem, DateItem } from '../type'
 
 export type InputOption = OptionItem & { selectable?: boolean }
 interface Props {
   /** 输入框类型 */
-  type?: "text" | "password" | "number" | "select"
-  /** 选项 */
-  options?: InputOption[]
+  type?: "text" | "password" | "number" | "select" | "date"
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
+  /** 选项 (仅 type 为 select 时有效) */
+  options?: InputOption[]
+  /** 格式化 (仅 type 为 date 时有效) */
+  format?: (date: DateItem) => string
   /** 回车事件 */
   onEnter?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
-  options: () => []
+  options: () => [],
+  format: ([year, month, day]: DateItem) => `${year}/${month}/${day}`
 })
 const inputValue = defineModel<string>('value', { required: true })
 
@@ -67,8 +71,9 @@ const compositionstart = () => {
 // 菜单
 const MenuRef = ref<HTMLElement | null>(null)
 const MenuManager = ref<WindowManager | null>(null)
+let isSelecting: boolean = false
 onMounted(() => {
-  if (!inputRef.value) return
+  if (!inputRef.value || props.type !== 'select') return
   MenuManager.value = createWindowManager(inputRef.value, MenuRef, 'fixed', 'click')
 })
 onUnmounted(() => {
@@ -81,22 +86,6 @@ const onOptionClick = (option: InputOption) => {
   inputValue.value = option.name
   MenuManager.value?.close()
 }
-
-// 回车
-const enter = () => {
-  if (isComposing) return
-  props.onEnter?.()
-}
-
-// 清空
-const clear = () => {
-  inputValue.value = ''
-  inputRef.value?.focus()
-  MenuManager.value?.open()
-}
-
-// 根据输入值过滤选项
-let isSelecting: boolean = false
 const filterOptions = (options: InputOption[], keyword: string): InputOption[] =>
   options.reduce<InputOption[]>((acc, option) => {
     if (option.name.includes(keyword)) {
@@ -122,15 +111,56 @@ watch(filteredOptions, () => {
   }
 })
 
+// 日历
+const date = ref<DateItem>(formatDate(Date.now()))
+const DateRef = ref<HTMLElement | null>(null)
+const DateManager = ref<WindowManager | null>(null)
+onMounted(() => {
+  if (!inputRef.value || props.type !== 'date') return
+  DateManager.value = createWindowManager(inputRef.value, DateRef, 'fixed', 'click')
+})
+onUnmounted(() => {
+  MenuManager.value?.cleanup()
+})
+const onDateClick = () => {
+  inputRef.value?.focus()
+  inputValue.value = props.format(date.value)
+  DateManager.value?.close()
+}
+
+// 回车
+const enter = () => {
+  if (isComposing) return
+  props.onEnter?.()
+}
+
+// 清空
+const clear = () => {
+  inputValue.value = ''
+  inputRef.value?.focus()
+  MenuManager.value?.open()
+  DateManager.value?.open()
+}
+
 // Tab 补全
 const collectSelectable = (options: InputOption[]): InputOption[] => options.flatMap(option => option.options && !option.selectable ? collectSelectable(option.options) : [option])
 const tab = () => {
-  if (!MenuManager.value) return
-  const selectable = collectSelectable(filteredOptions.value)
-  if (selectable.length !== 1) return
-  isSelecting = true
-  inputValue.value = selectable[0].name
-  MenuManager.value.close()
+  if (props.type === 'select') {
+    if (!MenuManager.value) return
+    const selectable = collectSelectable(filteredOptions.value)
+    if (selectable.length !== 1) return
+    isSelecting = true
+    inputValue.value = selectable[0].name
+    MenuManager.value.close()
+  } else if (props.type === 'date') {
+    if (!DateManager.value) return
+    const match = inputValue.value.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/)
+    if (!match) return
+    const newDate: DateItem = [Number(match[1]), Number(match[2]), Number(match[3])]
+    date.value = newDate
+    inputValue.value = props.format(newDate)
+    DateManager.value.close()
+  }
 }
 
 // 暴露方法
@@ -138,10 +168,12 @@ defineExpose({
   focus: () => {
     inputRef.value?.focus()
     MenuManager.value?.open()
+    DateManager.value?.open()
   },
   blur: () => {
     inputRef.value?.blur()
     MenuManager.value?.close()
+    DateManager.value?.close()
   },
   select: () => inputRef.value?.select()
 })
@@ -152,9 +184,10 @@ defineExpose({
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" ref="inputRef" :type="props.type" :value="inputValue"
+    <input :class="$style.input" ref="inputRef"
+      :type="props.type === 'select' || props.type === 'date' ? 'text' : props.type" :value="inputValue"
       @input="(e) => inputValue = (e.target as HTMLInputElement).value"
-      :placeholder="props.placeholder ?? (props.type === 'select' ? '选择...' : '输入...')"
+      :placeholder="props.placeholder ?? (props.type === 'select' || props.type === 'date' ? '选择...' : '输入...')"
       :enterkeyhint="props.enterkeyhint" @keydown.enter.prevent="enter" @keydown.tab.prevent="tab"
       @compositionstart="compositionstart" @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
@@ -163,6 +196,9 @@ defineExpose({
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'select'"
       :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="filteredOptions"
       :on-option-click="onOptionClick" />
+    <DateWindow :ref="(ins) => DateRef = (ins as DateInstance | null)?.root ?? null" v-if="props.type === 'date'"
+      :visible="DateManager?.visible ?? false" :position="DateManager?.position ?? [0, 0]" v-model:date="date"
+      :on-date-click="onDateClick" />
   </Card>
 </template>
 
