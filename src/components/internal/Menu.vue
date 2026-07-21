@@ -101,9 +101,11 @@ defineExpose<MenuInstance>({
 
 .Menu .item {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 5px;
   padding: 5px;
+  min-width: 50px;
   border-radius: 8px;
   color: #000;
   cursor: pointer;
