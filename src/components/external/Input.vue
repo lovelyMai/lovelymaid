@@ -108,9 +108,10 @@ const filterOptions = (options: InputOption[], keyword: string): InputOption[] =
   }, [])
 const filteredOptions = computed<InputOption[]>(() => {
   const keyword = inputValue.value.trim()
-  return keyword && props.filter ? filterOptions(props.options, keyword) : props.options
+  return keyword ? filterOptions(props.options, keyword) : props.options
 })
-watch(filteredOptions, () => {
+const showingOptions = computed<InputOption[]>(() => props.filter ? filteredOptions.value : props.options)
+watch(showingOptions, () => {
   if (!MenuManager.value) return
   if (isSelecting) {
     isSelecting = false
@@ -202,7 +203,7 @@ defineExpose({
       <span class="lovelymai lovely-clear" v-show="inputValue && !props.disabled" @click.stop="() => clear()"></span>
     </div>
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'select'"
-      :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="filteredOptions"
+      :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="showingOptions"
       :width="style.Input.width + 'px'" :on-option-click="onOptionClick" />
     <DateWindow :ref="(ins) => DateRef = (ins as DateInstance | null)?.root ?? null" v-if="props.type === 'date'"
       :visible="DateManager?.visible ?? false" :position="DateManager?.position ?? [0, 0]" v-model:date="date"

@@ -15,6 +15,7 @@ export type FormItem = {
   width?: string
   height?: string
   options?: InputOption[]
+  filter?: boolean
   format?: (date: DateItem) => string
 }
 interface Props {
@@ -52,7 +53,7 @@ const onEnter = (index: number) => {
       <Input :class="$style.Input" v-else :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
         :type="item.type" v-model:value="item.value" :placeholder="item.placeholder"
         :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled" :options="item.options"
-        :format="item.format" :on-enter="() => onEnter(index)" />
+        :filter="item.filter" :format="item.format" :on-enter="() => onEnter(index)" />
     </li>
   </ul>
 </template>
