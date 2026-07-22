@@ -2,7 +2,7 @@
 import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
 import Card from './Card.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
-import DateWindow, { type DateInstance } from '../internal/DateWindow.vue'
+import DateWindow, { type DateInstance } from '../internal/Date.vue'
 
 import { formatDate, watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/useCssVar'

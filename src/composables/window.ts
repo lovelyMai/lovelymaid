@@ -26,8 +26,8 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
         console.error('flex 模式下 open 必须传入 event 事件对象')
         return
       }
-      X = e.clientX
-      Y = e.clientY
+      X = e.pageX
+      Y = e.pageY
     }
     position.value = [X, Y]
   }
@@ -36,23 +36,26 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     visible.value = true
     await nextTick()
     if (!WindowRef.value) return
-    document.documentElement.style.overflow = 'hidden'
-    document.addEventListener('mousedown', onDocDown, true)
+    document.addEventListener('pointerdown', onDocDown, true)
+    // 等本次 click 合成后再监听
+    setTimeout(() => document.addEventListener('click', onDocClick, true), 100)
   }
   const onTrigger = (e: MouseEvent) => {
     e.stopPropagation()
+    if (method === 'contextmenu') {
+      e?.preventDefault()
+    }
     open(e)
   }
   if (method === 'click') {
-    TriggerEl.addEventListener('mousedown', onTrigger)
+    TriggerEl.addEventListener('pointerdown', onTrigger)
   } else {
     TriggerEl.addEventListener('contextmenu', onTrigger)
   }
   const close = () => {
     if (!visible.value) return
     visible.value = false
-    document.documentElement.style.overflow = ''
-    document.removeEventListener('mousedown', onDocDown, true)
+    document.removeEventListener('pointerdown', onDocDown, true)
   }
   const onDocDown = (e: MouseEvent) => {
     if (!WindowRef.value) return
@@ -61,10 +64,17 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     e.preventDefault()
     close()
   }
+  const onDocClick = (e: MouseEvent) => {
+    if (WindowRef.value && WindowRef.value.contains(e.target as HTMLElement)) return
+    e.stopPropagation()
+    e.preventDefault()
+    document.removeEventListener('click', onDocClick, true)
+  }
   const cleanup = () => {
-    TriggerEl.removeEventListener('mousedown', onTrigger)
+    TriggerEl.removeEventListener('pointerdown', onTrigger)
     TriggerEl.removeEventListener('contextmenu', onTrigger)
-    document.removeEventListener('mousedown', onDocDown, true)
+    document.removeEventListener('pointerdown', onDocDown, true)
+    document.removeEventListener('click', onDocClick, true)
   }
 
   return reactive({ visible, position, open, close, cleanup })

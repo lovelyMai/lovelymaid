@@ -112,6 +112,7 @@ defineExpose<MenuInstance>({
   z-index: 0;
   padding: 5px;
   min-width: 50px;
+  height: 28px;
   border-radius: 8px;
   color: #000;
   cursor: pointer;
@@ -131,6 +132,8 @@ defineExpose<MenuInstance>({
 .Menu .item .text {
   font-size: 12px;
   font-weight: 450;
+  line-height: 18px;
+  white-space: nowrap;
 }
 </style>
 <style scoped>

@@ -113,7 +113,7 @@ defineExpose<DateInstance>({
 
 <style module>
 .Date {
-  position: fixed;
+  position: absolute;
   z-index: 0;
   width: 250px;
   padding: 14px;
