@@ -36,17 +36,21 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     visible.value = true
     await nextTick()
     if (!WindowRef.value) return
-    document.addEventListener('click', onDocClick, true)
+    document.removeEventListener('click', onDocClick, true)
+    setTimeout(() => {
+      document.addEventListener('click', onDocClick, true)
+    }, 100)
   }
   const onTrigger = (e: MouseEvent) => {
     e.stopPropagation()
     if (method === 'contextmenu') {
       e?.preventDefault()
     }
+    if (visible.value) return
     open(e)
   }
   if (method === 'click') {
-    TriggerEl.addEventListener('click', onTrigger)
+    TriggerEl.addEventListener('mousedown', onTrigger)
   } else {
     TriggerEl.addEventListener('contextmenu', onTrigger)
   }
@@ -63,7 +67,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     close()
   }
   const cleanup = () => {
-    TriggerEl.removeEventListener('click', onTrigger)
+    TriggerEl.removeEventListener('mousedown', onTrigger)
     TriggerEl.removeEventListener('contextmenu', onTrigger)
     document.removeEventListener('click', onDocClick, true)
   }
