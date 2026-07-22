@@ -36,15 +36,14 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     await nextTick()
     if (!WindowRef.value) return
     document.documentElement.style.overflow = 'hidden'
-    document.addEventListener('click', onDocClick, true)
+    document.addEventListener('mousedown', onDocDown, true)
   }
   const onTrigger = (e: MouseEvent) => {
     e.stopPropagation()
-    e.preventDefault()
     open(e)
   }
   if (method === 'click') {
-    TriggerEl.addEventListener('click', onTrigger)
+    TriggerEl.addEventListener('mousedown', onTrigger)
   } else {
     TriggerEl.addEventListener('contextmenu', onTrigger)
   }
@@ -52,18 +51,19 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     if (!visible.value) return
     visible.value = false
     document.documentElement.style.overflow = ''
-    document.removeEventListener('click', onDocClick, true)
+    document.removeEventListener('mousedown', onDocDown, true)
   }
-  const onDocClick = (e: MouseEvent) => {
+  const onDocDown = (e: MouseEvent) => {
     if (!WindowRef.value) return
     if (WindowRef.value.contains(e.target as HTMLElement)) return
     e.stopPropagation()
+    e.preventDefault()
     close()
   }
   const cleanup = () => {
-    TriggerEl.removeEventListener('click', onTrigger)
+    TriggerEl.removeEventListener('mousedown', onTrigger)
     TriggerEl.removeEventListener('contextmenu', onTrigger)
-    document.removeEventListener('click', onDocClick, true)
+    document.removeEventListener('mousedown', onDocDown, true)
   }
 
   return reactive({ visible, position, open, close, cleanup })
