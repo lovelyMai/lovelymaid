@@ -8,12 +8,7 @@ export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: MenuI
   const parentEl = TriggerEl.parentElement
   const position = ref<[number, number]>([0, 0])
   const calcPos = () => {
-    const rect = TriggerEl.getBoundingClientRect()
-    const offsetX = window.visualViewport?.offsetLeft ?? 0
-    const offsetY = window.visualViewport?.offsetTop ?? 0
-    const X = rect.right + offsetX
-    const Y = rect.top - 5 + offsetY
-    position.value = [X, Y]
+    position.value = [TriggerEl.offsetWidth, -5]
   }
   const open = () => {
     if (visible.value || !parentEl) return

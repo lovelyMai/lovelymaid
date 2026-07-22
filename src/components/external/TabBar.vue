@@ -5,7 +5,7 @@ import Button from './Button.vue'
 import Input from './Input.vue'
 
 import { clearTimer, watchDOM } from '@/utils/common';
-import getLayoutLeft from '@/utils/getLayoutLeft.js';
+import { getLayoutLeft } from '@/utils/getLayoutOffset.js';
 import useCssVar from '@/utils/useCssVar';
 
 export type TabItem = { id: string, name?: string, [key: string]: any }

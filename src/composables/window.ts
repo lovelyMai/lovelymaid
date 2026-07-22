@@ -1,5 +1,7 @@
 import { nextTick, reactive, ref, type Ref } from 'vue'
 
+import { getLayoutLeft, getLayoutTop } from '@/utils/getLayoutOffset'
+
 export type WindowManager = {
   readonly visible: boolean
   readonly position: [number, number]
@@ -15,11 +17,10 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     let X: number = 0
     let Y: number = 0
     if (type === 'fixed') {
-      const rect = TriggerEl.getBoundingClientRect()
-      const offsetX = window.visualViewport?.offsetLeft ?? 0
-      const offsetY = window.visualViewport?.offsetTop ?? 0
-      X = rect.left + Math.min(rect.width, rect.height) / 2 + offsetX
-      Y = rect.top + rect.height + 2 + offsetY
+      const offsetX = getLayoutLeft(TriggerEl)
+      const offsetY = getLayoutTop(TriggerEl)
+      X = offsetX + Math.min(TriggerEl.offsetWidth, TriggerEl.offsetHeight) / 2
+      Y = offsetY + TriggerEl.offsetHeight + 2
     } else {
       if (!e) {
         console.error('flex 模式下 open 必须传入 event 事件对象')
