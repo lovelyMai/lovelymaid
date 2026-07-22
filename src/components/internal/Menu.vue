@@ -12,6 +12,8 @@ interface Props {
   options: OptionItem[]
   /** 位置 */
   position: [number, number]
+  /** 宽度 */
+  width?: string
   /** 选项点击事件 */
   onOptionClick?: (option: OptionItem, index: number) => void
 }
@@ -74,11 +76,13 @@ defineExpose<MenuInstance>({
     <transition name="lovelymai-fade-leave">
       <ul :class="[$style.Menu, hasSubMenu ? $style.sub : '']" ref="MenuRef"
         v-if="props.visible && props.options.length > 0"
-        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }">
+        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px`, width: props.width ?? '' }">
         <li :class="$style.item" v-for="(item, index) in props.options" :key="item.id" :data-index="index"
           :data-has-children="item.options ? 'true' : 'false'" @click.stop="() => props.onOptionClick?.(item, index)">
-          <slot :item="item" :index="index"></slot>
-          <span :class="$style.text">{{ item.name }}</span>
+          <div :class="$style.left">
+            <slot :item="item" :index="index"></slot>
+            <span :class="$style.text">{{ item.name }}</span>
+          </div>
           <span class="lovelymai lovely-right-arrow" v-if="item.options"></span>
           <Menu v-if="item.options" :ref="(ins) => SubMenuInstances[index] = (ins as MenuInstance | null)"
             :visible="SubMenuManagers[index]?.visible ?? false" :position="SubMenuManagers[index]?.position ?? [0, 0]"
@@ -119,7 +123,7 @@ defineExpose<MenuInstance>({
 }
 
 .Menu.sub .item {
-  justify-content: flex-start;
+  justify-content: space-between;
 }
 
 @media (hover: hover) {
@@ -129,7 +133,12 @@ defineExpose<MenuInstance>({
   }
 }
 
-.Menu .item .text {
+.Menu .item .left {
+  display: flex;
+  gap: 5px;
+}
+
+.Menu .item .left .text {
   font-size: 12px;
   font-weight: 450;
   line-height: 18px;

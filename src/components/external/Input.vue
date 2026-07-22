@@ -21,6 +21,8 @@ interface Props {
   disabled?: boolean
   /** 选项 (仅 type 为 select 时有效) */
   options?: InputOption[]
+  /** 是否启用选项过滤 */
+  filter?: boolean
   /** 格式化 (仅 type 为 date 时有效) */
   format?: (date: DateItem) => string
   /** 回车事件 */
@@ -30,6 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   disabled: false,
   options: () => [],
+  filter: false,
   format: ([year, month, day]: DateItem) => `${year}/${month}/${day}`
 })
 const inputValue = defineModel<string>('value', { required: true })
@@ -40,7 +43,8 @@ const inputRef = ref<HTMLInputElement | null>(null)
 const slots = useSlots()
 const style = reactive({
   Input: {
-    height: 0,
+    width: 0,
+    height: 0
   },
   input: {
     height: 0,
@@ -52,7 +56,8 @@ const style = reactive({
 let cleanup: () => void
 onMounted(() => {
   if (!InputRef.value) return
-  cleanup = watchDOM(InputRef.value.$el, ({ height }) => {
+  cleanup = watchDOM(InputRef.value.$el, ({ width, height }) => {
+    style.Input.width = width
     style.Input.height = height
     style.input.height = height - 2
   })
@@ -103,7 +108,7 @@ const filterOptions = (options: InputOption[], keyword: string): InputOption[] =
   }, [])
 const filteredOptions = computed<InputOption[]>(() => {
   const keyword = inputValue.value.trim()
-  return keyword ? filterOptions(props.options, keyword) : props.options
+  return keyword && props.filter ? filterOptions(props.options, keyword) : props.options
 })
 watch(filteredOptions, () => {
   if (!MenuManager.value) return
@@ -198,7 +203,7 @@ defineExpose({
     </div>
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'select'"
       :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="filteredOptions"
-      :on-option-click="onOptionClick" />
+      :width="style.Input.width + 'px'" :on-option-click="onOptionClick" />
     <DateWindow :ref="(ins) => DateRef = (ins as DateInstance | null)?.root ?? null" v-if="props.type === 'date'"
       :visible="DateManager?.visible ?? false" :position="DateManager?.position ?? [0, 0]" v-model:date="date"
       :on-date-click="onDateClick" />

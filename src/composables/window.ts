@@ -20,7 +20,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
       const offsetX = getLayoutLeft(TriggerEl)
       const offsetY = getLayoutTop(TriggerEl)
       X = offsetX + Math.min(TriggerEl.offsetWidth, TriggerEl.offsetHeight) / 2
-      Y = offsetY + TriggerEl.offsetHeight + 2
+      Y = offsetY + TriggerEl.offsetHeight + 3
     } else {
       if (!e) {
         console.error('flex 模式下 open 必须传入 event 事件对象')
