@@ -19,7 +19,7 @@ const MenuRef = ref<HTMLElement | null>(null)
 const MenuManager = ref<WindowManager | null>(null)
 onMounted(() => {
   if (!SelectRef.value) return
-  MenuManager.value = createWindowManager(SelectRef.value, MenuRef, 'fixed', 'click')
+  MenuManager.value = createWindowManager(SelectRef.value, MenuRef)
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()

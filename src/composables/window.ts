@@ -10,7 +10,7 @@ export type WindowManager = {
   cleanup: () => void
 }
 
-export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLElement | null>, type: 'fixed' | 'flex' = 'fixed', method: 'click' | 'contextmenu' = 'click'): WindowManager => {
+export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLElement | null>, type: 'fixed' | 'flex' = 'fixed', method: 'down' | 'contextmenu' = 'down'): WindowManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
   const calcPos = (e?: MouseEvent) => {
@@ -49,7 +49,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     if (visible.value) return
     open(e)
   }
-  if (method === 'click') {
+  if (method === 'down') {
     TriggerEl.addEventListener('mousedown', onTrigger)
   } else {
     TriggerEl.addEventListener('contextmenu', onTrigger)

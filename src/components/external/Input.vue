@@ -85,7 +85,7 @@ const MenuManager = ref<WindowManager | null>(null)
 let isSelecting: boolean = false
 onMounted(() => {
   if (!inputRef.value || props.type !== 'select') return
-  MenuManager.value = createWindowManager(inputRef.value, MenuRef, 'fixed', 'click')
+  MenuManager.value = createWindowManager(inputRef.value, MenuRef)
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()
@@ -129,7 +129,7 @@ const DateRef = ref<HTMLElement | null>(null)
 const DateManager = ref<WindowManager | null>(null)
 onMounted(() => {
   if (!inputRef.value || props.type !== 'date') return
-  DateManager.value = createWindowManager(inputRef.value, DateRef, 'fixed', 'click')
+  DateManager.value = createWindowManager(inputRef.value, DateRef)
 })
 onUnmounted(() => {
   DateManager.value?.cleanup()
