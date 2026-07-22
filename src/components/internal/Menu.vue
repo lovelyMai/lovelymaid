@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
+import { inject, onUnmounted, provide, ref, watch, nextTick, computed } from 'vue'
 
 import { createSubMenuManager } from '@/composables/menu'
 import type { OptionItem } from '../type'
@@ -53,6 +53,9 @@ onUnmounted(() => {
   clearSubManagers()
 })
 
+// 是否存在子菜单
+const hasSubMenu = computed<boolean>(() => props.options.filter(option => option.options).length > 0)
+
 // 暴露菜单
 export type MenuInstance = {
   root: HTMLElement | null
@@ -69,7 +72,8 @@ defineExpose<MenuInstance>({
 <template>
   <teleport to="body" :disabled="isSubMenu">
     <transition name="lovelymai-fade-leave">
-      <ul :class="$style.Menu" ref="MenuRef" v-if="props.visible && props.options.length > 0"
+      <ul :class="[$style.Menu, hasSubMenu ? $style.sub : '']" ref="MenuRef"
+        v-if="props.visible && props.options.length > 0"
         :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }">
         <li :class="$style.item" v-for="(item, index) in props.options" :key="item.id" :data-index="index"
           :data-has-children="item.options ? 'true' : 'false'" @click.stop="() => props.onOptionClick?.(item, index)">
@@ -109,6 +113,10 @@ defineExpose<MenuInstance>({
   border-radius: 8px;
   color: #000;
   cursor: pointer;
+}
+
+.Menu.sub .item {
+  justify-content: flex-start;
 }
 
 @media (hover: hover) {
