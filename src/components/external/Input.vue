@@ -4,7 +4,7 @@ import Card from './Card.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 import DateWindow, { type DateInstance } from '../internal/Date.vue'
 
-import { formatDate, watchDOM } from '@/utils/common'
+import { formatDate, verifyDate, watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/useCssVar'
 import { createWindowManager, type WindowManager } from '@/composables/window'
 import type { OptionItem, DateItem } from '../type'
@@ -25,6 +25,8 @@ interface Props {
   filter?: boolean
   /** 格式化 (仅 type 为 date 时有效) */
   format?: (date: DateItem) => string
+  /** 校验（仅 type 为 select 或 date 时有效） */
+  verify?: boolean
   /** 回车事件 */
   onEnter?: () => void
 }
@@ -33,7 +35,8 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   options: () => [],
   filter: false,
-  format: ([year, month, day]: DateItem) => `${year}/${month}/${day}`
+  format: ([year, month, day]: DateItem) => `${year}/${month}/${day}`,
+  verify: true
 })
 const inputValue = defineModel<string>('value', { required: true })
 
@@ -129,7 +132,7 @@ onMounted(() => {
   DateManager.value = createWindowManager(inputRef.value, DateRef, 'fixed', 'click')
 })
 onUnmounted(() => {
-  MenuManager.value?.cleanup()
+  DateManager.value?.cleanup()
 })
 const onDateClick = () => {
   inputRef.value?.focus()
@@ -142,8 +145,6 @@ const enter = () => {
   if (isComposing) return
   props.onEnter?.()
 }
-
-// 校验
 
 // 清空
 const clear = () => {
@@ -174,8 +175,29 @@ const tab = () => {
   }
 }
 
-// 暴露方法
+// 校验是否通过
+const verified = computed<boolean>(() => {
+  if (!inputValue.value || !props.verify) return true
+  if (props.type === 'select') {
+    const isSelectable = (options: InputOption[]): boolean =>
+      options.some(option => {
+        if (option.options && !option.selectable) return isSelectable(option.options)
+        return option.name === inputValue.value
+      })
+    return isSelectable(props.options)
+  }
+  if (props.type === 'date') {
+    const match = inputValue.value.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/)
+    if (!match) return false
+    const dateItem: DateItem = [Number(match[1]), Number(match[2]), Number(match[3])]
+    return verifyDate(dateItem) && props.format(dateItem) === inputValue.value
+  }
+  return true
+})
+
+// 暴露
 defineExpose({
+  verified,
   focus: () => {
     inputRef.value?.focus()
     MenuManager.value?.open()
@@ -195,7 +217,7 @@ defineExpose({
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" ref="inputRef"
+    <input :class="$style.input" ref="inputRef" :style="{ outline: verified ? '' : '3px solid #EF6B6BCC' }"
       :type="props.type === 'select' || props.type === 'date' ? 'text' : props.type" :value="inputValue"
       @input="(e) => inputValue = (e.target as HTMLInputElement).value"
       :placeholder="props.placeholder ?? (props.type === 'select' || props.type === 'date' ? '选择...' : '输入...')"

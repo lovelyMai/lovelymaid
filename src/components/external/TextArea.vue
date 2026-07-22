@@ -54,7 +54,7 @@ const enter = (e: KeyboardEvent) => {
   props.onEnter?.()
 }
 
-// 暴露方法
+// 暴露
 defineExpose({
   focus: () => textareaRef.value?.focus(),
   blur: () => textareaRef.value?.blur(),
