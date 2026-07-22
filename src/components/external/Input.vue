@@ -197,7 +197,7 @@ const verified = computed<boolean>(() => {
 
 // 暴露
 defineExpose({
-  verified,
+  verification: verified,
   focus: () => {
     inputRef.value?.focus()
     MenuManager.value?.open()

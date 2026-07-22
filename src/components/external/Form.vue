@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import Input, { type InputOption } from './Input.vue'
 import TextArea from './TextArea.vue'
 
@@ -17,6 +17,7 @@ export type FormItem = {
   options?: InputOption[]
   filter?: boolean
   format?: (date: DateItem) => string
+  verify?: boolean
 }
 interface Props {
   /** 表单项默认宽 */
@@ -28,14 +29,30 @@ const props = defineProps<Props>()
 const items = defineModel<FormItem[]>('items', { required: true })
 
 // 回车聚焦下一个输入框
-const InputRefs = ref<Record<string, InstanceType<typeof Input> | null>>({})
-const TextAreaRefs = ref<Record<string, InstanceType<typeof TextArea> | null>>({})
+const InputInstancesRef = ref<Record<string, InstanceType<typeof Input> | null>>({})
+const TextAreaInstancesRef = ref<Record<string, InstanceType<typeof TextArea> | null>>({})
 const onEnter = (index: number) => {
-  InputRefs.value[index]?.blur()
-  InputRefs.value[index + 1]?.focus()
-  TextAreaRefs.value[index]?.blur()
-  TextAreaRefs.value[index + 1]?.focus()
+  InputInstancesRef.value[index]?.blur()
+  InputInstancesRef.value[index + 1]?.focus()
+  TextAreaInstancesRef.value[index]?.blur()
+  TextAreaInstancesRef.value[index + 1]?.focus()
 }
+
+// 校验结果（key 为表单项 id）
+const verifications = computed<Record<string, boolean>>(() => {
+  const result: Record<string, boolean> = {}
+  items.value.forEach((item, index) => {
+    if (item.type === 'textarea') {
+      result[item.id] = true
+    } else {
+      result[item.id] = InputInstancesRef.value[index]?.verification ?? false
+    }
+  })
+  return result
+})
+
+// 暴露
+defineExpose({ verifications })
 </script>
 <template>
   <ul :class="$style.Form" ref="FormRef">
@@ -47,13 +64,15 @@ const onEnter = (index: number) => {
         :style="{ lineHeight: item.type === 'textarea' ? '42px' : (item.height ?? props.itemHeight ?? 35) + 'px' }">
         {{ item.name }}</span>
       <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
-        :ref="(el) => TextAreaRefs[index] = (el as InstanceType<typeof TextArea> | null)" v-model:value="item.value"
-        :placeholder="item.placeholder" :enterkeyhint="index === items.length - 1 ? 'done' : 'next'"
-        :disabled="item.disabled" :on-enter="() => onEnter(index)" />
-      <Input :class="$style.Input" v-else :ref="(el) => InputRefs[index] = (el as InstanceType<typeof Input> | null)"
-        :type="item.type" v-model:value="item.value" :placeholder="item.placeholder"
+        :ref="(el) => TextAreaInstancesRef[index] = (el as InstanceType<typeof TextArea> | null)"
+        v-model:value="item.value" :placeholder="item.placeholder"
+        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled"
+        :on-enter="() => onEnter(index)" />
+      <Input :class="$style.Input" v-else
+        :ref="(el) => InputInstancesRef[index] = (el as InstanceType<typeof Input> | null)" :type="item.type"
+        v-model:value="item.value" :placeholder="item.placeholder"
         :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled" :options="item.options"
-        :filter="item.filter" :format="item.format" :on-enter="() => onEnter(index)" />
+        :filter="item.filter" :format="item.format" :verify="item.verify" :on-enter="() => onEnter(index)" />
     </li>
   </ul>
 </template>
