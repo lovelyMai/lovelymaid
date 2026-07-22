@@ -39,7 +39,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     document.removeEventListener('click', onDocClick, true)
     setTimeout(() => {
       document.addEventListener('click', onDocClick, true)
-    }, 100)
+    }, 200)
   }
   const onTrigger = (e: MouseEvent) => {
     e.stopPropagation()
