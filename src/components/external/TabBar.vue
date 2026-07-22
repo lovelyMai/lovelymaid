@@ -34,13 +34,13 @@ const style = reactive({
     width: 0,
     height: 0,
     'border-radius': 0,
-    'background-color': 'rgba(249, 249, 249, 0.9)',
+    'background-color': 'var(--color-gray-100)',
     scale: 1,
     transition: 'none'
   },
   slide: {
     width: 0,
-    background: '#e4e4e6',
+    background: 'var(--color-gray-200)',
     border: 'none',
     'box-shadow': 'none',
     translateX: 0,
@@ -190,8 +190,8 @@ const stopSlide = (e: PointerEvent) => {
   if ((Date.now() - startTime) < 100) {
     clearTimer(backgroundTimer)
   }
-  style.slide.background = '#e4e4e6'
-  style.Bar['background-color'] = 'rgba(249, 249, 249, 0.9)'
+  style.slide.background = 'var(--color-gray-200)'
+  style.Bar['background-color'] = 'var(--color-gray-100)'
   style.slide.border = 'none'
   style.slide['box-shadow'] = 'none'
   style.Bar.scale = 1
@@ -282,7 +282,7 @@ watch(searchIsActive, (newValue) => {
   user-select: none;
   -webkit-user-select: none;
   --font-size: 10px;
-  --top-color: #0067EC;
+  --top-color: var(--color-blue-300);
 }
 
 .Bar {

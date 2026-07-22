@@ -21,7 +21,7 @@ interface Props {
   disabled?: boolean
   /** 选项 (仅 type 为 select 时有效) */
   options?: InputOption[]
-  /** 是否启用选项过滤 */
+  /** 是否启用选项过滤 (仅 type 为 select 时有效) */
   filter?: boolean
   /** 格式化 (仅 type 为 date 时有效) */
   format?: (date: DateItem) => string
@@ -143,6 +143,8 @@ const enter = () => {
   props.onEnter?.()
 }
 
+// 校验
+
 // 清空
 const clear = () => {
   inputValue.value = ''
@@ -220,8 +222,8 @@ defineExpose({
   --font-size: 14px;
   --font-weight: 400;
   --line-height: 18px;
-  --clear-color: #767676;
-  --placeholder-color: #544957;
+  --clear-color: var(--color-gray-300);
+  --placeholder-color: var(--color-gray-400);
 }
 
 .icon {
@@ -232,7 +234,7 @@ defineExpose({
   width: calc(var(--input-height) * 1px);
   height: 100%;
   font-size: calc(var(--input-height) * 0.5px);
-  color: #19191a;
+  color: var(--color-gray-500);
   pointer-events: none;
 }
 
@@ -258,7 +260,7 @@ defineExpose({
 }
 
 .input {
-  caret-color: #3c86f6;
+  caret-color: var(--color-blue-200);
   outline: 0px solid transparent;
   transition: outline .2s ease;
 }
@@ -268,7 +270,7 @@ defineExpose({
 }
 
 .input:focus {
-  outline: 3px solid #94bbf0;
+  outline: 3px solid var(--color-blue-100);
 }
 
 .input[type="number"]::-webkit-inner-spin-button {

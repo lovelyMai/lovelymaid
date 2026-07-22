@@ -104,7 +104,7 @@ const onListClick = (e: MouseEvent, side: 'left' | 'right') => {
   z-index: 0;
   width: 100%;
   height: 24px;
-  background-color: #f4f4f4;
+  background-color: var(--color-gray-150);
   border-radius: 12px;
 }
 

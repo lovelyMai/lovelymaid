@@ -111,7 +111,7 @@ watch(() => props.visible, async (newVisible) => {
   height: 0;
   margin-bottom: 50px;
   padding: 0 10px 0 10px;
-  box-shadow: 0 0px 20px 35px rgba(248, 248, 248, .95);
+  box-shadow: 0 0px 20px 35px var(--color-gray-100);
 }
 
 .title {

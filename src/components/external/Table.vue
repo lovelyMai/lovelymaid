@@ -79,7 +79,7 @@ onUnmounted(() => {
   <div :class="$style.Table">
     <ul :class="$style.header" ref="headerRef">
       <li :class="$style.column" v-for="column in props.columns" :key="column.id"
-        :style="{ width: column.width + 'px', color: sort?.id === column.id ? '#000' : '#808080' }"
+        :style="{ width: column.width + 'px', color: sort?.id === column.id ? '#000' : 'var(--color-gray-300)' }"
         @click.stop="() => sort = { id: column.id, order: sort?.order === 'asc' ? 'desc' : 'asc' }">
         <div :class="$style.container">
           <span :class="$style.text">{{ column.name }}</span>
@@ -96,9 +96,9 @@ onUnmounted(() => {
     </ul>
     <ul :class="$style.list" ref="ListRef">
       <li :class="$style.row" v-for="(row, index) in sortedRows" :key="row.id"
-        :style="{ backgroundColor: ActivationManagerInstance?.activeIndexes.has(index) ? '#2962D9' : '', borderRadius: getBorderRadius(index) }">
+        :style="{ backgroundColor: ActivationManagerInstance?.activeIndexes.has(index) ? 'var(--color-blue-450)' : '', borderRadius: getBorderRadius(index) }">
         <span :class="$style.text" v-for="column in props.columns" :key="column.id"
-          :style="{ width: column.width + 'px', color: ActivationManagerInstance?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : '#808080') }">{{
+          :style="{ width: column.width + 'px', color: ActivationManagerInstance?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : 'var(--color-gray-300)') }">{{
             row[column.prop] }}</span>
       </li>
     </ul>
@@ -110,7 +110,7 @@ onUnmounted(() => {
   display: flex;
   margin-bottom: 4px;
   height: 28px;
-  border-bottom: 0.5px solid #808080;
+  border-bottom: 0.5px solid var(--color-gray-300);
   user-select: none;
   -webkit-user-select: none;
 }
@@ -128,7 +128,7 @@ onUnmounted(() => {
 }
 
 .header .column:not(:last-child) .container {
-  border-right: 0.5px solid #808080;
+  border-right: 0.5px solid var(--color-gray-300);
 }
 
 .header .column .container .text {
@@ -146,7 +146,7 @@ onUnmounted(() => {
 }
 
 .list .row:nth-child(even) {
-  background-color: #f5f5f5;
+  background-color: var(--color-gray-150);
 }
 
 .list .row .text {
@@ -161,7 +161,7 @@ onUnmounted(() => {
 <style scoped>
 .lovely-down-arrow {
   font-size: 12px;
-  color: #808080;
+  color: var(--color-gray-300);
   font-weight: 700;
 }
 </style>
