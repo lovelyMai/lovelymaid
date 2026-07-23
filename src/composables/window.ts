@@ -13,9 +13,8 @@ export type WindowManager = {
 export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLElement | null>, type: 'fixed' | 'flex' = 'fixed', method: 'down' | 'contextmenu' = 'down'): WindowManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
-  const calcPos = async (e?: MouseEvent) => {
-    await nextTick()
-    if (!WindowRef.value) return false
+  const calcPos = (e?: MouseEvent) => {
+    if (!WindowRef.value) return
     let X: number = 0
     let Y: number = 0
     if (type === 'fixed') {
@@ -43,12 +42,24 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
       X = X + offsetRight - 3
     }
     position.value = [X, Y]
-    return true
+  }
+  let lastEvent: MouseEvent | undefined
+  let ticking = false
+  const onScroll = () => {
+    if (ticking) return
+    requestAnimationFrame(() => {
+      calcPos(lastEvent)
+      ticking = false
+    })
+    ticking = true
   }
   const open = async (e?: MouseEvent) => {
+    lastEvent = e
     visible.value = true
-    const res = await calcPos(e)
-    if (!res) return
+    await nextTick()
+    if (!WindowRef.value) return
+    calcPos(e)
+    document.addEventListener('scroll', onScroll)
     document.removeEventListener('click', onDocClick, true)
     setTimeout(() => {
       document.addEventListener('click', onDocClick, true)
@@ -57,7 +68,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
   const onTrigger = (e: MouseEvent) => {
     e.stopPropagation()
     if (method === 'contextmenu') {
-      e?.preventDefault()
+      e.preventDefault()
     }
     if (visible.value) return
     open(e)
@@ -70,6 +81,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
   const close = () => {
     if (!visible.value) return
     visible.value = false
+    document.removeEventListener('scroll', onScroll)
     document.removeEventListener('click', onDocClick, true)
   }
   const onDocClick = (e: MouseEvent) => {
@@ -82,6 +94,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
   const cleanup = () => {
     TriggerEl.removeEventListener('mousedown', onTrigger)
     TriggerEl.removeEventListener('contextmenu', onTrigger)
+    document.removeEventListener('scroll', onScroll)
     document.removeEventListener('click', onDocClick, true)
   }
 
