@@ -7,7 +7,9 @@ export function debounce<T extends (...args: any[]) => any>(
 ): (...args: Parameters<T>) => void {
   let timer: number | undefined
   return function (this: any, ...args: Parameters<T>) {
-    if (timer) clearTimeout(timer)
+    if (timer) {
+      clearTimeout(timer)
+    }
     timer = setTimeout(() => {
       fn.apply(this, args)
       timer = undefined
@@ -22,10 +24,9 @@ export function throttle<T extends (...args: any[]) => any>(
 ): (...args: Parameters<T>) => void {
   let timer: number | undefined
   return function (this: any, ...args: Parameters<T>) {
-    if (!timer) {
-      timer = setTimeout(() => timer = undefined, interval)
-      fn.apply(this, args)
-    }
+    if (timer) return
+    timer = setTimeout(() => timer = undefined, interval)
+    fn.apply(this, args)
   }
 }
 

@@ -20,7 +20,7 @@ watch(() => props.lists, (newLists) => {
 const leftRef = ref<HTMLElement | null>(null)
 const rightRef = ref<HTMLElement | null>(null)
 let stopWatch: (() => void) | undefined
-const calculateActiveIds = (el: 'left' | 'right') => {
+const calculateActiveIds = debounce((el: 'left' | 'right') => {
   let index: number | undefined
   if (el === 'left' && leftRef.value) {
     index = Math.floor(leftRef.value.scrollTop / 24)
@@ -29,8 +29,7 @@ const calculateActiveIds = (el: 'left' | 'right') => {
     index = Math.floor(rightRef.value.scrollTop / 24)
     activeIds.value = [activeIds.value![0], props.lists[1][index].id]
   }
-}
-const delayCalculateActiveIds = debounce(calculateActiveIds, 100)
+}, 100)
 onMounted(() => {
   if (!leftRef.value || !rightRef.value) return
   stopWatch = watch([() => props.lists, activeIds], ([newLists, newActiveIds]) => {
@@ -61,7 +60,7 @@ const onListClick = (e: MouseEvent, side: 'left' | 'right') => {
 <template>
   <div :class="$style.Scroll">
     <div :class="$style.selected"></div>
-    <ul :class="[$style.list, $style.left]" ref="leftRef" @scroll="() => delayCalculateActiveIds('left')"
+    <ul :class="[$style.list, $style.left]" ref="leftRef" @scroll="() => calculateActiveIds('left')"
       @click="(e) => onListClick(e, 'left')">
       <li :class="$style.item" v-for="item in Array(3).fill('')">
         <span>{{ item }}</span>
@@ -73,7 +72,7 @@ const onListClick = (e: MouseEvent, side: 'left' | 'right') => {
         <span>{{ item }}</span>
       </li>
     </ul>
-    <ul :class="[$style.list, $style.right]" ref="rightRef" @scroll="() => delayCalculateActiveIds('right')"
+    <ul :class="[$style.list, $style.right]" ref="rightRef" @scroll="() => calculateActiveIds('right')"
       @click="(e) => onListClick(e, 'right')">
       <li :class="$style.item" v-for="item in Array(3).fill('')">
         <span>{{ item }}</span>

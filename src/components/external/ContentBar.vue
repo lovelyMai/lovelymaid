@@ -52,7 +52,9 @@ onMounted(() => {
   cleanup = watchDOM(ContentBarRef.value.$el, () => {
     debounceCalculateTransform()
   })
-  setTimeout(() => style.ContentBar.transition = 'transform .5s', 100)
+  setTimeout(() => {
+    style.ContentBar.transition = 'transform .5s'
+  }, 100)
   window.addEventListener('resize', debounceCalculateTransform)
 })
 onUnmounted(() => {
@@ -65,7 +67,9 @@ let timer: number | undefined
 watch(() => props.visible, async (newVisible) => {
   clearTimeout(timer)
   style.ContentBar.transition = 'transform .3s'
-  timer = setTimeout(() => style.ContentBar.transition = 'transform .5s', 300)
+  timer = setTimeout(() => {
+    style.ContentBar.transition = 'transform .5s'
+  }, 300)
   if (newVisible) {
     await nextTick()
     style.ContentBar.scale = '1'

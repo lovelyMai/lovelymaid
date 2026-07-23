@@ -52,7 +52,9 @@ onMounted(() => {
   cleanup = watchDOM(SideBarRef.value.$el, () => {
     debounceCalculateTransform()
   })
-  setTimeout(() => style.SideBar.transition = 'transform .5s', 100)
+  setTimeout(() => {
+    style.SideBar.transition = 'transform .5s'
+  }, 100)
   window.addEventListener('resize', debounceCalculateTransform)
 })
 onUnmounted(() => {
@@ -65,7 +67,9 @@ let timer: number | undefined
 watch(() => props.visible, async (newVisible) => {
   clearTimeout(timer)
   style.SideBar.transition = 'transform .3s'
-  timer = setTimeout(() => style.SideBar.transition = 'transform .5s', 300)
+  timer = setTimeout(() => {
+    style.SideBar.transition = 'transform .5s'
+  }, 300)
   if (newVisible) {
     await nextTick()
     style.SideBar.scale = '1'

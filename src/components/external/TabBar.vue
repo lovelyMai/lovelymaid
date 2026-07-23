@@ -4,7 +4,7 @@ import Card from './Card.vue';
 import Button from './Button.vue'
 import Input from './Input.vue'
 
-import { clearTimer, watchDOM } from '@/utils/common';
+import { clearTimer, throttle, watchDOM } from '@/utils/common';
 import { getLayoutLeft } from '@/utils/get-layout-offset.js';
 import useCssVar from '@/utils/use-css-var.js';
 
@@ -61,10 +61,8 @@ const style = reactive({
 })
 const maxDistance = ref<number>(0)
 let cleanup: () => void
-let virtualTimer1: number | undefined
-let virtualTimer2: number | undefined
-let moveSlideTimer: number | undefined
-let calculatePosTimer: number | undefined
+let virtualFrame: number | undefined
+let calcPosFrame: number | undefined
 let backgroundTimer: number | undefined
 onMounted(() => {
   if (!TabBarRef.value) return
@@ -87,115 +85,149 @@ onMounted(() => {
 })
 onUnmounted(() => {
   cleanup()
-  clearTimer(virtualTimer1, virtualTimer2, moveSlideTimer, calculatePosTimer, backgroundTimer)
+  cancelAnimationFrame(virtualFrame!)
+  cancelAnimationFrame(calcPosFrame!)
+  clearTimer(backgroundTimer)
 })
 
 // 滑块动画
 let followed = false
 let moved = false
 let startTime: number
-const calculateTargetPos = (e: PointerEvent, type: 'start' | 'move') => {
-  if (!SlideRef.value || !contentRef.value) return
+
+const getSlideX = () => new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
+const getTargetLeft = (e: PointerEvent) => {
+  if (!contentRef.value) return 0
   const clickX = e.pageX - getLayoutLeft(contentRef.value)
   const clickLeft = clickX - style.slide.width / 2
-  const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value).transform).m41
-  const targetLeft = clickLeft < 0 ? 0 : clickLeft > (props.tabs.length - 1) * style.slide.width ? (props.tabs.length - 1) * style.slide.width : clickLeft
-  if (type === 'start') {
-    style.slide.transition = `transform .5s, background .1s`
+  const maxLeft = (props.tabs.length - 1) * style.slide.width
+  return clamp(clickLeft, 0, maxLeft)
+}
+const stepToTarget = (targetLeft: number) => {
+  const realLeft = getSlideX()
+  if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
+    style.slide.transition = `background .1s`
     style.slide.translateX = targetLeft
-  } else if (followed || Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
+    followed = true
+    calcPosFrame = undefined
+  } else {
+    style.slide.translateX += (targetLeft - realLeft) > 0 ? maxDistance.value / 10 : -maxDistance.value / 10
+    calcPosFrame = requestAnimationFrame(() => stepToTarget(targetLeft))
+  }
+}
+const jumpToTarget = (targetLeft: number) => {
+  style.slide.transition = `transform .5s, background .1s`
+  style.slide.translateX = targetLeft
+}
+
+const moveTowardTarget = (targetLeft: number) => {
+  if (!SlideRef.value) return
+  const realLeft = getSlideX()
+  if (followed || Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
     style.slide.transition = `background .1s`
     style.slide.translateX = targetLeft
     followed = true
   } else {
     style.slide.transition = `background .1s`
     style.slide.translateX = realLeft
-    calculatePosTimer = setInterval(() => {
-      const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
-      if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
-        style.slide.transition = `background .1s`
-        style.slide.translateX = targetLeft
-        followed = true
-        clearTimer(calculatePosTimer)
-      } else {
-        style.slide.translateX += (targetLeft - realLeft) > 0 ? maxDistance.value / 10 : -maxDistance.value / 10
-      }
-    }, 8)
+    calcPosFrame = requestAnimationFrame(() => stepToTarget(targetLeft))
   }
 }
 const updateVirtualPos = (duration: number | undefined) => {
   const calc = () => {
-    const realLeft = new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
+    const realLeft = getSlideX()
     style.slide.center = realLeft + style.slide.width / 2
     const virtualWidth = style.slide.width * 1.2 / 1.1
     style['content-top'].clipLeft = style.slide.center - virtualWidth / 2
     style['content-top'].clipRight = style.slide.center + virtualWidth / 2
   }
   if (duration) {
-    clearInterval(virtualTimer1)
-    virtualTimer1 = setInterval(() => {
+    cancelAnimationFrame(virtualFrame!)
+    const start = performance.now()
+    const frame = () => {
       calc()
-    }, 8)
-    virtualTimer2 = setTimeout(() => clearInterval(virtualTimer1), duration)
+      if (performance.now() - start < duration) {
+        virtualFrame = requestAnimationFrame(frame)
+      } else {
+        virtualFrame = undefined
+      }
+    }
+    virtualFrame = requestAnimationFrame(frame)
   } else {
-    clearInterval(virtualTimer1)
+    cancelAnimationFrame(virtualFrame!)
     if (followed) {
       calc()
     } else {
-      virtualTimer1 = setInterval(() => {
+      const frame = () => {
         calc()
-      }, 8)
+        if (!followed) {
+          virtualFrame = requestAnimationFrame(frame)
+        } else {
+          virtualFrame = undefined
+        }
+      }
+      virtualFrame = requestAnimationFrame(frame)
     }
   }
 }
 const runStopAnimation = (stopIndex: number) => {
   style.slide.transition = `transform .5s, background .1s`
-  clearTimer(calculatePosTimer)
+  cancelAnimationFrame(calcPosFrame!)
+  calcPosFrame = undefined
   style.slide.translateX = stopIndex * style.slide.width
-  clearTimer(virtualTimer1, virtualTimer2)
+  cancelAnimationFrame(virtualFrame!)
+  virtualFrame = undefined
   updateVirtualPos(500)
 }
-const startSlide = (e: PointerEvent) => {
-  startTime = Date.now()
-  backgroundTimer = setTimeout(() => {
-    style.slide.background = '#fff'
-  }, 100)
+const applyHighlight = () => {
   style.Bar['background-color'] = '#fff'
   style.slide.border = '1px solid rgba(255, 255, 255, 0.5)'
   style.slide['box-shadow'] = '0 0 10px 0 rgba(0, 0, 0, 0.1)'
   style.Bar.scale = 1.05
   style.slide.scale = 1.2
-  calculateTargetPos(e, 'start')
-  clearTimer(virtualTimer1, virtualTimer2)
+  backgroundTimer = setTimeout(() => {
+    style.slide.background = '#fff'
+  }, 100)
+}
+const startSlide = (e: PointerEvent) => {
+  startTime = Date.now()
+  applyHighlight()
+  const targetLeft = getTargetLeft(e)
+  jumpToTarget(targetLeft)
+  cancelAnimationFrame(virtualFrame!)
+  virtualFrame = undefined
   updateVirtualPos(500)
   document.addEventListener('pointermove', moveSlide)
   document.addEventListener('pointerup', stopSlide)
 }
-const moveSlide = (e: PointerEvent) => {
-  if (moveSlideTimer) return
+const moveSlide = throttle((e: PointerEvent) => {
   moved = true
   if (searchIsActive.value) {
     searchIsActive.value = false
     return
   }
-  clearTimer(calculatePosTimer)
-  calculateTargetPos(e, 'move')
-  clearTimer(virtualTimer1, virtualTimer2)
+  cancelAnimationFrame(calcPosFrame!)
+  calcPosFrame = undefined
+  const targetLeft = getTargetLeft(e)
+  moveTowardTarget(targetLeft)
+  cancelAnimationFrame(virtualFrame!)
+  virtualFrame = undefined
   updateVirtualPos(undefined)
-  moveSlideTimer = setTimeout(() => {
-    moveSlideTimer = undefined
-  }, 8)
-}
-const stopSlide = (e: PointerEvent) => {
-  if ((Date.now() - startTime) < 100) {
-    clearTimer(backgroundTimer)
-  }
+}, 8)
+const resetHighlight = () => {
   style.slide.background = 'var(--color-gray-200)'
   style.Bar['background-color'] = 'var(--color-gray-100)'
   style.slide.border = 'none'
   style.slide['box-shadow'] = 'none'
   style.Bar.scale = 1
   style.slide.scale = 1
+}
+const stopSlide = (e: PointerEvent) => {
+  if ((Date.now() - startTime) < 100) {
+    clearTimer(backgroundTimer)
+  }
+  resetHighlight()
   if (searchIsActive.value) {
     searchIsActive.value = false
     runStopAnimation(activeIndex.value)
@@ -204,7 +236,7 @@ const stopSlide = (e: PointerEvent) => {
     const clickX = e.pageX - getLayoutLeft(contentRef.value)
     const index = Math.floor(clickX / style.slide.width)
     const oldActiveIndex = activeIndex.value
-    const newActiveIndex = index > props.tabs.length - 1 ? props.tabs.length - 1 : index < 0 ? 0 : index
+    const newActiveIndex = clamp(index, 0, props.tabs.length - 1)
     activeIndex.value = newActiveIndex
     if (oldActiveIndex === newActiveIndex) {
       runStopAnimation(newActiveIndex)
