@@ -2,10 +2,6 @@ node_modules
 .DS_Store
 dist
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-
 # Test
 src/App.vue
 src/main.ts
