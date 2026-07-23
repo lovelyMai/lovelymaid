@@ -195,8 +195,9 @@ const verified = computed<boolean>(() => {
   }
   return true
 })
-watch(verified, (newVerified) => {
-  if (newVerified) {
+watch(inputValue, () => {
+  if (props.type !== 'select' && props.type !== 'date') return
+  if (verified.value) {
     warning.value = false
   } else {
     warning.value = true
