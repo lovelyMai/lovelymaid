@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 
 import { watchDOM } from '@/utils/common';
-import useCssVar from '@/utils/useCssVar';
+import useCssVar from '@/utils/use-css-var';
 
 interface Props {
   /** 类型 */

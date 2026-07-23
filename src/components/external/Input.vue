@@ -6,7 +6,7 @@ import DateWindow, { type DateInstance } from '../internal/Date.vue'
 
 import type { OptionItem, DateItem } from '../type'
 import { formatDate, verifyDate, watchDOM } from '@/utils/common'
-import useCssVar from '@/utils/useCssVar'
+import useCssVar from '@/utils/use-css-var.js'
 import { createWindowManager, type WindowManager } from '@/composables/window'
 
 export type InputOption = OptionItem & { selectable?: boolean }

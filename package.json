@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "start": "vite",
-    "build": "vite build && vue-tsc -p tsconfig.build.json --declaration --emitDeclarationOnly --outDir dist"
+    "build": "vite build && vue-tsc -p tsconfig.build.json --declaration --emitDeclarationOnly --outDir dist && node scripts/gen-clean-types.js"
   },
   "peerDependencies": {
     "vue": "^3.4.0"

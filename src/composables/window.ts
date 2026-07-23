@@ -1,6 +1,6 @@
 import { nextTick, reactive, ref, type Ref } from 'vue'
 
-import { getLayoutLeft, getLayoutTop } from '@/utils/getLayoutOffset'
+import { getLayoutLeft, getLayoutTop } from '@/utils/get-layout-offset'
 
 export type WindowManager = {
   readonly visible: boolean

@@ -24,7 +24,7 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: 'src/index.ts',
+      entry: '/src/index.ts',
       fileName: () => `lovelymaid.js`,
       formats: ['es']
     },

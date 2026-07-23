@@ -3,6 +3,6 @@ node_modules
 dist
 
 # Test
-src/App.vue
-src/main.ts
+App.vue
+main.ts
 index.html
