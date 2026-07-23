@@ -52,7 +52,9 @@ const onListClick = (e: MouseEvent, side: 'left' | 'right') => {
   const index = li.dataset.index
   if (index === undefined) return
   const container = side === 'left' ? leftRef.value : rightRef.value
-  if (container) scrollToCenter(container, Number(index))
+  if (container) {
+    scrollToCenter(container, Number(index))
+  }
 }
 </script>
 

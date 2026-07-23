@@ -13,29 +13,42 @@ export type WindowManager = {
 export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLElement | null>, type: 'fixed' | 'flex' = 'fixed', method: 'down' | 'contextmenu' = 'down'): WindowManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
-  const calcPos = (e?: MouseEvent) => {
+  const calcPos = async (e?: MouseEvent) => {
+    await nextTick()
+    if (!WindowRef.value) return false
     let X: number = 0
     let Y: number = 0
     if (type === 'fixed') {
-      const offsetX = getLayoutLeft(TriggerEl)
-      const offsetY = getLayoutTop(TriggerEl)
-      X = offsetX + Math.min(TriggerEl.offsetWidth, TriggerEl.offsetHeight) / 2
-      Y = offsetY + TriggerEl.offsetHeight + 3
-    } else {
-      if (!e) {
-        console.error('flex 模式下 open 必须传入 event 事件对象')
-        return
+      X = getLayoutLeft(TriggerEl) + Math.min(TriggerEl.offsetWidth, TriggerEl.offsetHeight) / 2
+      Y = getLayoutTop(TriggerEl) + TriggerEl.offsetHeight + 3
+      const offsetBottom = document.documentElement.scrollTop + document.documentElement.clientHeight - (Y + WindowRef.value.offsetHeight)
+      const centerIsBottom = getLayoutTop(TriggerEl) + TriggerEl.offsetHeight / 2 > document.documentElement.scrollTop + document.documentElement.clientHeight / 2
+      if (offsetBottom < 3 && centerIsBottom) {
+        Y = getLayoutTop(TriggerEl) - WindowRef.value.offsetHeight - 3
       }
-      X = e.pageX
-      Y = e.pageY
+    } else {
+      if (e) {
+        X = e.pageX
+        Y = e.pageY
+        const offsetBottom = document.documentElement.scrollTop + document.documentElement.clientHeight - (Y + WindowRef.value.offsetHeight)
+        if (offsetBottom < 3) {
+          Y = Y + offsetBottom - 3
+        }
+      } else {
+        console.error('flex 类型下 open 必须传入 event 事件对象')
+      }
+    }
+    const offsetRight = document.documentElement.scrollLeft + document.documentElement.clientWidth - (X + WindowRef.value.offsetWidth)
+    if (offsetRight < 3) {
+      X = X + offsetRight - 3
     }
     position.value = [X, Y]
+    return true
   }
   const open = async (e?: MouseEvent) => {
-    calcPos(e)
     visible.value = true
-    await nextTick()
-    if (!WindowRef.value) return
+    const res = await calcPos(e)
+    if (!res) return
     document.removeEventListener('click', onDocClick, true)
     setTimeout(() => {
       document.addEventListener('click', onDocClick, true)

@@ -31,3 +31,21 @@ export const getLayoutTop = (el: HTMLElement): number => {
 
   return top;
 };
+
+/**
+ * 获取元素布局右侧距离（不受 transform/scale 影响）
+ * @param el - 目标元素
+ * @returns 相对于右侧的布局像素值
+ */
+export const getLayoutRight = (el: HTMLElement): number => {
+  return document.documentElement.clientWidth - (getLayoutLeft(el) + el.offsetWidth)
+}
+
+/**
+ * 获取元素布局底部距离（不受 transform/scale 影响）
+ * @param el - 目标元素
+ * @returns 相对于底部的布局像素值
+ */
+export const getLayoutBottom = (el: HTMLElement): number => {
+  return document.documentElement.clientHeight - (getLayoutTop(el) + el.offsetHeight)
+}

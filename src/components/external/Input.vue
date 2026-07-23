@@ -25,7 +25,7 @@ interface Props {
   filter?: boolean
   /** 格式化 (仅 type 为 date 时有效) */
   format?: (date: DateItem) => string
-  /** 校验（仅 type 为 select 或 date 时有效） */
+  /** 是否启用校验（仅 type 为 select 或 date 时有效） */
   verify?: boolean
   /** 回车事件 */
   onEnter?: () => void
@@ -237,7 +237,7 @@ defineExpose({
     </div>
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'select'"
       :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="showingOptions"
-      :width="style.Input.width + 'px'" :on-option-click="onOptionClick" />
+      :width="2 * style.Input.width + 'px'" :on-option-click="onOptionClick" />
     <DateWindow :ref="(ins) => DateRef = (ins as DateInstance | null)?.root ?? null" v-if="props.type === 'date'"
       :visible="DateManager?.visible ?? false" :position="DateManager?.position ?? [0, 0]" v-model:date="date"
       :on-date-click="onDateClick" />

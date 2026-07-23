@@ -15,9 +15,13 @@ export type FormItem = {
   width?: string
   height?: string
   options?: InputOption[]
+  /** 是否启用选项过滤 (仅 type 为 select 时有效) */
   filter?: boolean
+  /** 格式化 (仅 type 为 date 时有效) */
   format?: (date: DateItem) => string
+  /** 是否启用校验（仅 type 为 select 或 date 时有效） */
   verify?: boolean
+  /** 是否警告 */
   warning?: boolean
 }
 interface Props {
