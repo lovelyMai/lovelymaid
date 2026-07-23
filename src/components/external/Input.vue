@@ -237,7 +237,7 @@ defineExpose({
     </div>
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'select'"
       :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="showingOptions"
-      :width="2 * style.Input.width + 'px'" :on-option-click="onOptionClick" />
+      :width="style.Input.width + 'px'" :on-option-click="onOptionClick" />
     <DateWindow :ref="(ins) => DateRef = (ins as DateInstance | null)?.root ?? null" v-if="props.type === 'date'"
       :visible="DateManager?.visible ?? false" :position="DateManager?.position ?? [0, 0]" v-model:date="date"
       :on-date-click="onDateClick" />
