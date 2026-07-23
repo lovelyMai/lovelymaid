@@ -2,10 +2,9 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
+import type { Item } from '../type.js'
 import { createWindowManager, type WindowManager } from '@/composables/window'
 import { createActivationManager, type ActivationManager } from '@/composables/activation'
-
-import type { Item } from '../type.js'
 
 export type ColumnConfig = {
   id: string

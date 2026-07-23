@@ -2,8 +2,8 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import Menu, { type MenuInstance } from '../internal/Menu.vue';
 
-import { createWindowManager, type WindowManager } from '@/composables/window';
 import type { OptionItem } from '../type.js'
+import { createWindowManager, type WindowManager } from '@/composables/window';
 
 interface Props {
   /** 选项配置 */

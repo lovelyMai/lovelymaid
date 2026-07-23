@@ -4,10 +4,10 @@ import Card from './Card.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 import DateWindow, { type DateInstance } from '../internal/Date.vue'
 
+import type { OptionItem, DateItem } from '../type'
 import { formatDate, verifyDate, watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/useCssVar'
 import { createWindowManager, type WindowManager } from '@/composables/window'
-import type { OptionItem, DateItem } from '../type'
 
 export type InputOption = OptionItem & { selectable?: boolean }
 interface Props {

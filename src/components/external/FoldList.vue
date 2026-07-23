@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch, computed, reactive } from 'vue'
 
+import type { ListItem } from '../type'
 import getSlideCount from '../../utils/calculateOffsets'
 import { watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/useCssVar'
-import type { ListItem } from '../type'
 
 interface Props {
   /** 标题 */
