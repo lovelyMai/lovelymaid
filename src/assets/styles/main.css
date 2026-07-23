@@ -12,6 +12,8 @@
   --color-gray-300: #767676;
   --color-gray-400: #544957;
   --color-gray-500: #19191a;
+  /* 红色 */
+  --color-red-200: #ef6b6bcc;
   /* 阴影 */
   --box-shadow-100: 0 0 20px 0 rgba(0, 0, 0, .1);
   --box-shadow-200: 0 0 10px 2px rgba(0, 0, 0, 0.1);

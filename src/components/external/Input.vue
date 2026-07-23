@@ -39,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
   verify: true
 })
 const inputValue = defineModel<string>('value', { required: true })
+const warning = defineModel<boolean>('warning', { default: false })
 
 // 初始化
 const InputRef = ref<InstanceType<typeof Card> | null>(null)
@@ -194,6 +195,13 @@ const verified = computed<boolean>(() => {
   }
   return true
 })
+watch(verified, (newVerified) => {
+  if (newVerified) {
+    warning.value = false
+  } else {
+    warning.value = true
+  }
+})
 
 // 暴露
 defineExpose({
@@ -217,7 +225,7 @@ defineExpose({
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" ref="inputRef" :style="{ outline: verified ? '' : '3px solid #EF6B6BCC' }"
+    <input :class="$style.input" ref="inputRef" :style="{ outline: warning ? '3px solid var(--color-red-200)' : '' }"
       :type="props.type === 'select' || props.type === 'date' ? 'text' : props.type" :value="inputValue"
       @input="(e) => inputValue = (e.target as HTMLInputElement).value"
       :placeholder="props.placeholder ?? (props.type === 'select' || props.type === 'date' ? '选择...' : '输入...')"

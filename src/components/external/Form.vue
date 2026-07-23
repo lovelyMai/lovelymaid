@@ -18,6 +18,7 @@ export type FormItem = {
   filter?: boolean
   format?: (date: DateItem) => string
   verify?: boolean
+  warning?: boolean
 }
 interface Props {
   /** 表单项默认宽 */
@@ -72,7 +73,7 @@ defineExpose({ verifications })
         :ref="(el) => InputInstancesRef[index] = (el as InstanceType<typeof Input> | null)" :type="item.type"
         v-model:value="item.value" :placeholder="item.placeholder"
         :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled" :options="item.options"
-        :filter="item.filter" :format="item.format" :verify="item.verify" :on-enter="() => onEnter(index)" />
+        :filter="item.filter" :format="item.format" :verify="item.verify" v-model:warning="item.warning" :on-enter="() => onEnter(index)" />
     </li>
   </ul>
 </template>
