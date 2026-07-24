@@ -8,8 +8,10 @@ import { createWindowManager, type WindowManager } from '@/composables/window';
 interface Props {
   /** 选项配置 */
   options: OptionItem[]
+  /** 弹窗 z-index */
+  zIndex?: number
   /** 选项点击事件 */
-  onOptionClick?: (item: OptionItem, index: number) => void
+  onOptionClick?: (option: OptionItem, index: number) => void
 }
 const props = defineProps<Props>()
 
@@ -29,8 +31,8 @@ onUnmounted(() => {
 <template>
   <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" ref="SelectRef">
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" :visible="MenuManager?.visible ?? false"
-      :position="MenuManager?.position ?? [0, 0]" :options="props.options" :on-option-click="() => {
-        props.onOptionClick
+      :position="MenuManager?.position ?? [0, 0]" :z-index="props.zIndex" :options="props.options" :on-option-click="(option, index) => {
+        props.onOptionClick?.(option, index)
         MenuManager?.close()
       }" v-slot="{ item, index }">
       <slot :item="item" :index="index"></slot>

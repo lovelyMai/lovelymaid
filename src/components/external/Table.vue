@@ -23,6 +23,8 @@ interface Props {
   columns: ColumnConfig[]
   /** 行 */
   rows: Item[]
+  /** 弹窗 z-index */
+  zIndex?: number
 }
 const props = defineProps<Props>()
 const sort = defineModel<SortConfig>('sort')
@@ -87,7 +89,7 @@ onUnmounted(() => {
         </div>
       </li>
       <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null"
-        :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]"
+        :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :z-index="props.zIndex"
         :options="[{ id: '1', name: '关闭排序' }]" :on-option-click="() => {
           sort = undefined
           MenuManager?.close()

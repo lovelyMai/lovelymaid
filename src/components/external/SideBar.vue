@@ -82,7 +82,7 @@ watch(() => props.visible, async (newVisible) => {
 <template>
   <Card :class="$style.SideBar" ref="SideBarRef" type="glass">
     <div :class="$style.header">
-      <div :class="[$style.button, { [$style.close]: !isOpen }]" :title="isOpen ? '收起侧边栏' : '展开侧边栏'" @click.stop="() => {
+      <div :class="[$style.button, { [$style.close]: !isOpen }]" :title="isOpen ? '收起侧边栏' : '打开侧边栏'" @click.stop="() => {
         isOpen = !isOpen
         props.onButtonClick?.()
       }">

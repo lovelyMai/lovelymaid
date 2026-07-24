@@ -8,16 +8,20 @@ import { type WindowManager } from '@/composables/window'
 interface Props {
   /** 是否显示 */
   visible: boolean
-  /** 选项 */
-  options: OptionItem[]
   /** 位置 */
   position: [number, number]
   /** 宽度 */
   width?: string
+  /** z-index */
+  zIndex?: number
+  /** 选项 */
+  options: OptionItem[]
   /** 选项点击事件 */
   onOptionClick?: (option: OptionItem, index: number) => void
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  zIndex: 0
+})
 const isSubMenu = inject('menu-is-sub', false)
 provide('menu-is-sub', true)
 
@@ -76,7 +80,7 @@ defineExpose<MenuInstance>({
     <transition name="lovelymai-fade-leave">
       <ul :class="[$style.Menu, hasSubMenu ? $style.sub : '']" ref="MenuRef"
         v-if="props.visible && props.options.length > 0"
-        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px`, width: props.width ?? '' }">
+        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px`, zIndex: props.zIndex, width: props.width ?? '' }">
         <li :class="$style.item" v-for="(item, index) in props.options" :key="item.id" :data-index="index"
           :data-has-children="item.options ? 'true' : 'false'" @click.stop="() => props.onOptionClick?.(item, index)">
           <div :class="$style.left">
@@ -96,7 +100,6 @@ defineExpose<MenuInstance>({
 <style module>
 .Menu {
   position: absolute;
-  z-index: 0;
   padding: 4px;
   background-color: var(--color-gray-150);
   border: 1px solid #fff;
@@ -115,7 +118,6 @@ defineExpose<MenuInstance>({
   position: relative;
   z-index: 0;
   padding: 5px;
-  min-width: 50px;
   height: 28px;
   border-radius: 8px;
   color: #000;

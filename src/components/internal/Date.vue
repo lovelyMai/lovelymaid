@@ -11,10 +11,14 @@ interface Props {
   visible: boolean
   /** 位置 */
   position: [number, number]
+  /** z-index */
+  zIndex?: number
   /** 日期点击事件 */
   onDateClick?: () => void
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  zIndex: 0
+})
 const date = defineModel<DateItem>('date', { default: () => formatDate(Date.now()) })
 
 // 初始化
@@ -79,7 +83,8 @@ defineExpose<DateInstance>({
   <teleport to="body">
     <transition name="lovelymai-fade-leave">
       <Card :class="$style.Date" :ref="(ins) => DateRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null"
-        v-if="props.visible" type="glass" :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px` }">
+        v-if="props.visible" type="glass"
+        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px`, zIndex: props.zIndex }">
         <div :class="$style.header">
           <h5 :class="$style.date" @click.stop="() => scrollIsOpen = !scrollIsOpen">
             <span :style="{ color: scrollIsOpen ? 'var(--color-blue-300)' : '' }">{{ `${year} 年 ${month} 月` }}</span>

@@ -10,6 +10,10 @@ export type WindowManager = {
   cleanup: () => void
 }
 
+const stopClickPropagation = (e: Event) => {
+  e.stopPropagation()
+  document.removeEventListener('click', stopClickPropagation, true)
+}
 export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLElement | null>, type: 'fixed' | 'flex' = 'fixed', method: 'down' | 'contextmenu' = 'down'): WindowManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
@@ -62,11 +66,13 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     document.addEventListener('scroll', onScroll)
     document.removeEventListener('click', onDocClick, true)
     setTimeout(() => {
+      document.removeEventListener('click', stopClickPropagation, true)
       document.addEventListener('click', onDocClick, true)
     }, 200)
   }
   const onTrigger = (e: MouseEvent) => {
     e.stopPropagation()
+    document.addEventListener('click', stopClickPropagation, true)
     if (method === 'contextmenu') {
       e.preventDefault()
     }
@@ -94,6 +100,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
   const cleanup = () => {
     TriggerEl.removeEventListener('mousedown', onTrigger)
     TriggerEl.removeEventListener('contextmenu', onTrigger)
+    document.removeEventListener('click', stopClickPropagation, true)
     document.removeEventListener('scroll', onScroll)
     document.removeEventListener('click', onDocClick, true)
   }

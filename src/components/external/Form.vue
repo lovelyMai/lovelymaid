@@ -21,6 +21,8 @@ export type FormItem = {
   format?: (date: DateItem) => string
   /** 是否启用校验（仅 type 为 select 或 date 时有效） */
   verify?: boolean
+  /** 弹窗 z-index（仅 type 为 select 或 date 时有效）*/
+  zIndex?: number
   /** 是否警告 */
   warning?: boolean
 }
@@ -77,7 +79,8 @@ defineExpose({ verifications })
         :ref="(el) => InputInstancesRef[index] = (el as InstanceType<typeof Input> | null)" :type="item.type"
         v-model:value="item.value" :placeholder="item.placeholder"
         :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled" :options="item.options"
-        :filter="item.filter" :format="item.format" :verify="item.verify" v-model:warning="item.warning" :on-enter="() => onEnter(index)" />
+        :filter="item.filter" :format="item.format" :verify="item.verify" :z-index="item.zIndex"
+        v-model:warning="item.warning" :on-enter="() => onEnter(index)" />
     </li>
   </ul>
 </template>
