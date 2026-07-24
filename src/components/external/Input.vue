@@ -19,6 +19,8 @@ interface Props {
   enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
   /** 是否禁用 */
   disabled?: boolean
+  /** 是否只读 */
+  readonly?: boolean
   /** 选项 (仅 type 为 select 时有效) */
   options?: InputOption[]
   /** 是否启用选项过滤 (仅 type 为 select 时有效) */
@@ -35,6 +37,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   disabled: false,
+  readonly: false,
   options: () => [],
   filter: false,
   format: ([year, month, day]: DateItem): string => `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`,
@@ -232,8 +235,9 @@ defineExpose({
       :type="props.type === 'select' || props.type === 'date' ? 'text' : props.type" :value="inputValue"
       @input="(e) => inputValue = (e.target as HTMLInputElement).value"
       :placeholder="props.placeholder ?? (props.type === 'select' || props.type === 'date' ? '选择...' : '输入...')"
-      :enterkeyhint="props.enterkeyhint" :disabled="props.disabled" @keydown.enter.prevent="enter"
-      @keydown.tab.prevent="tab" @compositionstart="compositionstart" @compositionend="compositionend" />
+      :enterkeyhint="props.enterkeyhint" :disabled="props.disabled" :readonly="props.readonly"
+      @keydown.enter.prevent="enter" @keydown.tab.prevent="tab" @compositionstart="compositionstart"
+      @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-show="inputValue && !props.disabled" @click.stop="() => clear()"></span>
     </div>

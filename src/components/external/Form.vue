@@ -12,6 +12,7 @@ export type FormItem = {
   value: string
   placeholder?: string
   disabled?: boolean
+  readonly?: boolean
   width?: string
   height?: string
   options?: InputOption[]
@@ -78,8 +79,8 @@ defineExpose({ verifications })
       <Input :class="$style.Input" v-else
         :ref="(el) => InputInstancesRef[index] = (el as InstanceType<typeof Input> | null)" :type="item.type"
         v-model:value="item.value" :placeholder="item.placeholder"
-        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled" :options="item.options"
-        :filter="item.filter" :format="item.format" :verify="item.verify" :z-index="item.zIndex"
+        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled" :readonly="item.readonly"
+        :options="item.options" :filter="item.filter" :format="item.format" :verify="item.verify" :z-index="item.zIndex"
         v-model:warning="item.warning" :on-enter="() => onEnter(index)" />
     </li>
   </ul>
