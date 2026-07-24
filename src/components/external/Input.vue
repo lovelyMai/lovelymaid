@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   options: () => [],
   filter: false,
-  format: ([year, month, day]: DateItem) => `${year}/${month}/${day}`,
+  format: ([year, month, day]: DateItem): string => `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`,
   verify: true
 })
 const inputValue = defineModel<string>('value', { required: true })

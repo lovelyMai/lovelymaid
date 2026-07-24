@@ -94,7 +94,6 @@ onUnmounted(() => {
 let followed = false
 let moved = false
 let startTime: number
-
 const getSlideX = () => new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 const getTargetLeft = (e: PointerEvent) => {
@@ -120,7 +119,6 @@ const jumpToTarget = (targetLeft: number) => {
   style.slide.transition = `transform .5s, background .1s`
   style.slide.translateX = targetLeft
 }
-
 const moveTowardTarget = (targetLeft: number) => {
   if (!SlideRef.value) return
   const realLeft = getSlideX()

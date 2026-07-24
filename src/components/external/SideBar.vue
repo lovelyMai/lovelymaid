@@ -129,7 +129,7 @@ watch(() => props.visible, async (newVisible) => {
 
 @media (hover: hover) {
   .button:hover {
-    background-color: var(--color-gray-200);
+    background-color: var(--color-gray-150);
   }
 }
 </style>
