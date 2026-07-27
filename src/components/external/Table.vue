@@ -10,7 +10,7 @@ export type ColumnConfig = {
   id: string
   name: string
   prop: string
-  width: number | string
+  width?: string
 }
 export type SortConfig = {
   /** 列 id */
@@ -80,7 +80,7 @@ onUnmounted(() => {
   <div :class="$style.Table">
     <ul :class="$style.header" ref="headerRef">
       <li :class="$style.column" v-for="column in props.columns" :key="column.id"
-        :style="{ width: column.width + 'px', color: sort?.id === column.id ? '#000' : 'var(--color-gray-300)' }"
+        :style="{ width: column.width ?? '200px', color: sort?.id === column.id ? '#000' : 'var(--color-gray-300)' }"
         @click.stop="() => sort = { id: column.id, order: sort?.order === 'asc' ? 'desc' : 'asc' }">
         <div :class="$style.container">
           <span :class="$style.text">{{ column.name }}</span>
@@ -99,7 +99,7 @@ onUnmounted(() => {
       <li :class="$style.row" v-for="(row, index) in sortedRows" :key="row.id"
         :style="{ backgroundColor: ActivationManagerInstance?.activeIndexes.has(index) ? 'var(--color-blue-450)' : '', borderRadius: getBorderRadius(index) }">
         <span :class="$style.text" v-for="column in props.columns" :key="column.id"
-          :style="{ width: column.width + 'px', color: ActivationManagerInstance?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : 'var(--color-gray-300)') }">{{
+          :style="{ width: column.width ?? '200px', color: ActivationManagerInstance?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : 'var(--color-gray-300)') }">{{
             row[column.prop] }}</span>
       </li>
     </ul>
