@@ -49,7 +49,9 @@ onUnmounted(() => {
 <style module>
 .MenuBar {
   padding: 3px;
-  border-radius: var(--MenuBar-border-radius)
+  border-radius: var(--MenuBar-border-radius);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .menus {
