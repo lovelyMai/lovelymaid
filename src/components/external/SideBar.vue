@@ -113,6 +113,9 @@ watch(() => props.visible, async (newVisible) => {
 
 .text {
   flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 30px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
