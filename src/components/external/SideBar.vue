@@ -28,28 +28,28 @@ const style = reactive({
   },
   button: {
     get translateX() {
-      return isOpen.value ? '0' : `${transformDistance.value - (SideBarRef.value?.$el.offsetWidth ?? 0) + 55}px`
+      return isOpen.value ? '0' : `${transformDistance.value - (SideBarRef.value?.offsetWidth ?? 0) + 55}px`
     }
   }
 })
 onMounted(() => {
-  if (!SideBarRef.value?.$el) return
-  useCssVar(SideBarRef.value?.$el, style)
+  if (!SideBarRef.value) return
+  useCssVar(SideBarRef.value, style)
 })
 
 // 计算平移距离
-const SideBarRef = ref<InstanceType<typeof Card> | null>(null)
+const SideBarRef = ref<HTMLElement | null>(null)
 const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
-  if (!SideBarRef.value?.$el) return
-  transformDistance.value = getLayoutLeft(SideBarRef.value.$el) + SideBarRef.value.$el.offsetWidth + 10
+  if (!SideBarRef.value) return
+  transformDistance.value = getLayoutLeft(SideBarRef.value) + SideBarRef.value.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
-  if (!SideBarRef.value?.$el) return
+  if (!SideBarRef.value) return
   calculateTransform()
-  cleanup = watchDOM(SideBarRef.value.$el, () => {
+  cleanup = watchDOM(SideBarRef.value, () => {
     debounceCalculateTransform()
   })
   setTimeout(() => {
@@ -80,7 +80,7 @@ watch(() => props.visible, async (newVisible) => {
 </script>
 
 <template>
-  <Card :class="$style.SideBar" ref="SideBarRef" type="glass">
+  <Card :class="$style.SideBar" :ref="(el) => SideBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
     <div :class="$style.header">
       <div :class="$style.text">
         <slot name="title"></slot>

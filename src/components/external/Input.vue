@@ -47,7 +47,7 @@ const inputValue = defineModel<string>('value', { required: true })
 const warning = defineModel<boolean>('warning', { default: false })
 
 // 初始化
-const InputRef = ref<InstanceType<typeof Card> | null>(null)
+const InputRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLInputElement | null>(null)
 const slots = useSlots()
 const style = reactive({
@@ -65,12 +65,12 @@ const style = reactive({
 let cleanup: () => void
 onMounted(() => {
   if (!InputRef.value) return
-  cleanup = watchDOM(InputRef.value.$el, ({ width, height }) => {
+  cleanup = watchDOM(InputRef.value, ({ width, height }) => {
     style.Input.width = width
     style.Input.height = height
     style.input.height = height - 2
   })
-  useCssVar(InputRef.value.$el, style)
+  useCssVar(InputRef.value, style)
 })
 onUnmounted(() => cleanup())
 
@@ -227,7 +227,7 @@ defineExpose({
 </script>
 
 <template>
-  <Card :class="$style.Input" ref="InputRef" type="glass">
+  <Card :class="$style.Input" :ref="(el) => InputRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>

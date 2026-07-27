@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import Input, { type InputOption } from './Input.vue'
 import TextArea from './TextArea.vue'
 
-import { DateItem } from '../type'
+import type { DateItem } from '../type'
 
 export type FormItem = {
   id: string

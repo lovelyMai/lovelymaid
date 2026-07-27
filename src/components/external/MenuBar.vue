@@ -1,0 +1,73 @@
+<script setup lang="ts">
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import Card from './Card.vue';
+
+import type { Item } from '../type.js';
+import { watchDOM } from '@/utils/common';
+import useCssVar from '@/utils/use-css-var';
+
+interface Props {
+  /** 菜单 */
+  menus: Item[]
+}
+const props = defineProps<Props>()
+
+// 初始化
+const MenuBarRef = ref<HTMLElement | null>(null)
+const style = reactive({
+  MenuBar: {
+    'border-radius': '0'
+  }
+})
+let cleanup: (() => void) | undefined
+onMounted(() => {
+  if (!MenuBarRef.value) return
+  cleanup = watchDOM(MenuBarRef.value, ({ width, height }) => {
+    const shorter = Math.min(width, height)
+    style.MenuBar['border-radius'] = `${shorter / 2}px`
+  })
+  useCssVar(MenuBarRef.value, style)
+})
+onUnmounted(() => {
+  cleanup?.()
+})
+</script>
+
+<template>
+  <Card :class="$style.MenuBar" :ref="(el) => MenuBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
+    <ul :class="$style.menus">
+      <li :class="$style.menu" v-for="(menu, index) in props.menus">
+        <slot :menu="menu" :index="index"></slot>
+      </li>
+    </ul>
+  </Card>
+</template>
+
+<style module>
+.MenuBar {
+  padding: 3px;
+  border-radius: var(--MenuBar-border-radius)
+}
+
+.menus {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .menu:hover {
+    background-color: var(--color-gray-150);
+  }
+}
+</style>

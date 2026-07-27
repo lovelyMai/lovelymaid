@@ -4,10 +4,11 @@ import ContentBar from './components/external/ContentBar.vue'
 import FoldList from './components/external/FoldList.vue'
 import Form, { type FormItem } from './components/external/Form.vue'
 import Input, { type InputOption } from './components/external/Input.vue'
+import MenuBar from './components/external/MenuBar.vue'
 import Modal from './components/external/Modal.vue'
 import Select from './components/external/Select.vue'
 import SideBar from './components/external/SideBar.vue'
-import TabBar, { type TabItem } from './components/external/TabBar.vue'
+import TabBar from './components/external/TabBar.vue'
 import Table, { type ColumnConfig, type SortConfig } from './components/external/Table.vue'
 import TextArea from './components/external/TextArea.vue'
 
@@ -24,10 +25,11 @@ export {
   FoldList,
   Form, type FormItem,
   Input, type InputOption,
+  MenuBar,
   Modal,
   Select,
   SideBar,
-  TabBar, type TabItem,
+  TabBar,
   Table, type ColumnConfig, type SortConfig,
   TextArea,
   type Item, type ListItem, type OptionItem, type DateItem

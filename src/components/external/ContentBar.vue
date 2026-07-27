@@ -33,23 +33,23 @@ const style = reactive({
   }
 })
 onMounted(() => {
-  if (!ContentBarRef.value?.$el) return
-  useCssVar(ContentBarRef.value.$el, style)
+  if (!ContentBarRef.value) return
+  useCssVar(ContentBarRef.value, style)
 })
 
 // 计算平移距离
-const ContentBarRef = ref<InstanceType<typeof Card> | null>(null)
+const ContentBarRef = ref<HTMLElement | null>(null)
 const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
   if (!ContentBarRef.value) return
-  transformDistance.value = getLayoutLeft(ContentBarRef.value.$el) + ContentBarRef.value.$el.offsetWidth + 10
+  transformDistance.value = getLayoutLeft(ContentBarRef.value) + ContentBarRef.value.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
   if (!ContentBarRef.value) return
   calculateTransform()
-  cleanup = watchDOM(ContentBarRef.value.$el, () => {
+  cleanup = watchDOM(ContentBarRef.value, () => {
     debounceCalculateTransform()
   })
   setTimeout(() => {
@@ -80,10 +80,10 @@ watch(() => props.visible, async (newVisible) => {
 </script>
 
 <template>
-  <Card :class="$style.ContentBar" ref="ContentBarRef" type="glass">
+  <Card :class="$style.ContentBar" :ref="(el) => ContentBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
     <div :class="$style.header">
       <div :class="$style.title" :title="props.title">{{ props.title }}</div>
-      <Button type="glass" :class="$style.Button" :on-click="props.onCloseClick" title="收起内容栏">
+      <Button :class="$style.Button" :on-click="props.onCloseClick" title="收起内容栏">
         <span class="lovelymai lovely-close"></span>
       </Button>
     </div>

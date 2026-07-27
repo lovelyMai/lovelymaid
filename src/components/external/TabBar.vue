@@ -4,14 +4,14 @@ import Card from './Card.vue';
 import Button from './Button.vue'
 import Input from './Input.vue'
 
+import type { ListItem } from '../type.js';
 import { clearTimer, throttle, watchDOM } from '@/utils/common';
 import { getLayoutLeft } from '@/utils/get-layout-offset.js';
 import useCssVar from '@/utils/use-css-var.js';
 
-export type TabItem = { id: string, name?: string, [key: string]: any }
 interface Props {
   /** 标签 */
-  tabs: TabItem[]
+  tabs: ListItem[]
   /** 是否启用搜索按钮 */
   showSearch?: boolean
   /** 输入框提示词 */
@@ -274,7 +274,7 @@ watch(searchIsActive, (newValue) => {
 
 <template>
   <div :class="$style.TabBar" ref="TabBarRef">
-    <Card :class="[$style.Bar, { [$style.active]: !searchIsActive }]" type="glass">
+    <Card :class="[$style.Bar, { [$style.active]: !searchIsActive }]">
       <ul :class="$style.content" ref="contentRef" @pointerdown.prevent="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
           <slot :item="props.tabs[activeIndex]" :index="activeIndex"></slot>
@@ -293,7 +293,7 @@ watch(searchIsActive, (newValue) => {
       </ul>
     </Card>
     <div :class="[$style.search, { [$style.active]: searchIsActive }]" v-if="props.showSearch">
-      <Button type="glass" :class="$style.Button" v-show="!searchIsShow" :on-click="clickSearch">
+      <Button :class="$style.Button" v-show="!searchIsShow" type="glass" :on-click="clickSearch">
         <span class="lovelymai lovely-search button"></span>
       </Button>
       <Input :class="$style.Input" v-show="searchIsShow" type="text" v-model:value="inputValue"

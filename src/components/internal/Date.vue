@@ -83,7 +83,7 @@ defineExpose<DateInstance>({
   <teleport to="body">
     <transition name="lovelymai-fade-leave">
       <Card :class="$style.Date" :ref="(ins) => DateRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null"
-        v-if="props.visible" type="glass"
+        v-if="props.visible"
         :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px`, zIndex: props.zIndex }">
         <div :class="$style.header">
           <h5 :class="$style.date" @click.stop="() => scrollIsOpen = !scrollIsOpen">
