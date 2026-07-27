@@ -82,6 +82,9 @@ watch(() => props.visible, async (newVisible) => {
 <template>
   <Card :class="$style.SideBar" ref="SideBarRef" type="glass">
     <div :class="$style.header">
+      <div :class="$style.text">
+        <slot name="title"></slot>
+      </div>
       <div :class="[$style.button, { [$style.close]: !isOpen }]" :title="isOpen ? '收起侧边栏' : '打开侧边栏'" @click.stop="() => {
         isOpen = !isOpen
         props.onButtonClick?.()
@@ -101,17 +104,24 @@ watch(() => props.visible, async (newVisible) => {
 }
 
 .header {
+  display: flex;
+  align-items: center;
   position: relative;
   height: 50px;
+  padding: 0 10px;
+}
+
+.text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .button {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: absolute;
-  top: 10px;
-  right: 10px;
   width: 35px;
   height: 30px;
   border: none;
