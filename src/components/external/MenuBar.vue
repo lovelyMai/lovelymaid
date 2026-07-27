@@ -9,6 +9,8 @@ import useCssVar from '@/utils/use-css-var';
 interface Props {
   /** 菜单 */
   menus: Item[]
+  /** 菜单点击事件 */
+  onMenuClick?: (menu: Item, index: number) => void
 }
 const props = defineProps<Props>()
 
@@ -36,7 +38,8 @@ onUnmounted(() => {
 <template>
   <Card :class="$style.MenuBar" :ref="(el) => MenuBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
     <ul :class="$style.menus">
-      <li :class="$style.menu" v-for="(menu, index) in props.menus">
+      <li :class="$style.menu" v-for="(menu, index) in props.menus"
+        @click.stop="() => props.onMenuClick?.(menu, index)">
         <slot :menu="menu" :index="index"></slot>
       </li>
     </ul>
