@@ -11,10 +11,14 @@ interface Props {
   width?: string
   /** 高 */
   height?: string
+  /** z-index */
+  zIndex?: number
   /** 关闭事件 */
   onClose?: () => void
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  zIndex: 0
+})
 const visible = defineModel<boolean>('visible', { required: true })
 
 // 初始化
@@ -49,7 +53,7 @@ const close = () => {
 
 <template>
   <teleport to="body">
-    <div :class="$style.Modal" ref="ModalRef">
+    <div :class="$style.Modal" ref="ModalRef" :style="{ zIndex: props.zIndex }">
       <transition name="lovelymai-fade">
         <div :class="$style.mask" v-if="visible" @click.capture.stop="close"></div>
       </transition>
@@ -67,7 +71,6 @@ const close = () => {
 <style module>
 .Modal {
   position: relative;
-  z-index: 0;
 }
 
 .mask {

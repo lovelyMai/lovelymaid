@@ -68,7 +68,7 @@ defineExpose({ verifications })
       width: item.type === 'textarea' ? '100%' : (item.width ?? props.itemWidth ?? '150px'),
       height: item.type === 'textarea' ? '' : (item.height ?? props.itemHeight ?? '35px')
     }">
-      <span :class="$style.name"
+      <span :class="$style.name" v-if="item.name"
         :style="{ lineHeight: item.type === 'textarea' ? '42px' : (item.height ?? props.itemHeight ?? 35) + 'px' }">
         {{ item.name }}</span>
       <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
