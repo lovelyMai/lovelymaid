@@ -7,14 +7,14 @@ import { createWindowManager, type WindowManager } from '@/composables/window'
 import { createActivationManager, type ActivationManager } from '@/composables/activation'
 
 export type ColumnConfig = {
-  id: string
+  id: string | number
   name: string
   prop: string
   width?: string
 }
 export type SortConfig = {
   /** 列 id */
-  id: string
+  id: string | number
   /** 排序规则 */
   order: 'asc' | 'desc'
 }
@@ -28,7 +28,7 @@ interface Props {
 }
 const props = defineProps<Props>()
 const sort = defineModel<SortConfig>('sort')
-const activeIds = defineModel<Set<string>>('active-ids', { default: () => new Set() })
+const activeIds = defineModel<Set<string | number>>('active-ids', { default: () => new Set() })
 
 // 表头排序
 const sortedRows = computed<Item[]>(() => {

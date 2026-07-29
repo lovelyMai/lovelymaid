@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
   title: '标题'
 })
 const isOpen = defineModel<boolean>('open', { required: true })
-const activeId = defineModel<string>('active-id')
+const activeId = defineModel<string | number>('active-id')
 
 // 初始化
 const FoldListRef = ref<HTMLElement | null>(null)
@@ -44,7 +44,7 @@ onMounted(() => {
 // 列表项动画
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
-const oldlist = ref<{ id: string, name: string }[]>(props.list)
+const oldlist = ref<{ id: string | number, name: string }[]>(props.list)
 const listSnapshot = computed(() => props.list.map(item => item.id).join(','))
 watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
   if (newSnapshot === oldSnapshot) return

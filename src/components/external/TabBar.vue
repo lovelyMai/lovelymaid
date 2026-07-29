@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import Card from './Card.vue';
 import Button from './Button.vue'
 import Input from './Input.vue'
@@ -22,7 +22,7 @@ interface Props {
   onSearch?: () => void
 }
 const props = defineProps<Props>()
-const activeIndex = defineModel<number>('active-index', { required: true })
+const activeId = defineModel<string | number>('active-id', { required: true })
 const inputValue = defineModel<string>('value', { default: '' })
 
 // 初始化
@@ -58,6 +58,10 @@ const style = reactive({
       return style.slide.scale === 1.2 ? 1.1 : 1
     }
   }
+})
+const activeIndex = computed<number>({
+  get: () => props.tabs.findIndex(tab => tab.id === activeId.value),
+  set: (newActiveIndex) => activeId.value = props.tabs[newActiveIndex].id
 })
 const maxDistance = ref<number>(0)
 let cleanup: () => void
@@ -281,13 +285,13 @@ watch(searchIsActive, (newValue) => {
         </li>
         <li :class="$style.tab" v-for="(item, index) in props.tabs" :key="index">
           <slot :item="item" :index="index"></slot>
-          <span v-if="item.name">{{ item.name }}</span>
+          <span :class="$style.text" v-if="item.name">{{ item.name }}</span>
         </li>
-        <div :class="$style.slide" ref="SlideRef" v-show="!searchIsActive"></div>
+        <div :class="$style.slide" ref="SlideRef" v-show="activeIndex !== -1 && !searchIsActive"></div>
         <ul :class="[$style.content, $style.top]" v-show="!searchIsActive">
           <li :class="[$style.tab, $style.top]" v-for="(item, index) in props.tabs" :key="index">
             <slot :item="item" :index="index"></slot>
-            <span v-if="item.name">{{ item.name }}</span>
+            <span :class="$style.text" v-if="item.name">{{ item.name }}</span>
           </li>
         </ul>
       </ul>
@@ -378,7 +382,7 @@ watch(searchIsActive, (newValue) => {
   height: 100%;
 }
 
-.tab :nth-child(2) {
+.tab .text {
   font-size: var(--font-size);
 }
 

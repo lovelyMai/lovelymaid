@@ -7,7 +7,7 @@ export type ActivationManager = {
   cleanup: () => void
 }
 
-export const createActivationManager = (items: Ref<Item[]>, activeIds: Ref<Set<string>>, ParentEl: HTMLElement): ActivationManager => {
+export const createActivationManager = (items: Ref<Item[]>, activeIds: Ref<Set<string | number>>, ParentEl: HTMLElement): ActivationManager => {
   const activeIndexes = ref<Set<number>>(new Set())
   let lastActiveIndex: number | undefined = undefined
   watch(activeIds, (newActiveIds) => {

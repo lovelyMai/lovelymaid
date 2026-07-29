@@ -24,16 +24,16 @@ const date = defineModel<DateItem>('date', { default: () => formatDate(Date.now(
 // 初始化
 const today = formatDate(Date.now())
 const weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-const months: ListItem[] = Array(12).fill(null).map((_, index) => ({ id: String(index + 1), name: `${index + 1}月` }))
-const years: ListItem[] = Array(200).fill(null).map((_, index) => ({ id: String(1900 + index), name: `${1900 + index}年` }))
+const months: ListItem[] = Array(12).fill(null).map((_, index) => ({ id: index + 1, name: `${index + 1}月` }))
+const years: ListItem[] = Array(200).fill(null).map((_, index) => ({ id: 1900 + index, name: `${1900 + index}年` }))
 
 // 年月切换
 const year = ref<number>(today[0])
 const month = ref<number>(today[1])
 const scrollIsOpen = ref<boolean>(false)
-const activeIds = computed<[string, string]>({
-  get: () => [String(year.value), String(month.value)] as [string, string],
-  set: ([newYearId, newMonthId]: [string, string]) => {
+const activeIds = computed<[string | number, string | number]>({
+  get: () => [year.value, month.value] as [string | number, string | number],
+  set: ([newYearId, newMonthId]: [string | number, string | number]) => {
     year.value = Number(newYearId)
     month.value = Number(newMonthId)
   }

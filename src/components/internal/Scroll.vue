@@ -9,10 +9,10 @@ interface Props {
   lists: [ListItem[], ListItem[]]
 }
 const props = defineProps<Props>()
-const activeIds = defineModel<[string, string]>('active-ids')
+const activeIds = defineModel<[string | number, string | number]>('active-ids')
 watch(() => props.lists, (newLists) => {
   if (activeIds.value === undefined) {
-    activeIds.value = newLists.map(list => list[0].id) as [string, string]
+    activeIds.value = newLists.map(list => list[0].id) as [string | number, string | number]
   }
 }, { immediate: true })
 

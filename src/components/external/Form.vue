@@ -6,7 +6,7 @@ import TextArea from './TextArea.vue'
 import type { DateItem } from '../type'
 
 export type FormItem = {
-  id: string
+  id: string | number
   name: string
   type?: 'text' | 'number' | 'password' | 'select' | 'textarea' | 'date'
   value: string

@@ -1,10 +1,10 @@
-const calculateOffsets = <T extends { id: string }>(
+const calculateOffsets = <T extends { id: string | number }>(
   newList: T[],
   oldList: T[]
 ): number[] => {
   const result: number[] = new Array(newList.length);
 
-  const oldIndexMap = new Map<string, number>();
+  const oldIndexMap = new Map<string | number, number>();
   for (let i = 0; i < oldList.length; i++) {
     oldIndexMap.set(oldList[i].id, i);
   }
