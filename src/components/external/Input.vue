@@ -272,7 +272,7 @@ defineExpose({
   width: calc(var(--input-height) * 1px);
   height: 100%;
   font-size: calc(var(--input-height) * 0.5px);
-  color: var(--lovelymai-color-gray-500);
+  color: var(--lovelymai-color-gray-600);
   pointer-events: none;
 }
 

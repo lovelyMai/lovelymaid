@@ -11,7 +11,8 @@
   --lovelymai-color-gray-250: #b3b3b3;
   --lovelymai-color-gray-300: #767676;
   --lovelymai-color-gray-400: #544957;
-  --lovelymai-color-gray-500: #19191a;
+  --lovelymai-color-gray-500: #0000001a;
+  --lovelymai-color-gray-600: #19191a;
   /* 红色 */
   --lovelymai-color-red-200: #ef6b6bcc;
   /* 阴影 */
@@ -22,7 +23,7 @@
 .lovelymai-glass-container {
   background-color: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px) saturate(1.5);
-  border: 1px solid #fff;
+  border: 1px solid var(--lovelymai-color-gray-500);
   box-shadow: var(--lovelymai-box-shadow-100);
 }
 

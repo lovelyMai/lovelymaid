@@ -149,6 +149,6 @@ watch(() => props.visible, async (newVisible) => {
 <style scoped>
 .lovely-left-sidebar {
   font-size: 20px;
-  color: var(--lovelymai-color-gray-500);
+  color: var(--lovelymai-color-gray-600);
 }
 </style>
