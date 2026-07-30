@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
 import Card from './Card.vue';
 
 import { debounce, watchDOM } from '@/utils/common';
-import { getLayoutLeft } from '@/utils/get-layout-offset.js';
+import { getOffsetLeft } from '@/utils/get-offset.js';
 import useCssVar from '@/utils/use-css-var.js';
 
 interface Props {
@@ -43,7 +43,7 @@ const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
   if (!SideBarRef.value) return
-  transformDistance.value = getLayoutLeft(SideBarRef.value) + SideBarRef.value.offsetWidth + 10
+  transformDistance.value = getOffsetLeft(SideBarRef.value) + SideBarRef.value.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {

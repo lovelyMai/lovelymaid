@@ -4,7 +4,7 @@ import Card from './Card.vue';
 import Button from './Button.vue';
 
 import { debounce, watchDOM } from '@/utils/common';
-import { getLayoutLeft } from '@/utils/get-layout-offset.js';
+import { getOffsetLeft } from '@/utils/get-offset.js';
 import useCssVar from '@/utils/use-css-var.js';
 
 interface Props {
@@ -43,7 +43,7 @@ const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
   if (!ContentBarRef.value) return
-  transformDistance.value = getLayoutLeft(ContentBarRef.value) + ContentBarRef.value.offsetWidth + 10
+  transformDistance.value = getOffsetLeft(ContentBarRef.value) + ContentBarRef.value.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
