@@ -101,10 +101,10 @@ defineExpose<MenuInstance>({
 .Menu {
   position: absolute;
   padding: 4px;
-  background-color: var(--color-gray-150);
+  background-color: var(--lovelymai-color-gray-150);
   border: 1px solid #fff;
   border-radius: 10px;
-  outline: 0.5px solid var(--color-gray-250);
+  outline: 0.5px solid var(--lovelymai-color-gray-250);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, .3);
   user-select: none;
   -webkit-user-select: none;
@@ -130,7 +130,7 @@ defineExpose<MenuInstance>({
 
 @media (hover: hover) {
   .Menu .item:hover {
-    background-color: var(--color-blue-200);
+    background-color: var(--lovelymai-color-blue-200);
     color: #fff;
   }
 }

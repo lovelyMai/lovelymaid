@@ -34,13 +34,13 @@ const style = reactive({
     width: 0,
     height: 0,
     'border-radius': 0,
-    'background-color': 'var(--color-gray-100)',
+    'background-color': 'var(--lovelymai-color-gray-100)',
     scale: 1,
     transition: 'none'
   },
   slide: {
     width: 0,
-    background: 'var(--color-gray-200)',
+    background: 'var(--lovelymai-color-gray-200)',
     border: 'none',
     'box-shadow': 'none',
     translateX: 0,
@@ -218,8 +218,8 @@ const moveSlide = throttle((e: PointerEvent) => {
   updateVirtualPos(undefined)
 }, 8)
 const resetHighlight = () => {
-  style.slide.background = 'var(--color-gray-200)'
-  style.Bar['background-color'] = 'var(--color-gray-100)'
+  style.slide.background = 'var(--lovelymai-color-gray-200)'
+  style.Bar['background-color'] = 'var(--lovelymai-color-gray-100)'
   style.slide.border = 'none'
   style.slide['box-shadow'] = 'none'
   style.Bar.scale = 1
@@ -316,7 +316,7 @@ watch(searchIsActive, (newValue) => {
   user-select: none;
   -webkit-user-select: none;
   --font-size: 10px;
-  --top-color: var(--color-blue-300);
+  --top-color: var(--lovelymai-color-blue-300);
 }
 
 .Bar {

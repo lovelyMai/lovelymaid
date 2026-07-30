@@ -72,7 +72,7 @@ onUnmounted(() => {
 
 @media (hover: hover) {
   .menu:hover {
-    background-color: var(--color-gray-150);
+    background-color: var(--lovelymai-color-gray-150);
   }
 }
 </style>

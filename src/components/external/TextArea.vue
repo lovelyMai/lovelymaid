@@ -79,7 +79,7 @@ defineExpose({
   --font-size: 14px;
   --font-weight: 400;
   --line-height: 18px;
-  --placeholder-color: var(--color-gray-400);
+  --placeholder-color: var(--lovelymai-color-gray-400);
 }
 </style>
 <style scoped>
@@ -94,7 +94,7 @@ textarea {
   font-size: var(--font-size);
   font-weight: var(--font-weight);
   line-height: var(--line-height);
-  caret-color: var(--color-blue-200);
+  caret-color: var(--lovelymai-color-blue-200);
   outline: 0px solid transparent;
   transition: outline .2s ease;
   resize: none;
@@ -107,6 +107,6 @@ textarea::placeholder {
 }
 
 textarea:focus {
-  outline: 3px solid var(--color-blue-100);
+  outline: 3px solid var(--lovelymai-color-blue-100);
 }
 </style>

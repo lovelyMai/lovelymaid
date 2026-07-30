@@ -87,7 +87,8 @@ defineExpose<DateInstance>({
         :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px`, zIndex: props.zIndex }">
         <div :class="$style.header">
           <h5 :class="$style.date" @click.stop="() => scrollIsOpen = !scrollIsOpen">
-            <span :style="{ color: scrollIsOpen ? 'var(--color-blue-300)' : '' }">{{ `${year} 年 ${month} 月` }}</span>
+            <span :style="{ color: scrollIsOpen ? 'var(--lovelymai-color-blue-300)' : '' }">{{ `${year} 年 ${month} 月`
+              }}</span>
             <span :class="['lovelymai', 'lovely-right-arrow', $style.arrow]"
               :style="{ transform: scrollIsOpen ? 'translateY(1px) rotate(90deg)' : 'translateY(1px) rotate(0deg)' }"></span>
           </h5>
@@ -162,7 +163,7 @@ defineExpose<DateInstance>({
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: var(--color-gray-300);
+  color: var(--lovelymai-color-gray-300);
 }
 
 .days .monthDays {
@@ -193,18 +194,18 @@ defineExpose<DateInstance>({
 }
 
 .days .day.today {
-  color: var(--color-blue-200);
+  color: var(--lovelymai-color-blue-200);
 }
 
 .days .day.active {
-  background-color: var(--color-blue-200);
+  background-color: var(--lovelymai-color-blue-200);
   color: #fff;
 }
 </style>
 <style scoped>
 .lovelymai {
   font-weight: 600;
-  color: var(--color-blue-300);
+  color: var(--lovelymai-color-blue-300);
   transform: translateY(1px);
   cursor: pointer;
 }

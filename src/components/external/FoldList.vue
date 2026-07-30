@@ -88,7 +88,7 @@ const onItemClick = (item: ListItem, index: number) => {
 .FoldList {
   --header-height: 30px;
   --header-font-size: 12px;
-  --header-color: var(--color-gray-300);
+  --header-color: var(--lovelymai-color-gray-300);
   --list-font-size: 14px;
   --list-line-height: 30px;
   --list-color: inherit;
@@ -137,8 +137,8 @@ const onItemClick = (item: ListItem, index: number) => {
 }
 
 .list .item.active {
-  background-color: var(--color-gray-200);
-  color: var(--color-blue-200);
+  background-color: var(--lovelymai-color-gray-200);
+  color: var(--lovelymai-color-blue-200);
 }
 
 @keyframes slideAnimation {

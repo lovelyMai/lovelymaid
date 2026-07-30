@@ -231,7 +231,8 @@ defineExpose({
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" ref="inputRef" :style="{ outline: warning ? '3px solid var(--color-red-200)' : '' }"
+    <input :class="$style.input" ref="inputRef"
+      :style="{ outline: warning ? '3px solid var(--lovelymai-color-red-200)' : '' }"
       :type="props.type === 'select' || props.type === 'date' ? 'text' : props.type" :value="inputValue"
       @input="(e) => inputValue = (e.target as HTMLInputElement).value"
       :placeholder="props.placeholder ?? (props.type === 'select' || props.type === 'date' ? '选择...' : '输入...')"
@@ -259,8 +260,8 @@ defineExpose({
   --font-size: 14px;
   --font-weight: 400;
   --line-height: 18px;
-  --clear-color: var(--color-gray-300);
-  --placeholder-color: var(--color-gray-400);
+  --clear-color: var(--lovelymai-color-gray-300);
+  --placeholder-color: var(--lovelymai-color-gray-400);
 }
 
 .icon {
@@ -271,7 +272,7 @@ defineExpose({
   width: calc(var(--input-height) * 1px);
   height: 100%;
   font-size: calc(var(--input-height) * 0.5px);
-  color: var(--color-gray-500);
+  color: var(--lovelymai-color-gray-500);
   pointer-events: none;
 }
 
@@ -297,7 +298,7 @@ defineExpose({
 }
 
 .input {
-  caret-color: var(--color-blue-200);
+  caret-color: var(--lovelymai-color-blue-200);
   outline: 0px solid transparent;
   transition: outline .2s ease;
 }
@@ -307,7 +308,7 @@ defineExpose({
 }
 
 .input:focus {
-  outline: 3px solid var(--color-blue-100);
+  outline: 3px solid var(--lovelymai-color-blue-100);
 }
 
 .input[type="number"]::-webkit-inner-spin-button {

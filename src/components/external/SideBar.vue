@@ -137,18 +137,18 @@ watch(() => props.visible, async (newVisible) => {
 .button.close {
   border: 1px solid #fff;
   background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: var(--box-shadow-200);
+  box-shadow: var(--lovelymai-box-shadow-200);
 }
 
 @media (hover: hover) {
   .button:hover {
-    background-color: var(--color-gray-150);
+    background-color: var(--lovelymai-color-gray-150);
   }
 }
 </style>
 <style scoped>
 .lovely-left-sidebar {
   font-size: 20px;
-  color: var(--color-gray-500);
+  color: var(--lovelymai-color-gray-500);
 }
 </style>

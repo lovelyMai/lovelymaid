@@ -58,13 +58,13 @@ onUnmounted(() => {
   border-radius: var(--Button-border-radius);
   font-size: var(--Button-font-size);
   font-weight: 500;
-  color: var(--color-gray-500);
+  color: var(--lovelymai-color-gray-500);
   transition: transform .2s;
   cursor: pointer;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  --background-color: var(--color-blue-200);
+  --background-color: var(--lovelymai-color-blue-200);
 }
 
 .Button.common {
