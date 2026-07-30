@@ -82,11 +82,9 @@ onUnmounted(() => {
       <li :class="$style.column" v-for="column in props.columns" :key="column.id"
         :style="{ width: column.width ?? '200px', color: sort?.id === column.id ? '#000' : 'var(--lovelymai-color-gray-300)' }"
         @click.stop="() => sort = { id: column.id, order: sort?.order === 'asc' ? 'desc' : 'asc' }">
-        <div :class="$style.container">
-          <span :class="$style.text">{{ column.name }}</span>
-          <span class="lovelymai lovely-down-arrow" v-show="column.id === sort?.id"
-            :style="{ transform: sort?.order === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)' }"></span>
-        </div>
+        <span :class="$style.text">{{ column.name }}</span>
+        <span class="lovelymai lovely-down-arrow" v-show="column.id === sort?.id"
+          :style="{ transform: sort?.order === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)' }"></span>
       </li>
       <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null"
         :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :z-index="props.zIndex"
@@ -117,22 +115,18 @@ onUnmounted(() => {
 }
 
 .header .column {
-  padding: 6px 0;
-  cursor: pointer;
-}
-
-.header .column .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 8px;
+  padding: 6px 8px;
+  cursor: pointer;
 }
 
-.header .column:not(:last-child) .container {
+.header .column:not(:last-child) {
   border-right: 0.5px solid var(--lovelymai-color-gray-300);
 }
 
-.header .column .container .text {
+.header .column .text {
   font-size: 12px;
   line-height: 16px;
   font-weight: 500;
