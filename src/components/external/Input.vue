@@ -89,9 +89,12 @@ const compositionstart = () => {
 const MenuRef = ref<HTMLElement | null>(null)
 const MenuManager = ref<WindowManager | null>(null)
 let isSelecting: boolean = false
+let isFocused: boolean = false
 onMounted(() => {
   if (!inputRef.value || props.type !== 'select') return
   MenuManager.value = createWindowManager(inputRef.value, MenuRef)
+  inputRef.value.addEventListener('focus', () => { isFocused = true })
+  inputRef.value.addEventListener('blur', () => { isFocused = false })
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()
@@ -124,7 +127,7 @@ watch(showingOptions, () => {
   if (!MenuManager.value) return
   if (isSelecting) {
     isSelecting = false
-  } else {
+  } else if (isFocused) {
     MenuManager.value.open()
   }
 })
