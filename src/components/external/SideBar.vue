@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
 import Card from './Card.vue';
 
 import { debounce, watchDOM } from '@/utils/common';
-import { getOffsetLeft } from '@/utils/get-offset.js';
+import { getOffsetLeft } from '@/utils/get-layout-offset.js';
 import useCssVar from '@/utils/use-css-var.js';
 
 interface Props {

@@ -1,6 +1,6 @@
 import { nextTick, reactive, ref, type Ref } from 'vue'
 
-import { getOffsetLeft, getOffsetTop } from '@/utils/get-offset'
+import { getOffsetLeft, getOffsetTop } from '@/utils/get-view-offset'
 
 export type WindowManager = {
   readonly visible: boolean
@@ -14,6 +14,22 @@ const stopClickPropagation = (e: Event) => {
   e.stopPropagation()
   document.removeEventListener('click', stopClickPropagation, true)
 }
+
+/** 获取元素的所有可滚动祖先（含 document） */
+const getScrollableParents = (el: HTMLElement): (HTMLElement | Document)[] => {
+  const parents: (HTMLElement | Document)[] = []
+  let current: HTMLElement | null = el.parentElement
+  while (current) {
+    const style = getComputedStyle(current)
+    if (/(auto|scroll)/.test(style.overflow + style.overflowX + style.overflowY)) {
+      parents.push(current)
+    }
+    current = current.parentElement
+  }
+  parents.push(document)
+  return parents
+}
+
 export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLElement | null>, type: 'fixed' | 'flex' = 'fixed', method: 'down' | 'contextmenu' = 'down'): WindowManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
@@ -49,6 +65,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
   }
   let lastEvent: MouseEvent | undefined
   let ticking = false
+  let scrollParents: (HTMLElement | Document)[] = []
   const onScroll = () => {
     if (ticking) return
     requestAnimationFrame(() => {
@@ -63,7 +80,8 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     await nextTick()
     if (!WindowRef.value) return
     calcPos(e)
-    document.addEventListener('scroll', onScroll)
+    scrollParents = getScrollableParents(TriggerEl)
+    scrollParents.forEach(p => p.addEventListener('scroll', onScroll))
     document.removeEventListener('click', onDocClick, true)
     setTimeout(() => {
       document.removeEventListener('click', stopClickPropagation, true)
@@ -87,7 +105,8 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
   const close = () => {
     if (!visible.value) return
     visible.value = false
-    document.removeEventListener('scroll', onScroll)
+    scrollParents.forEach(p => p.removeEventListener('scroll', onScroll))
+    scrollParents = []
     document.removeEventListener('click', onDocClick, true)
   }
   const onDocClick = (e: MouseEvent) => {
@@ -101,7 +120,8 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     TriggerEl.removeEventListener('mousedown', onTrigger)
     TriggerEl.removeEventListener('contextmenu', onTrigger)
     document.removeEventListener('click', stopClickPropagation, true)
-    document.removeEventListener('scroll', onScroll)
+    scrollParents.forEach(p => p.removeEventListener('scroll', onScroll))
+    scrollParents = []
     document.removeEventListener('click', onDocClick, true)
   }
 

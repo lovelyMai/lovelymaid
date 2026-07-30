@@ -6,7 +6,7 @@ import Input from './Input.vue'
 
 import type { ListItem } from '../type.js';
 import { clearTimer, throttle, watchDOM } from '@/utils/common';
-import { getOffsetLeft } from '@/utils/get-offset.js';
+import { getOffsetLeft } from '@/utils/get-layout-offset.js';
 import useCssVar from '@/utils/use-css-var.js';
 
 interface Props {
