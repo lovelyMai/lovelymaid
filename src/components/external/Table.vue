@@ -31,9 +31,16 @@ const sort = defineModel<SortConfig>('sort')
 const activeIds = defineModel<Set<string | number>>('active-ids', { default: () => new Set() })
 
 // 表头排序
+const onHeaderClick = (column: ColumnConfig) => {
+  const valid = props.rows.every(row => typeof row[column.prop] === 'string' || typeof row[column.prop] === 'number')
+  if (!valid) return
+  sort.value = { id: column.id, order: sort.value?.order === 'asc' ? 'desc' : 'asc' }
+}
 const sortedRows = computed<Item[]>(() => {
   if (!sort.value) return props.rows
   const sortProp = props.columns.find(column => column.id === sort.value!.id)!.prop
+  const valid = props.rows.every(row => typeof row[sortProp] === 'string' || typeof row[sortProp] === 'number')
+  if (!valid) return props.rows
   return [...props.rows].sort((a, b) => {
     if (sort.value!.order === 'asc') {
       return a[sortProp].localeCompare(b[sortProp], undefined, { numeric: true });
@@ -81,7 +88,7 @@ onUnmounted(() => {
     <ul :class="$style.header" ref="headerRef">
       <li :class="$style.column" v-for="column in props.columns" :key="column.id"
         :style="{ width: column.width ?? '200px', color: sort?.id === column.id ? '#000' : 'var(--lovelymai-color-gray-300)' }"
-        @click.stop="() => sort = { id: column.id, order: sort?.order === 'asc' ? 'desc' : 'asc' }">
+        @click.stop="() => onHeaderClick(column)">
         <span :class="$style.text">{{ column.name }}</span>
         <span class="lovelymai lovely-down-arrow" v-show="column.id === sort?.id"
           :style="{ transform: sort?.order === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)' }"></span>
