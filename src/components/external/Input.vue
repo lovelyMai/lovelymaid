@@ -163,6 +163,12 @@ const clear = () => {
   DateManager.value?.open()
 }
 
+// 非弹窗类时输入自动清除警告
+watch(inputValue, () => {
+  if (props.type === 'select' || props.type === 'date') return
+  warning.value = false
+})
+
 // Tab 补全
 const collectSelectable = (options: InputOption[]): InputOption[] => options.flatMap(option => option.options && !option.selectable ? collectSelectable(option.options) : [option])
 const tab = () => {
