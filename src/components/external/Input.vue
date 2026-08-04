@@ -9,10 +9,13 @@ import { formatDate, verifyDate, watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/use-css-var.js'
 import { createWindowManager, type WindowManager } from '@/composables/window'
 
-export type InputOption = OptionItem & { selectable?: boolean }
+export type InputOption = OptionItem & {
+  /** 选项能否被选中（仅该选项还有子选项时生效） */
+  selectable?: boolean
+}
 interface Props {
   /** 输入框类型 */
-  type?: "text" | "password" | "number" | "select" | "date"
+  type?: "text" | "password" | "number" | "radio" | "checkbox" | "date"
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
@@ -91,7 +94,7 @@ const MenuManager = ref<WindowManager | null>(null)
 let isSelecting: boolean = false
 let isFocused: boolean = false
 onMounted(() => {
-  if (!inputRef.value || props.type !== 'select') return
+  if (!inputRef.value || props.type !== 'radio') return
   MenuManager.value = createWindowManager(inputRef.value, MenuRef)
   inputRef.value.addEventListener('focus', () => { isFocused = true })
   inputRef.value.addEventListener('blur', () => { isFocused = false })
@@ -165,14 +168,14 @@ const clear = () => {
 
 // 非弹窗类时输入自动清除警告
 watch(inputValue, () => {
-  if (props.type === 'select' || props.type === 'date') return
+  if (props.type === 'radio' || props.type === 'date') return
   warning.value = false
 })
 
 // Tab 补全
 const collectSelectable = (options: InputOption[]): InputOption[] => options.flatMap(option => option.options && !option.selectable ? collectSelectable(option.options) : [option])
 const tab = () => {
-  if (props.type === 'select') {
+  if (props.type === 'radio') {
     if (!MenuManager.value) return
     const selectable = collectSelectable(filteredOptions.value)
     if (selectable.length !== 1) return
@@ -193,7 +196,7 @@ const tab = () => {
 // 校验是否通过
 const verified = computed<boolean>(() => {
   if (!inputValue.value || !props.verify) return true
-  if (props.type === 'select') {
+  if (props.type === 'radio') {
     const isSelectable = (options: InputOption[]): boolean =>
       options.some(option => {
         if (option.options && !option.selectable) return isSelectable(option.options)
@@ -210,7 +213,7 @@ const verified = computed<boolean>(() => {
   return true
 })
 watch(inputValue, () => {
-  if (props.type !== 'select' && props.type !== 'date') return
+  if (props.type !== 'radio' && props.type !== 'date') return
   if (verified.value) {
     warning.value = false
   } else {
@@ -242,16 +245,16 @@ defineExpose({
     </div>
     <input :class="$style.input" ref="inputRef"
       :style="{ outline: warning ? '3px solid var(--lovelymai-color-red-200)' : '' }"
-      :type="props.type === 'select' || props.type === 'date' ? 'text' : props.type" :value="inputValue"
+      :type="props.type === 'radio' || props.type === 'date' ? 'text' : props.type" :value="inputValue"
       @input="(e) => inputValue = (e.target as HTMLInputElement).value"
-      :placeholder="props.placeholder ?? (props.type === 'select' || props.type === 'date' ? '选择...' : '输入...')"
+      :placeholder="props.placeholder ?? (props.type === 'radio' || props.type === 'date' ? '选择...' : '输入...')"
       :enterkeyhint="props.enterkeyhint" :disabled="props.disabled" :readonly="props.readonly"
       @keydown.enter.prevent="enter" @keydown.tab.prevent="tab" @compositionstart="compositionstart"
       @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-show="inputValue && !props.disabled" @click.stop="() => clear()"></span>
     </div>
-    <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'select'"
+    <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'radio'"
       :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="showingOptions"
       :width="style.Input.width + 'px'" :z-index="props.zIndex" :on-option-click="onOptionClick" />
     <DateWindow :ref="(ins) => DateRef = (ins as DateInstance | null)?.root ?? null" v-if="props.type === 'date'"

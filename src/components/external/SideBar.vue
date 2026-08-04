@@ -111,7 +111,7 @@ watch(() => props.visible, async (newVisible) => {
   padding: 0 10px;
 }
 
-.text {
+.header .text {
   flex: 1;
   font-size: 16px;
   font-weight: 500;

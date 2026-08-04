@@ -8,7 +8,7 @@ import type { DateItem } from '../type'
 export type FormItem = {
   id: string | number
   name: string
-  type?: 'text' | 'number' | 'password' | 'select' | 'textarea' | 'date'
+  type?: 'text' | 'number' | 'password' | 'radio' | 'textarea' | 'date'
   value: string
   placeholder?: string
   disabled?: boolean

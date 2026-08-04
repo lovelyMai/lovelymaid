@@ -6,11 +6,15 @@ import type { Item } from '../type.js';
 import { watchDOM } from '@/utils/common';
 import useCssVar from '@/utils/use-css-var';
 
+type MenuItem = Item & {
+  /** 是否禁用 */
+  disabled?: boolean
+}
 interface Props {
   /** 菜单 */
-  menus: Item[]
+  menus: MenuItem[]
   /** 菜单点击事件 */
-  onMenuClick?: (menu: Item, index: number) => void
+  onMenuClick?: (menu: MenuItem, index: number) => void
 }
 const props = defineProps<Props>()
 
@@ -38,7 +42,7 @@ onUnmounted(() => {
 <template>
   <Card :class="$style.MenuBar" :ref="(el) => MenuBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
     <ul :class="$style.menus">
-      <li :class="$style.menu" v-for="(menu, index) in props.menus"
+      <li :class="[$style.menu, { [$style.disabled]: menu.disabled }]" v-for="(menu, index) in props.menus"
         @click.stop="() => props.onMenuClick?.(menu, index)">
         <slot :menu="menu" :index="index"></slot>
       </li>
@@ -61,7 +65,7 @@ onUnmounted(() => {
   height: 100%;
 }
 
-.menu {
+.menus .menu {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -70,8 +74,13 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
+.menus .menu.disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
 @media (hover: hover) {
-  .menu:hover {
+  .menu:not(.disabled):hover {
     background-color: var(--lovelymai-color-gray-150);
   }
 }

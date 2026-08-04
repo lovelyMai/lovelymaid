@@ -22,7 +22,7 @@ export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: MenuI
     if (!MenuInstance.root) return
     const target = e.target as HTMLElement
     if (MenuInstance.root.contains(target)) {
-      TriggerEl.style.backgroundColor = '#dadada'
+      TriggerEl.style.backgroundColor = 'var(--lovelymai-color-gray-225)'
       TriggerEl.style.color = '#000'
     } else {
       TriggerEl.style.backgroundColor = ''
