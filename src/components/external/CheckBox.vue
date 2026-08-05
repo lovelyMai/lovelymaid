@@ -175,7 +175,7 @@ defineExpose({
       @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
       <span class="lovelymai lovely-clear" v-show="!props.disabled && selectedValue.length > 0"
-        @click.stop="() => clear()"></span>
+        @mouseup.stop="() => clear()"></span>
     </div>
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" :visible="MenuManager?.visible ?? false"
       :position="MenuManager?.position ?? [0, 0]" :options="showingOptions" :min-width="style.Input.width + 'px'"

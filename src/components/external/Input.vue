@@ -248,7 +248,7 @@ defineExpose({
       @keydown.enter.prevent="enter" @keydown.tab.prevent="tab" @compositionstart="compositionstart"
       @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
-      <span class="lovelymai lovely-clear" v-show="!props.disabled && inputValue" @click.stop="() => clear()"></span>
+      <span class="lovelymai lovely-clear" v-show="!props.disabled && inputValue" @mouseup.stop="() => clear()"></span>
     </div>
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'radio'"
       :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="showingOptions"
