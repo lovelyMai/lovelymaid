@@ -2,17 +2,19 @@ import { reactive, ref } from 'vue'
 
 import { type WindowManager } from './window'
 import { type MenuInstance } from '@/components/internal/Menu.vue'
+import { watchDOM } from '@/utils/common'
 
 export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: MenuInstance): WindowManager => {
   const visible = ref<boolean>(false)
   const parentEl = TriggerEl.parentElement
   const position = ref<[number, number]>([0, 0])
-  const calcPos = () => {
-    position.value = [TriggerEl.offsetWidth, -5]
-  }
+  let cleanWatchDOM: (() => void) | undefined
+
   const open = () => {
     if (visible.value || !parentEl) return
-    calcPos()
+    cleanWatchDOM = watchDOM(TriggerEl, ({ width }) => {
+      position.value = [width, -5]
+    })
     visible.value = true
     parentEl.addEventListener('mouseover', onParentOverToChange)
     parentEl.addEventListener('mouseover', onParentOverToClose)
@@ -30,10 +32,11 @@ export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: MenuI
     }
   }
   const close = () => {
-    if (!visible.value || !parentEl) return
+    if (!visible.value) return
     visible.value = false
-    parentEl.removeEventListener('mouseover', onParentOverToChange)
-    parentEl.removeEventListener('mouseover', onParentOverToClose)
+    cleanWatchDOM?.()
+    parentEl?.removeEventListener('mouseover', onParentOverToChange)
+    parentEl?.removeEventListener('mouseover', onParentOverToClose)
   }
   const onParentOverToClose = (e: MouseEvent) => {
     if (!parentEl) return
