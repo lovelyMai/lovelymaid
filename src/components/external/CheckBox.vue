@@ -37,7 +37,7 @@ const warning = defineModel<boolean>('warning', { default: false })
 
 // 输入框展示文本：输入时显示过滤关键词，否则显示已选中项
 const keyword = ref('')
-const showValue = computed<string>(() => MenuManager.value?.visible ? keyword.value : selectedValue.value.length > 0 ? `已选择${selectedValue.value.length}项` : '')
+const showValue = computed<string>(() => MenuManager.value?.visible ? keyword.value : selectedValue.value.length > 0 ? `已选择 ${selectedValue.value.length} 项` : '')
 
 // 初始化
 const InputRef = ref<HTMLElement | null>(null)
