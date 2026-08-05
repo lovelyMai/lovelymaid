@@ -75,7 +75,7 @@ onUnmounted(() => {
 }
 
 .menus .menu.disabled {
-  opacity: .4;
+  opacity: .3;
   cursor: not-allowed;
 }
 

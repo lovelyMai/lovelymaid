@@ -9,13 +9,9 @@ import { formatDate, verifyDate, watchDOM } from '@/utils/common'
 import useCssVar from '@/utils/use-css-var.js'
 import { createWindowManager, type WindowManager } from '@/composables/window'
 
-export type InputOption = OptionItem & {
-  /** 选项能否被选中（仅该选项还有子选项时生效） */
-  selectable?: boolean
-}
 interface Props {
   /** 输入框类型 */
-  type?: "text" | "password" | "number" | "radio" | "checkbox" | "date"
+  type?: "text" | "password" | "number" | "radio" | "date"
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
@@ -24,15 +20,15 @@ interface Props {
   disabled?: boolean
   /** 是否只读 */
   readonly?: boolean
-  /** 选项 (仅 type 为 select 时有效) */
-  options?: InputOption[]
-  /** 是否启用选项过滤 (仅 type 为 select 时有效) */
+  /** 选项 (仅 type 为 radio 时有效) */
+  options?: OptionItem[]
+  /** 是否启用选项过滤 (仅 type 为 radio 时有效) */
   filter?: boolean
   /** 格式化 (仅 type 为 date 时有效) */
   format?: (date: DateItem) => string
-  /** 是否启用校验 (仅 type 为 select 或 date 时有效) */
+  /** 是否启用校验 (仅 type 为 radio 或 date 时有效) */
   verify?: boolean
-  /** 弹窗 z-index（仅 type 为 select 或 date 时有效）*/
+  /** 弹窗 z-index（仅 type 为 radio 或 date 时有效）*/
   zIndex?: number
   /** 回车事件 */
   onEnter?: () => void
@@ -102,15 +98,15 @@ onMounted(() => {
 onUnmounted(() => {
   MenuManager.value?.cleanup()
 })
-const onOptionClick = (option: InputOption) => {
+const onOptionClick = (option: OptionItem) => {
   inputRef.value?.focus()
-  if (option.options && !option.selectable) return
+  if (option.options) return
   isSelecting = true
   inputValue.value = option.name
   MenuManager.value?.close()
 }
-const filterOptions = (options: InputOption[], keyword: string): InputOption[] =>
-  options.reduce<InputOption[]>((acc, option) => {
+const filterOptions = (options: OptionItem[], keyword: string): OptionItem[] =>
+  options.reduce<OptionItem[]>((acc, option) => {
     if (option.name.includes(keyword)) {
       acc.push(option);
     } else if (option.options) {
@@ -121,16 +117,17 @@ const filterOptions = (options: InputOption[], keyword: string): InputOption[] =
     }
     return acc;
   }, [])
-const filteredOptions = computed<InputOption[]>(() => {
+const filteredOptions = computed<OptionItem[]>(() => {
   const keyword = inputValue.value.trim()
   return keyword ? filterOptions(props.options, keyword) : props.options
 })
-const showingOptions = computed<InputOption[]>(() => props.filter ? filteredOptions.value : props.options)
+const showingOptions = computed<OptionItem[]>(() => props.filter ? filteredOptions.value : props.options)
 watch(showingOptions, () => {
   if (!MenuManager.value) return
   if (isSelecting) {
     isSelecting = false
-  } else if (isFocused) {
+  } else {
+    if (!isFocused) return
     MenuManager.value.open()
   }
 })
@@ -173,14 +170,15 @@ watch(inputValue, () => {
 })
 
 // Tab 补全
-const collectSelectable = (options: InputOption[]): InputOption[] => options.flatMap(option => option.options && !option.selectable ? collectSelectable(option.options) : [option])
+const collectCandidates = (options: OptionItem[]): OptionItem[] =>
+  options.map(option => [option, ...(option.options ? collectCandidates(option.options) : [])]).flat()
 const tab = () => {
   if (props.type === 'radio') {
     if (!MenuManager.value) return
-    const selectable = collectSelectable(filteredOptions.value)
-    if (selectable.length !== 1) return
+    const candidates = collectCandidates(filteredOptions.value)
+    if (candidates.length !== 1) return
     isSelecting = true
-    inputValue.value = selectable[0].name
+    inputValue.value = candidates[0].name
     MenuManager.value.close()
   } else if (props.type === 'date') {
     if (!DateManager.value) return
@@ -197,12 +195,9 @@ const tab = () => {
 const verified = computed<boolean>(() => {
   if (!inputValue.value || !props.verify) return true
   if (props.type === 'radio') {
-    const isSelectable = (options: InputOption[]): boolean =>
-      options.some(option => {
-        if (option.options && !option.selectable) return isSelectable(option.options)
-        return option.name === inputValue.value
-      })
-    return isSelectable(props.options)
+    const isValidOption = (options: OptionItem[]): boolean =>
+      options.some(option => option.name === inputValue.value || (!!option.options && isValidOption(option.options)))
+    return isValidOption(props.options)
   }
   if (props.type === 'date') {
     const match = inputValue.value.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/)
@@ -252,11 +247,11 @@ defineExpose({
       @keydown.enter.prevent="enter" @keydown.tab.prevent="tab" @compositionstart="compositionstart"
       @compositionend="compositionend" />
     <div :class="[$style.icon, $style.clear]">
-      <span class="lovelymai lovely-clear" v-show="inputValue && !props.disabled" @click.stop="() => clear()"></span>
+      <span class="lovelymai lovely-clear" v-show="!props.disabled && inputValue" @click.stop="() => clear()"></span>
     </div>
     <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'radio'"
       :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="showingOptions"
-      :width="style.Input.width + 'px'" :z-index="props.zIndex" :on-option-click="onOptionClick" />
+      :min-width="style.Input.width + 'px'" :z-index="props.zIndex" :on-option-click="onOptionClick" />
     <DateWindow :ref="(ins) => DateRef = (ins as DateInstance | null)?.root ?? null" v-if="props.type === 'date'"
       :visible="DateManager?.visible ?? false" :position="DateManager?.position ?? [0, 0]" v-model:date="date"
       :z-index="props.zIndex" :on-date-click="onDateClick" />

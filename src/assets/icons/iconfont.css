@@ -1,13 +1,18 @@
 @font-face {
   font-family: "lovelymai"; /* Project id 5124876 */
-  src: url('iconfont.ttf?t=1783300735945') format('truetype');
+  src: url('iconfont.ttf?t=1785895268554') format('truetype');
 }
 
 .lovelymai {
   font-family: "lovelymai" !important;
+  font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.lovely-horizontal:before {
+  content: "\ea87";
 }
 
 .lovely-ellipsis:before {

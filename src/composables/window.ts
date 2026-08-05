@@ -66,6 +66,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
   let lastEvent: MouseEvent | undefined
   let ticking = false
   let scrollParents: (HTMLElement | Document)[] = []
+  let openTimer: number | undefined
   const onScroll = () => {
     if (ticking) return
     requestAnimationFrame(() => {
@@ -80,10 +81,13 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     await nextTick()
     if (!WindowRef.value) return
     calcPos(e)
+    scrollParents.forEach(p => p.removeEventListener('scroll', onScroll))
     scrollParents = getScrollableParents(TriggerEl)
     scrollParents.forEach(p => p.addEventListener('scroll', onScroll))
+    // 重新注册前清理旧监听与挂起的定时器，避免重复注册 / 定时器残留
+    clearTimeout(openTimer)
     document.removeEventListener('click', onDocClick, true)
-    setTimeout(() => {
+    openTimer = setTimeout(() => {
       document.removeEventListener('click', stopClickPropagation, true)
       document.addEventListener('click', onDocClick, true)
     }, 200)
@@ -107,6 +111,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     visible.value = false
     scrollParents.forEach(p => p.removeEventListener('scroll', onScroll))
     scrollParents = []
+    clearTimeout(openTimer)
     document.removeEventListener('click', onDocClick, true)
   }
   const onDocClick = (e: MouseEvent) => {
@@ -119,6 +124,7 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
   const cleanup = () => {
     TriggerEl.removeEventListener('mousedown', onTrigger)
     TriggerEl.removeEventListener('contextmenu', onTrigger)
+    clearTimeout(openTimer)
     document.removeEventListener('click', stopClickPropagation, true)
     scrollParents.forEach(p => p.removeEventListener('scroll', onScroll))
     scrollParents = []

@@ -1,9 +1,10 @@
 import Button from './components/external/Button.vue'
 import Card from './components/external/Card.vue'
+import CheckBox from './components/external/CheckBox.vue'
 import ContentBar from './components/external/ContentBar.vue'
 import FoldList from './components/external/FoldList.vue'
 import Form, { type FormItem } from './components/external/Form.vue'
-import Input, { type InputOption } from './components/external/Input.vue'
+import Input from './components/external/Input.vue'
 import MenuBar from './components/external/MenuBar.vue'
 import Modal from './components/external/Modal.vue'
 import Select from './components/external/Select.vue'
@@ -21,10 +22,11 @@ import '@/assets/icons/iconfont.css'
 export {
   Button,
   Card,
+  CheckBox,
   ContentBar,
   FoldList,
   Form, type FormItem,
-  Input, type InputOption,
+  Input, 
   MenuBar,
   Modal,
   Select,

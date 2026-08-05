@@ -10,8 +10,8 @@ interface Props {
   visible: boolean
   /** 位置 */
   position: [number, number]
-  /** 宽度 */
-  width?: string
+  /** 最小宽度 */
+  minWidth?: string
   /** z-index */
   zIndex?: number
   /** 选项 */
@@ -73,6 +73,10 @@ defineExpose<MenuInstance>({
   },
   props
 })
+
+defineSlots<{
+  default: (props: { item: OptionItem; index: number }) => void
+}>()
 </script>
 
 <template>
@@ -80,7 +84,8 @@ defineExpose<MenuInstance>({
     <transition name="lovelymai-fade-leave">
       <ul :class="[$style.Menu, hasSubMenu ? $style.sub : '']" ref="MenuRef"
         v-if="props.visible && props.options.length > 0"
-        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px`, zIndex: props.zIndex, width: props.width ?? '' }">
+        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px`, zIndex: props.zIndex, minWidth: props.minWidth ?? '' }"
+        @click.stop>
         <li :class="$style.item" v-for="(item, index) in props.options" :key="item.id" :data-index="index"
           :data-has-children="item.options ? 'true' : 'false'" @click.stop="() => props.onOptionClick?.(item, index)">
           <div :class="$style.left">
@@ -90,7 +95,9 @@ defineExpose<MenuInstance>({
           <span class="lovelymai lovely-right-arrow" v-if="item.options"></span>
           <Menu v-if="item.options" :ref="(ins) => SubMenuInstances[index] = (ins as MenuInstance | null)"
             :visible="SubMenuManagers[index]?.visible ?? false" :position="SubMenuManagers[index]?.position ?? [0, 0]"
-            :options="item.options" :on-option-click="props.onOptionClick" />
+            :options="item.options" :on-option-click="props.onOptionClick" v-slot="{ item, index }">
+            <slot :item="item" :index="index"></slot>
+          </Menu>
         </li>
       </ul>
     </transition>
