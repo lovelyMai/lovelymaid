@@ -170,15 +170,15 @@ watch(inputValue, () => {
 })
 
 // Tab 补全
-const collectCandidates = (options: OptionItem[]): OptionItem[] =>
-  options.map(option => [option, ...(option.options ? collectCandidates(option.options) : [])]).flat()
+const collectLeafNames = (options: OptionItem[]): string[] =>
+  options.map(option => option.options ? collectLeafNames(option.options) : option.name).flat()
 const tab = () => {
   if (props.type === 'radio') {
     if (!MenuManager.value) return
-    const candidates = collectCandidates(filteredOptions.value)
-    if (candidates.length !== 1) return
+    const leaves = collectLeafNames(filteredOptions.value)
+    if (leaves.length !== 1) return
     isSelecting = true
-    inputValue.value = candidates[0].name
+    inputValue.value = leaves[0]
     MenuManager.value.close()
   } else if (props.type === 'date') {
     if (!DateManager.value) return

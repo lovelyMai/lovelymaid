@@ -100,8 +100,7 @@ const onOptionClick = (option: OptionItem) => {
   inputRef.value?.focus()
   const leaves = option.options ? collectLeafNames(option.options) : [option.name]
   const leafSet = new Set(leaves)
-  const allSelected = checkState(option) === 2
-  selectedValue.value = allSelected ? selectedValue.value.filter(name => !leafSet.has(name)) : [...new Set([...selectedValue.value, ...leaves])]
+  selectedValue.value = checkState(option) === 2 ? selectedValue.value.filter(name => !leafSet.has(name)) : [...new Set([...selectedValue.value, ...leaves])]
 }
 
 // 过滤
@@ -131,7 +130,10 @@ const enter = () => {
 
 // Tab 补全
 const tab = () => {
-  // TODO: 多选逻辑 — 只剩单个候选项时按 Tab 快速选中
+  if (!MenuManager.value) return
+  const leaves = collectLeafNames(filteredOptions.value)
+  selectedValue.value = [...new Set([...selectedValue.value, ...leaves])]
+  MenuManager.value.close()
 }
 
 // 清空
@@ -251,5 +253,10 @@ defineExpose({
   color: var(--clear-color);
   cursor: pointer;
   pointer-events: auto;
+}
+
+.lovely-horizontal,
+.lovely-check {
+  font-size: 16px;
 }
 </style>
