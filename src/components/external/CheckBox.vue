@@ -132,8 +132,7 @@ const enter = () => {
 const tab = () => {
   if (!MenuManager.value) return
   const leaves = collectLeafNames(filteredOptions.value)
-  selectedValue.value = [...new Set([...selectedValue.value, ...leaves])]
-  MenuManager.value.close()
+  selectedValue.value = [...leaves.filter(leave => leave.includes(keyword.value))]
 }
 
 // 清空
