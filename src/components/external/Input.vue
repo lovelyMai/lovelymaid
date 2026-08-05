@@ -173,6 +173,7 @@ watch(inputValue, () => {
 const collectLeafNames = (options: OptionItem[]): string[] =>
   options.map(option => option.options ? collectLeafNames(option.options) : option.name).flat()
 const tab = () => {
+  if (!inputValue.value) return
   if (props.type === 'radio') {
     if (!MenuManager.value) return
     const leaves = collectLeafNames(filteredOptions.value)

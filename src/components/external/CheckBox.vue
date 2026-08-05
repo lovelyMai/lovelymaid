@@ -130,7 +130,7 @@ const enter = () => {
 
 // Tab 补全
 const tab = () => {
-  if (!MenuManager.value) return
+  if (!MenuManager.value || !keyword.value) return
   const leaves = collectLeafNames(filteredOptions.value)
   selectedValue.value = [...leaves.filter(leave => leave.includes(keyword.value))]
 }
