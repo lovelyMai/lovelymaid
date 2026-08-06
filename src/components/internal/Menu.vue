@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { inject, onUnmounted, provide, ref, watch, nextTick, computed } from 'vue'
 
-import { createSubMenuManager } from '@/composables/menu'
+import { createSubMenuManager } from '@/services/menu'
 import type { OptionItem } from '../type'
-import { type WindowManager } from '@/composables/window'
+import { type WindowManager } from '@/services/window'
 
 interface Props {
   /** 是否显示 */

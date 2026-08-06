@@ -8,7 +8,7 @@ import type { Item } from '../type.js';
 import { clearTimer, throttle } from '@/utils/function';
 import { watchDOM } from '@/utils/dom';
 import { getLayoutLeft } from '@/utils/layout-offset.js';
-import { useCssVar } from '@/composables/css-var.js';
+import { useCssVar } from '@/services/css-var.js';
 
 interface Props {
   /** 标签 */

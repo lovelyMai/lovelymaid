@@ -4,7 +4,7 @@ import Card from './Card.vue';
 
 import type { Item } from '../type.js';
 import { watchDOM } from '@/utils/dom';
-import { useCssVar } from '@/composables/css-var.js';
+import { useCssVar } from '@/services/css-var.js';
 
 type MenuItem = Item & {
   /** 是否禁用 */

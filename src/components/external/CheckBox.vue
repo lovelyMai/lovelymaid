@@ -5,8 +5,8 @@ import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
 import type { OptionItem } from '../type'
 import { watchDOM } from '@/utils/dom'
-import { useCssVar } from '@/composables/css-var.js'
-import { createWindowManager, type WindowManager } from '@/composables/window'
+import { useCssVar } from '@/services/css-var.js'
+import { createWindowManager, type WindowManager } from '@/services/window.js'
 
 interface Props {
   /** 输入框提示词 */
