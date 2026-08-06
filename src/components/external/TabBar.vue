@@ -4,14 +4,14 @@ import Card from './Card.vue';
 import Button from './Button.vue'
 import Input from './Input.vue'
 
-import type { ListItem } from '../type.js';
+import type { Item } from '../type.js';
 import { clearTimer, throttle, watchDOM } from '@/utils/common';
 import { getOffsetLeft } from '@/utils/get-layout-offset.js';
 import useCssVar from '@/utils/use-css-var.js';
 
 interface Props {
   /** 标签 */
-  tabs: ListItem[]
+  tabs: Item[]
   /** 是否启用搜索按钮 */
   showSearch?: boolean
   /** 输入框提示词 */
@@ -28,7 +28,7 @@ const inputValue = defineModel<string>('value', { default: '' })
 // 初始化
 const TabBarRef = ref<HTMLElement | null>(null)
 const contentRef = ref<HTMLElement | null>(null)
-const SlideRef = ref<HTMLElement | null>(null)
+const slideRef = ref<HTMLElement | null>(null)
 const style = reactive({
   Bar: {
     width: 0,
@@ -98,7 +98,7 @@ onUnmounted(() => {
 let followed = false
 let moved = false
 let startTime: number
-const getSlideX = () => new DOMMatrix(window.getComputedStyle(SlideRef.value!).transform).m41
+const getSlideX = () => new DOMMatrix(window.getComputedStyle(slideRef.value!).transform).m41
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 const getTargetLeft = (e: PointerEvent) => {
   if (!contentRef.value) return 0
@@ -124,7 +124,7 @@ const jumpToTarget = (targetLeft: number) => {
   style.slide.translateX = targetLeft
 }
 const moveTowardTarget = (targetLeft: number) => {
-  if (!SlideRef.value) return
+  if (!slideRef.value) return
   const realLeft = getSlideX()
   if (followed || Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
     style.slide.transition = `background .1s`
@@ -281,17 +281,15 @@ watch(searchIsActive, (newValue) => {
     <Card :class="[$style.Bar, { [$style.active]: !searchIsActive }]">
       <ul :class="$style.content" ref="contentRef" @pointerdown.prevent="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
-          <slot :item="props.tabs[activeIndex]" :index="activeIndex"></slot>
+          <slot :tab="props.tabs[activeIndex]" :index="activeIndex"></slot>
         </li>
-        <li :class="$style.tab" v-for="(item, index) in props.tabs" :key="index">
-          <slot :item="item" :index="index"></slot>
-          <span :class="$style.text" v-if="item.name">{{ item.name }}</span>
+        <li :class="$style.tab" v-for="(tab, index) in props.tabs" :key="index">
+          <slot :tab="tab" :index="index"></slot>
         </li>
-        <div :class="$style.slide" ref="SlideRef" v-show="activeIndex !== -1 && !searchIsActive"></div>
+        <div :class="$style.slide" ref="slideRef" v-show="activeIndex !== -1 && !searchIsActive"></div>
         <ul :class="[$style.content, $style.top]" v-show="!searchIsActive">
-          <li :class="[$style.tab, $style.top]" v-for="(item, index) in props.tabs" :key="index">
-            <slot :item="item" :index="index"></slot>
-            <span :class="$style.text" v-if="item.name">{{ item.name }}</span>
+          <li :class="[$style.tab, $style.top]" v-for="(tab, index) in props.tabs" :key="index">
+            <slot :tab="tab" :index="index"></slot>
           </li>
         </ul>
       </ul>
@@ -315,7 +313,6 @@ watch(searchIsActive, (newValue) => {
   height: 50px;
   user-select: none;
   -webkit-user-select: none;
-  --font-size: 10px;
   --top-color: var(--lovelymai-color-blue-300);
 }
 
@@ -380,10 +377,6 @@ watch(searchIsActive, (newValue) => {
   align-items: center;
   width: calc(var(--slide-width) * 1px);
   height: 100%;
-}
-
-.tab .text {
-  font-size: var(--font-size);
 }
 
 .tab.small {
