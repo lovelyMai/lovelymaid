@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import Card from './Card.vue';
 
-import type { Item } from '../type.js';
+import type { Item } from '../types';
 import { watchDOM } from '@/utils/dom';
 import { useCssVar } from '@/utils/css-var.js';
 

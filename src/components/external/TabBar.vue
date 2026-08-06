@@ -4,7 +4,7 @@ import Card from './Card.vue';
 import Button from './Button.vue'
 import Input from './Input.vue'
 
-import type { Item } from '../type.js';
+import type { Item } from '../types';
 import { clearTimer, throttle } from '@/utils/function';
 import { watchDOM } from '@/utils/dom';
 import { getLayoutLeft } from '@/utils/layout-offset.js';

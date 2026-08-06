@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import Menu, { type MenuInstance } from '../internal/Menu.vue';
 
-import type { OptionItem } from '../type.js'
+import type { OptionItem } from '../types'
 import { createWindowManager, type WindowManager } from '@/utils/window.js';
 
 interface Props {

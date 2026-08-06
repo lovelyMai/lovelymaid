@@ -15,8 +15,6 @@ interface Props {
   isOpen: boolean;
   /** 关闭事件 */
   onCloseClick: () => void;
-  /** 标题 */
-  title?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true,
@@ -83,7 +81,9 @@ watch(() => props.visible, async (newVisible) => {
 <template>
   <Card :class="$style.ContentBar" :ref="(el) => ContentBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
     <div :class="$style.header">
-      <div :class="$style.title" :title="props.title">{{ props.title }}</div>
+      <div :class="$style.title">
+        <slot name="title">标题</slot>
+      </div>
       <Button :class="$style.Button" type="glass" :on-click="props.onCloseClick" title="收起内容栏">
         <span class="lovelymai lovely-close"></span>
       </Button>

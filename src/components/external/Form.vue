@@ -4,7 +4,7 @@ import TextArea from './TextArea.vue'
 import CheckBox from './CheckBox.vue'
 import Input from './Input.vue'
 
-import type { DateItem, OptionItem } from '../type'
+import type { DateItem, OptionItem } from '../types'
 
 export type FormItem = {
   id: string | number

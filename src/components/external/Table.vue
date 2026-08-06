@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
-import type { Item } from '../type.js'
+import type { Item } from '../types'
 import { createWindowManager, type WindowManager } from '@/utils/window.js'
 import { createActivationManager, type ActivationManager } from '@/utils/activation.js'
 

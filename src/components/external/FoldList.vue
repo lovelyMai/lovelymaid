@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch, computed, reactive } from 'vue'
 
-import type { ListItem } from '../type'
+import type { ListItem } from '../types'
 import { getSlideCount } from '@/utils/slide'
 import { watchDOM } from '@/utils/dom'
 import { useCssVar } from '@/utils/css-var'

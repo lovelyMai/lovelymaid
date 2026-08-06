@@ -3,7 +3,7 @@ import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from
 import Card from './Card.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
-import type { OptionItem } from '../type'
+import type { OptionItem } from '../types'
 import { watchDOM } from '@/utils/dom'
 import { useCssVar } from '@/utils/css-var.js'
 import { createWindowManager, type WindowManager } from '@/utils/window.js'

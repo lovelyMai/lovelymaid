@@ -13,7 +13,7 @@ import TabBar from './components/external/TabBar.vue'
 import Table, { type ColumnConfig, type SortConfig } from './components/external/Table.vue'
 import TextArea from './components/external/TextArea.vue'
 
-import type { Item, ListItem, OptionItem, DateItem } from './components/type'
+import type { Item, ListItem, OptionItem, DateItem } from './components/types.js'
 
 import '@/assets/styles/reset.css'
 import '@/assets/styles/main.css'
@@ -26,7 +26,7 @@ export {
   ContentBar,
   FoldList,
   Form, type FormItem,
-  Input, 
+  Input,
   MenuBar,
   Modal,
   Select,

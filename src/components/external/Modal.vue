@@ -5,8 +5,6 @@ import ContentBar from './ContentBar.vue';
 import { useCssVar } from '@/utils/css-var.js';
 
 interface Props {
-  /** 标题 */
-  title?: string
   /** 宽 */
   width?: string
   /** 高 */
@@ -57,8 +55,10 @@ const close = () => {
       <transition name="lovelymai-fade">
         <div :class="$style.mask" v-if="visible" @click.capture.stop="close"></div>
       </transition>
-      <ContentBar :class="$style.ContentBar" :visible="visible" :is-open="true" :on-close-click="close"
-        :title="props.title">
+      <ContentBar :class="$style.ContentBar" :visible="visible" :is-open="true" :on-close-click="close">
+        <template #title>
+          <slot name="title"></slot>
+        </template>
         <slot></slot>
         <template #tip>
           <slot name="tip"></slot>

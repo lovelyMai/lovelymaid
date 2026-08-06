@@ -4,7 +4,7 @@ import Card from '../external/Card.vue'
 import Scroll from '../internal/Scroll.vue'
 
 import { formatDate } from '@/utils/date.js'
-import type { ListItem, DateItem } from '../type.js'
+import type { ListItem, DateItem } from '../types'
 
 interface Props {
   /** 是否显示 */
@@ -88,7 +88,7 @@ defineExpose<DateInstance>({
         <div :class="$style.header">
           <h5 :class="$style.date" @click.stop="() => scrollIsOpen = !scrollIsOpen">
             <span :style="{ color: scrollIsOpen ? 'var(--lovelymai-color-blue-300)' : '' }">{{ `${year} 年 ${month} 月`
-            }}</span>
+              }}</span>
             <span :class="['lovelymai', 'lovely-right-arrow', $style.arrow]"
               :style="{ transform: scrollIsOpen ? 'translateY(1px) rotate(90deg)' : 'translateY(1px) rotate(0deg)' }"></span>
           </h5>
