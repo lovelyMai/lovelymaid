@@ -1,8 +1,11 @@
-node_modules
+# 系统
 .DS_Store
+
+# 项目
+node_modules
 dist
 
-# Test
+# 测试
 App.vue
 main.ts
 index.html
