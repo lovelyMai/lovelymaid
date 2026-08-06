@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 
-import { watchDOM } from '@/utils/common';
-import useCssVar from '@/utils/use-css-var';
+import { watchDOM } from '@/utils/dom';
+import { useCssVar } from '@/composables/css-var';
 
 interface Props {
   /** 类型 */

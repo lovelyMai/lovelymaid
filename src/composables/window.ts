@@ -1,6 +1,6 @@
 import { nextTick, reactive, ref, type Ref } from 'vue'
 
-import { getOffsetLeft, getOffsetTop } from '@/utils/get-view-offset'
+import { getViewLeft, getViewTop } from '@/utils/view-offset'
 
 export type WindowManager = {
   readonly visible: boolean
@@ -38,12 +38,12 @@ export const createWindowManager = (TriggerEl: HTMLElement, WindowRef: Ref<HTMLE
     let X: number = 0
     let Y: number = 0
     if (type === 'fixed') {
-      X = getOffsetLeft(TriggerEl) + Math.min(TriggerEl.offsetWidth, TriggerEl.offsetHeight) / 2
-      Y = getOffsetTop(TriggerEl) + TriggerEl.offsetHeight + 3
+      X = getViewLeft(TriggerEl) + Math.min(TriggerEl.offsetWidth, TriggerEl.offsetHeight) / 2
+      Y = getViewTop(TriggerEl) + TriggerEl.offsetHeight + 3
       const offsetBottom = document.documentElement.scrollTop + document.documentElement.clientHeight - (Y + WindowRef.value.offsetHeight)
-      const centerIsBottom = getOffsetTop(TriggerEl) + TriggerEl.offsetHeight / 2 > document.documentElement.scrollTop + document.documentElement.clientHeight / 2
+      const centerIsBottom = getViewTop(TriggerEl) + TriggerEl.offsetHeight / 2 > document.documentElement.scrollTop + document.documentElement.clientHeight / 2
       if (offsetBottom < 3 && centerIsBottom) {
-        Y = getOffsetTop(TriggerEl) - WindowRef.value.offsetHeight - 3
+        Y = getViewTop(TriggerEl) - WindowRef.value.offsetHeight - 3
       }
     } else {
       if (e) {

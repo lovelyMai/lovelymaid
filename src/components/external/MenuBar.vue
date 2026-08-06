@@ -3,8 +3,8 @@ import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import Card from './Card.vue';
 
 import type { Item } from '../type.js';
-import { watchDOM } from '@/utils/common';
-import useCssVar from '@/utils/use-css-var';
+import { watchDOM } from '@/utils/dom';
+import { useCssVar } from '@/composables/css-var.js';
 
 type MenuItem = Item & {
   /** 是否禁用 */

@@ -5,9 +5,10 @@ import Button from './Button.vue'
 import Input from './Input.vue'
 
 import type { Item } from '../type.js';
-import { clearTimer, throttle, watchDOM } from '@/utils/common';
-import { getOffsetLeft } from '@/utils/get-layout-offset.js';
-import useCssVar from '@/utils/use-css-var.js';
+import { clearTimer, throttle } from '@/utils/function';
+import { watchDOM } from '@/utils/dom';
+import { getLayoutLeft } from '@/utils/layout-offset.js';
+import { useCssVar } from '@/composables/css-var.js';
 
 interface Props {
   /** 标签 */
@@ -102,7 +103,7 @@ const getSlideX = () => new DOMMatrix(window.getComputedStyle(slideRef.value!).t
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 const getTargetLeft = (e: PointerEvent) => {
   if (!contentRef.value) return 0
-  const clickX = e.pageX - getOffsetLeft(contentRef.value)
+  const clickX = e.pageX - getLayoutLeft(contentRef.value)
   const clickLeft = clickX - style.slide.width / 2
   const maxLeft = (props.tabs.length - 1) * style.slide.width
   return clamp(clickLeft, 0, maxLeft)
@@ -235,7 +236,7 @@ const stopSlide = (e: PointerEvent) => {
     runStopAnimation(activeIndex.value)
   } else {
     if (!contentRef.value) return
-    const clickX = e.pageX - getOffsetLeft(contentRef.value)
+    const clickX = e.pageX - getLayoutLeft(contentRef.value)
     const index = Math.floor(clickX / style.slide.width)
     const oldActiveIndex = activeIndex.value
     const newActiveIndex = clamp(index, 0, props.tabs.length - 1)

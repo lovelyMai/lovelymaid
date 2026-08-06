@@ -2,9 +2,9 @@
 import { ref, nextTick, onMounted, watch, computed, reactive } from 'vue'
 
 import type { ListItem } from '../type'
-import getSlideCount from '../../utils/calculate-offsets'
-import { watchDOM } from '@/utils/common'
-import useCssVar from '@/utils/use-css-var'
+import { getSlideCount } from '@/utils/slide'
+import { watchDOM } from '@/utils/dom'
+import { useCssVar } from '@/composables/css-var'
 
 interface Props {
   /** 标题 */

@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { ListItem } from '../type';
-import { debounce } from '@/utils/common';
+import { debounce } from '@/utils/function';
 
 interface Props {
   /** 列表 */

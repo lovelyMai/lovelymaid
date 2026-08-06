@@ -3,9 +3,10 @@ import { ref, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
 import Card from './Card.vue';
 import Button from './Button.vue';
 
-import { debounce, watchDOM } from '@/utils/common';
-import { getOffsetLeft } from '@/utils/get-layout-offset.js';
-import useCssVar from '@/utils/use-css-var.js';
+import { debounce } from '@/utils/function';
+import { watchDOM } from '@/utils/dom';
+import { getLayoutLeft } from '@/utils/layout-offset.js';
+import { useCssVar } from '@/composables/css-var.js';
 
 interface Props {
   /** 是否显示 */
@@ -43,7 +44,7 @@ const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
   if (!ContentBarRef.value) return
-  transformDistance.value = getOffsetLeft(ContentBarRef.value) + ContentBarRef.value.offsetWidth + 10
+  transformDistance.value = getLayoutLeft(ContentBarRef.value) + ContentBarRef.value.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {

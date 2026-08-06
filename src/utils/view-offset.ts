@@ -4,7 +4,7 @@
  * @param el - 目标元素
  * @returns 相对于文档左侧的视觉像素值
  */
-export const getOffsetLeft = (el: HTMLElement): number => {
+export const getViewLeft = (el: HTMLElement): number => {
   return el.getBoundingClientRect().left + document.documentElement.scrollLeft;
 }
 
@@ -14,7 +14,7 @@ export const getOffsetLeft = (el: HTMLElement): number => {
  * @param el - 目标元素
  * @returns 相对于文档顶部的视觉像素值
  */
-export const getOffsetTop = (el: HTMLElement): number => {
+export const getViewTop = (el: HTMLElement): number => {
   return el.getBoundingClientRect().top + document.documentElement.scrollTop;
 }
 
@@ -24,7 +24,7 @@ export const getOffsetTop = (el: HTMLElement): number => {
  * @param el - 目标元素
  * @returns 相对于文档右侧的视觉像素值
  */
-export const getOffsetRight = (el: HTMLElement): number => {
+export const getViewRight = (el: HTMLElement): number => {
   return document.documentElement.scrollWidth - (el.getBoundingClientRect().right + document.documentElement.scrollLeft);
 }
 
@@ -34,6 +34,6 @@ export const getOffsetRight = (el: HTMLElement): number => {
  * @param el - 目标元素
  * @returns 相对于文档底部的视觉像素值
  */
-export const getOffsetBottom = (el: HTMLElement): number => {
+export const getViewBottom = (el: HTMLElement): number => {
   return document.documentElement.scrollHeight - (el.getBoundingClientRect().bottom + document.documentElement.scrollTop);
 }

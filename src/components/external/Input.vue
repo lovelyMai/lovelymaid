@@ -5,8 +5,9 @@ import Menu, { type MenuInstance } from '../internal/Menu.vue'
 import DateWindow, { type DateInstance } from '../internal/Date.vue'
 
 import type { OptionItem, DateItem } from '../type'
-import { formatDate, verifyDate, watchDOM } from '@/utils/common'
-import useCssVar from '@/utils/use-css-var.js'
+import { formatDate, verifyDate } from '@/utils/date'
+import { watchDOM } from '@/utils/dom'
+import { useCssVar } from '@/composables/css-var.js'
 import { createWindowManager, type WindowManager } from '@/composables/window'
 
 interface Props {

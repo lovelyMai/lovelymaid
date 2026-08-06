@@ -1,4 +1,10 @@
-const calculateOffsets = <T extends { id: string | number }>(
+/**
+ * 计算列表增删后每项需要滑动的格数（用于 FLIP 动画）
+ * @param newList - 新列表
+ * @param oldList - 旧列表
+ * @returns 每项对应的滑动格数
+ */
+export const getSlideCount = <T extends { id: string | number }>(
   newList: T[],
   oldList: T[]
 ): number[] => {
@@ -32,5 +38,3 @@ const calculateOffsets = <T extends { id: string | number }>(
 
   return result;
 };
-
-export default calculateOffsets
