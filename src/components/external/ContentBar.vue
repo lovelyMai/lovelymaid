@@ -6,7 +6,7 @@ import Button from './Button.vue';
 import { debounce } from '@/utils/function';
 import { watchDOM } from '@/utils/dom';
 import { getLayoutLeft } from '@/utils/layout-offset.js';
-import { useCssVar } from '@/services/css-var.js';
+import { useCssVar } from '@/utils/css-var.js';
 
 interface Props {
   /** 是否显示 */

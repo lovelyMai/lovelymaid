@@ -1,6 +1,6 @@
 import { reactive, ref } from 'vue'
 
-import { type WindowManager } from './window'
+import { type WindowManager } from '../utils/window'
 import { type MenuInstance } from '@/components/internal/Menu.vue'
 import { watchDOM } from '@/utils/dom'
 

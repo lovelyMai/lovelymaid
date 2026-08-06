@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import Menu, { type MenuInstance } from '../internal/Menu.vue';
 
 import type { OptionItem } from '../type.js'
-import { createWindowManager, type WindowManager } from '@/services/window.js';
+import { createWindowManager, type WindowManager } from '@/utils/window.js';
 
 interface Props {
   /** 选项配置 */

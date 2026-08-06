@@ -3,7 +3,7 @@ import { inject, onUnmounted, provide, ref, watch, nextTick, computed } from 'vu
 
 import { createSubMenuManager } from '@/services/menu'
 import type { OptionItem } from '../type'
-import { type WindowManager } from '@/services/window'
+import { type WindowManager } from '@/utils/window'
 
 interface Props {
   /** 是否显示 */

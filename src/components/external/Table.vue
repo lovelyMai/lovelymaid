@@ -3,8 +3,8 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
 import type { Item } from '../type.js'
-import { createWindowManager, type WindowManager } from '@/services/window.js'
-import { createActivationManager, type ActivationManager } from '@/services/activation.js'
+import { createWindowManager, type WindowManager } from '@/utils/window.js'
+import { createActivationManager, type ActivationManager } from '@/utils/activation.js'
 
 export type ColumnConfig = {
   id: string | number
@@ -52,18 +52,18 @@ const sortedRows = computed<Item[]>(() => {
 
 // 列表项激活
 const ListRef = ref<HTMLElement | null>(null)
-const ActivationManagerInstance = ref<ActivationManager | null>(null)
+const ActivationManager = ref<ActivationManager | null>(null)
 onMounted(() => {
   if (!ListRef.value) return
-  ActivationManagerInstance.value = createActivationManager(sortedRows, activeIds, ListRef.value)
+  ActivationManager.value = createActivationManager(sortedRows, activeIds, ListRef.value)
 })
 onUnmounted(() => {
-  ActivationManagerInstance.value?.cleanup()
+  ActivationManager.value?.cleanup()
 })
 const getBorderRadius = (index: number): string => {
-  if (!ActivationManagerInstance.value?.activeIndexes.has(index)) return '8px';
-  const hasPrev = ActivationManagerInstance.value.activeIndexes.has(index - 1);
-  const hasNext = ActivationManagerInstance.value.activeIndexes.has(index + 1);
+  if (!ActivationManager.value?.activeIndexes.has(index)) return '8px';
+  const hasPrev = ActivationManager.value.activeIndexes.has(index - 1);
+  const hasNext = ActivationManager.value.activeIndexes.has(index + 1);
   if (!hasPrev && !hasNext) return '8px';
   if (hasPrev && hasNext) return '0';
   if (!hasPrev && hasNext) return '8px 8px 0 0';
@@ -102,9 +102,9 @@ onUnmounted(() => {
     </ul>
     <ul :class="$style.list" ref="ListRef">
       <li :class="$style.row" v-for="(row, index) in sortedRows" :key="row.id"
-        :style="{ backgroundColor: ActivationManagerInstance?.activeIndexes.has(index) ? 'var(--lovelymai-color-blue-450)' : '', borderRadius: getBorderRadius(index) }">
+        :style="{ backgroundColor: ActivationManager?.activeIndexes.has(index) ? 'var(--lovelymai-color-blue-450)' : '', borderRadius: getBorderRadius(index) }">
         <span :class="$style.text" v-for="column in props.columns" :key="column.id"
-          :style="{ width: column.width ?? '200px', color: ActivationManagerInstance?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : 'var(--lovelymai-color-gray-300)') }">
+          :style="{ width: column.width ?? '200px', color: ActivationManager?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : 'var(--lovelymai-color-gray-300)') }">
           <slot :row="row" :column="column">{{ row[column.prop] }}</slot>
         </span>
       </li>

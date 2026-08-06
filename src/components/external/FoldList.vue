@@ -4,7 +4,7 @@ import { ref, nextTick, onMounted, watch, computed, reactive } from 'vue'
 import type { ListItem } from '../type'
 import { getSlideCount } from '@/utils/slide'
 import { watchDOM } from '@/utils/dom'
-import { useCssVar } from '@/services/css-var'
+import { useCssVar } from '@/utils/css-var'
 
 interface Props {
   /** 标题 */

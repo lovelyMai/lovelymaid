@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import ContentBar from './ContentBar.vue';
 
-import { useCssVar } from '@/services/css-var.js';
+import { useCssVar } from '@/utils/css-var.js';
 
 interface Props {
   /** 标题 */
