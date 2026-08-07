@@ -87,7 +87,7 @@ watch(() => props.visible, async (newVisible) => {
     :ref="(ins) => ContentBarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null">
     <div :class="$style.header">
       <div :class="$style.title">
-        <slot name="header">标题</slot>
+        <slot name="header"></slot>
       </div>
       <Button :class="$style.Button" type="glass" :on-click="props.onCloseClick" title="收起内容栏">
         <span class="lovelymai lovely-close"></span>
