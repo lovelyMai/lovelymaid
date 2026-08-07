@@ -4,7 +4,7 @@ import Card from '../external/Card.vue'
 import Scroll from '../internal/Scroll.vue'
 
 import { formatDate } from '@/utils/date.js'
-import type { ListItem, DateItem } from '../types'
+import type { ListItem, DateItem } from '@/types'
 
 interface Props {
   /** 是否显示 */

@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Card from './Card.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
-import type { Item } from '../types'
+import type { Item } from '@/types'
 import { createWindowManager, type WindowManager } from '@/utils/window.js'
 import { createActivationManager, type ActivationManager } from '@/utils/activation.js'
 import Loading from './Loading.vue'
@@ -113,7 +113,7 @@ onUnmounted(() => {
         </span>
       </li>
     </ul>
-    <Loading :loading="props.loading" :z-index="1"/>
+    <Loading :loading="props.loading" :z-index="1" />
   </Card>
 </template>
 

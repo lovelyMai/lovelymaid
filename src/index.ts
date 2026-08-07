@@ -14,7 +14,7 @@ import TabBar from './components/external/TabBar.vue'
 import Table, { type ColumnConfig, type SortConfig } from './components/external/Table.vue'
 import TextArea from './components/external/TextArea.vue'
 
-import type { Item, ListItem, OptionItem, DateItem } from './components/types.js'
+import type { Item, ListItem, OptionItem, DateItem } from './types.js'
 
 import '@/assets/styles/reset.css'
 import '@/assets/styles/main.css'

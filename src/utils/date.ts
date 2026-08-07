@@ -1,4 +1,4 @@
-import { DateItem } from "@/components/types"
+import { DateItem } from "@/types"
 
 // 格式化时间
 export function formatDate(date: number | Date): DateItem {

@@ -2,7 +2,7 @@
 import { inject, onUnmounted, provide, ref, watch, nextTick, computed } from 'vue'
 
 import { createSubMenuManager } from '@/services/menu'
-import type { OptionItem } from '../types'
+import type { OptionItem } from '@/types'
 import { type WindowManager } from '@/utils/window'
 
 interface Props {

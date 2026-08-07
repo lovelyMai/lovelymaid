@@ -4,7 +4,7 @@ import Card from './Card.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 import DateWindow, { type DateInstance } from '../internal/Date.vue'
 
-import type { OptionItem, DateItem } from '../types'
+import type { OptionItem, DateItem } from '@/types'
 import { formatDate, verifyDate } from '@/utils/date'
 import { watchDOM } from '@/utils/dom'
 import { useCssVar } from '@/utils/css-var.js'
