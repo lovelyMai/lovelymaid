@@ -46,6 +46,9 @@ export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: MenuI
       close()
     }
   }
+  if (TriggerEl.matches(':hover')) {
+    open()
+  }
   const cleanup = () => {
     TriggerEl.removeEventListener('mouseenter', open)
     parentEl?.removeEventListener('mouseover', onParentOverToChange)
