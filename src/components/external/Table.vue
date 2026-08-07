@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import Card from './Card.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
 import type { Item } from '../types'
 import { createWindowManager, type WindowManager } from '@/utils/window.js'
 import { createActivationManager, type ActivationManager } from '@/utils/activation.js'
+import Loading from './Loading.vue'
 
 export type ColumnConfig = {
   id: string | number
@@ -25,6 +27,8 @@ interface Props {
   rows: Item[]
   /** 弹窗 z-index */
   zIndex?: number
+  /** 加载状态 */
+  loading?: boolean
 }
 const props = defineProps<Props>()
 const sort = defineModel<SortConfig>('sort')
@@ -84,7 +88,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div :class="$style.Table">
+  <Card :class="$style.Table">
     <ul :class="$style.header" ref="headerRef">
       <li :class="$style.column" v-for="column in props.columns" :key="column.id"
         :style="{ width: column.width ?? '200px', color: sort?.id === column.id ? '#000' : 'var(--lovelymai-color-gray-300)' }"
@@ -103,19 +107,30 @@ onUnmounted(() => {
     <ul :class="$style.list" ref="ListRef">
       <li :class="$style.row" v-for="(row, index) in sortedRows" :key="row.id"
         :style="{ backgroundColor: ActivationManager?.activeIndexes.has(index) ? 'var(--lovelymai-color-blue-450)' : '', borderRadius: getBorderRadius(index) }">
-        <span :class="$style.text" v-for="column in props.columns" :key="column.id"
+        <span :class="$style.cell" v-for="column in props.columns" :key="column.id"
           :style="{ width: column.width ?? '200px', color: ActivationManager?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : 'var(--lovelymai-color-blue-50)') : (sort?.id === column.id ? '#000' : 'var(--lovelymai-color-gray-300)') }">
           <slot :row="row" :column="column">{{ row[column.prop] }}</slot>
         </span>
       </li>
     </ul>
-  </div>
+    <Loading :loading="props.loading" :z-index="1"/>
+  </Card>
 </template>
 
 <style module>
+.Table {
+  position: relative;
+  z-index: 0;
+  padding: 12px;
+  border-radius: 16px;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
 .header {
   display: flex;
   margin-bottom: 4px;
+  width: max-content;
   height: 28px;
   border-bottom: 0.5px solid var(--lovelymai-color-gray-300);
   user-select: none;
@@ -123,6 +138,7 @@ onUnmounted(() => {
 }
 
 .header .column {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -145,6 +161,7 @@ onUnmounted(() => {
 
 .list .row {
   display: flex;
+  width: max-content;
   height: 35px;
 }
 
@@ -152,7 +169,8 @@ onUnmounted(() => {
   background-color: var(--lovelymai-color-gray-150);
 }
 
-.list .row .text {
+.list .row .cell {
+  flex-shrink: 0;
   padding: 0 8px;
   font-size: 16px;
   line-height: 35px;

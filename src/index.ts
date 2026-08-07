@@ -5,6 +5,7 @@ import ContentBar from './components/external/ContentBar.vue'
 import FoldList from './components/external/FoldList.vue'
 import Form, { type FormItem } from './components/external/Form.vue'
 import Input from './components/external/Input.vue'
+import Loading from './components/external/Loading.vue'
 import MenuBar from './components/external/MenuBar.vue'
 import Modal from './components/external/Modal.vue'
 import Select from './components/external/Select.vue'
@@ -27,6 +28,7 @@ export {
   FoldList,
   Form, type FormItem,
   Input,
+  Loading,
   MenuBar,
   Modal,
   Select,

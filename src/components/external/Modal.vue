@@ -13,6 +13,8 @@ interface Props {
   zIndex?: number
   /** 关闭事件 */
   onClose?: () => void
+  /** 加载状态 */
+  loading?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
   zIndex: 0
@@ -55,14 +57,12 @@ const close = () => {
       <transition name="lovelymai-fade">
         <div :class="$style.mask" v-if="visible" @click.capture.stop="close"></div>
       </transition>
-      <ContentBar :class="$style.ContentBar" :visible="visible" :is-open="true" :on-close-click="close">
-        <template #title>
-          <slot name="title"></slot>
+      <ContentBar :class="$style.ContentBar" :visible="visible" :is-open="true" :on-close-click="close"
+        :loading="props.loading">
+        <template #header>
+          <slot name="header"></slot>
         </template>
         <slot></slot>
-        <template #tip>
-          <slot name="tip"></slot>
-        </template>
       </ContentBar>
     </div>
   </teleport>

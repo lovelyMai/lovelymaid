@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
 import Card from './Card.vue';
 import Button from './Button.vue';
+import Loading from './Loading.vue';
 
 import { debounce } from '@/utils/function';
 import { watchDOM } from '@/utils/dom';
@@ -15,10 +16,13 @@ interface Props {
   isOpen: boolean;
   /** 关闭事件 */
   onCloseClick: () => void;
+  /** 加载状态 */
+  loading?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true,
-  isOpen: true
+  isOpen: true,
+  loading: false
 })
 
 // 初始化
@@ -79,10 +83,11 @@ watch(() => props.visible, async (newVisible) => {
 </script>
 
 <template>
-  <Card :class="$style.ContentBar" :ref="(el) => ContentBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
+  <Card :class="$style.ContentBar"
+    :ref="(ins) => ContentBarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null">
     <div :class="$style.header">
       <div :class="$style.title">
-        <slot name="title">标题</slot>
+        <slot name="header">标题</slot>
       </div>
       <Button :class="$style.Button" type="glass" :on-click="props.onCloseClick" title="收起内容栏">
         <span class="lovelymai lovely-close"></span>
@@ -91,9 +96,7 @@ watch(() => props.visible, async (newVisible) => {
     <div :class="$style.content">
       <slot></slot>
     </div>
-    <div :class="$style.tip">
-      <slot name="tip"></slot>
-    </div>
+    <Loading :loading="props.loading" :z-index="1" />
   </Card>
 </template>
 
@@ -109,10 +112,10 @@ watch(() => props.visible, async (newVisible) => {
 .header {
   display: flex;
   justify-content: space-between;
-  position: sticky;
   gap: 5px;
+  position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
   height: 0;
   margin-bottom: 50px;
   padding: 0 10px 0 10px;
@@ -141,13 +144,5 @@ watch(() => props.visible, async (newVisible) => {
   display: flow-root;
   position: relative;
   z-index: 0;
-}
-
-.tip {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 2;
-  transform: translate(-50%, -50%)
 }
 </style>

@@ -6,12 +6,15 @@ import { debounce } from '@/utils/function';
 import { watchDOM } from '@/utils/dom';
 import { getLayoutLeft } from '@/utils/layout-offset.js';
 import { useCssVar } from '@/utils/css-var.js';
+import Loading from './Loading.vue';
 
 interface Props {
   /** 是否显示 */
   visible?: boolean;
   /** 按钮点击事件 */
   onButtonClick?: () => void
+  /** 加载状态 */
+  loading?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true
@@ -81,10 +84,10 @@ watch(() => props.visible, async (newVisible) => {
 </script>
 
 <template>
-  <Card :class="$style.SideBar" :ref="(el) => SideBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
+  <Card :class="$style.SideBar" :ref="(ins) => SideBarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null">
     <div :class="$style.header">
       <div :class="$style.text">
-        <slot name="title"></slot>
+        <slot name="header"></slot>
       </div>
       <div :class="[$style.button, { [$style.close]: !isOpen }]" :title="isOpen ? '收起侧边栏' : '打开侧边栏'" @click.stop="() => {
         isOpen = !isOpen
@@ -93,7 +96,11 @@ watch(() => props.visible, async (newVisible) => {
         <span class="lovelymai lovely-left-sidebar"></span>
       </div>
     </div>
-    <slot></slot>
+    <div :class="$style.mask">
+      <div :class="$style.empty"></div>
+      <slot>111</slot>
+      <Loading :loading="props.loading" />
+    </div>
   </Card>
 </template>
 
@@ -107,7 +114,9 @@ watch(() => props.visible, async (newVisible) => {
 .header {
   display: flex;
   align-items: center;
-  position: relative;
+  position: absolute;
+  z-index: 1;
+  width: 100%;
   height: 50px;
   padding: 0 10px;
 }
@@ -122,7 +131,7 @@ watch(() => props.visible, async (newVisible) => {
   white-space: nowrap;
 }
 
-.button {
+.header .button {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -135,16 +144,28 @@ watch(() => props.visible, async (newVisible) => {
   cursor: pointer;
 }
 
-.button.close {
+.header .button.close {
   border: 1px solid #fff;
   background-color: rgba(255, 255, 255, 0.9);
   box-shadow: var(--lovelymai-box-shadow-200);
 }
 
 @media (hover: hover) {
-  .button:hover {
+  .header .button:hover {
     background-color: var(--lovelymai-color-gray-150);
   }
+}
+
+.mask {
+  position: relative;
+  z-index: 0;
+  min-height: 100%;
+  border-radius: inherit;
+  overflow-y: auto;
+}
+
+.mask .empty {
+  height: 50px;
 }
 </style>
 <style scoped>
