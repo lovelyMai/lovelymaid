@@ -104,7 +104,7 @@ onUnmounted(() => {
       <li :class="$style.row" v-for="(row, index) in sortedRows" :key="row.id"
         :style="{ backgroundColor: ActivationManager?.activeIndexes.has(index) ? 'var(--lovelymai-color-blue-450)' : '', borderRadius: getBorderRadius(index) }">
         <span :class="$style.text" v-for="column in props.columns" :key="column.id"
-          :style="{ width: column.width ?? '200px', color: ActivationManager?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : '#bfd0f4') : (sort?.id === column.id ? '#000' : 'var(--lovelymai-color-gray-300)') }">
+          :style="{ width: column.width ?? '200px', color: ActivationManager?.activeIndexes.has(index) ? (sort?.id === column.id ? '#fff' : 'var(--lovelymai-color-blue-50)') : (sort?.id === column.id ? '#000' : 'var(--lovelymai-color-gray-300)') }">
           <slot :row="row" :column="column">{{ row[column.prop] }}</slot>
         </span>
       </li>
