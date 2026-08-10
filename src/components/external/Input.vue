@@ -69,7 +69,7 @@ onMounted(() => {
   cleanup = watchDOM(inputContainerRef.value, ({ width, height }) => {
     style.inputContainer.width = width
     style.inputContainer.height = height
-    style.inputContainer.height = height - 2
+    style.input.height = height - 2
   })
   useCssVar(inputContainerRef.value, style)
 })
