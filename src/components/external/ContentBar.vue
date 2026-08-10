@@ -102,6 +102,9 @@ watch(
     <div :class="$style.content">
       <slot></slot>
     </div>
+    <div :class="$style.center">
+      <slot name="center"></slot>
+    </div>
     <Loading :loading="props.loading" :z-index="1" />
   </Card>
 </template>
@@ -150,5 +153,12 @@ watch(
   display: flow-root;
   position: relative;
   z-index: 0;
+}
+
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>

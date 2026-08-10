@@ -68,6 +68,9 @@ const close = () => {
           <slot name="header"></slot>
         </template>
         <slot></slot>
+        <template #center>
+          <slot name="center"></slot>
+        </template>
       </ContentBar>
     </div>
   </teleport>
