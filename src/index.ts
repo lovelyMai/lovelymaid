@@ -15,7 +15,6 @@ import Table, { type ColumnConfig, type SortConfig } from './components/external
 import TextArea from './components/external/TextArea.vue'
 
 import type { Item, ListItem, OptionItem, DateItem } from './types.js'
-
 import '@/assets/styles/reset.css'
 import '@/assets/styles/main.css'
 import '@/assets/icons/iconfont.css'
@@ -26,7 +25,8 @@ export {
   CheckBox,
   ContentBar,
   FoldList,
-  Form, type FormItem,
+  Form,
+  type FormItem,
   Input,
   Loading,
   MenuBar,
@@ -34,7 +34,12 @@ export {
   Select,
   SideBar,
   TabBar,
-  Table, type ColumnConfig, type SortConfig,
+  Table,
+  type ColumnConfig,
+  type SortConfig,
   TextArea,
-  type Item, type ListItem, type OptionItem, type DateItem
+  type Item,
+  type ListItem,
+  type OptionItem,
+  type DateItem,
 }

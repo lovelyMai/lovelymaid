@@ -7,23 +7,39 @@ export type ActivationManager = {
   cleanup: () => void
 }
 
-export const createActivationManager = (items: Ref<Item[]>, activeIds: Ref<Set<string | number>>, ParentEl: HTMLElement): ActivationManager => {
+export const createActivationManager = (
+  items: Ref<Item[]>,
+  activeIds: Ref<Set<string | number>>,
+  ParentEl: HTMLElement,
+): ActivationManager => {
   const activeIndexes = ref<Set<number>>(new Set())
   let lastActiveIndex: number | undefined = undefined
-  watch(activeIds, (newActiveIds) => {
-    activeIndexes.value = new Set(items.value.map((item, index) => newActiveIds.has(item.id) ? index : -1).filter(index => index !== -1))
-  }, { immediate: true })
+  watch(
+    activeIds,
+    (newActiveIds) => {
+      activeIndexes.value = new Set(
+        items.value
+          .map((item, index) => (newActiveIds.has(item.id) ? index : -1))
+          .filter((index) => index !== -1),
+      )
+    },
+    { immediate: true },
+  )
   watch(items, (newItems) => {
-    activeIndexes.value = new Set(newItems.map((item, index) => activeIds.value.has(item.id) ? index : -1).filter(index => index !== -1))
+    activeIndexes.value = new Set(
+      newItems
+        .map((item, index) => (activeIds.value.has(item.id) ? index : -1))
+        .filter((index) => index !== -1),
+    )
   })
   const removeContinuous = (set: Set<number>): Set<number> => {
-    const result = new Set<number>();
+    const result = new Set<number>()
     for (const num of set) {
       if (!set.has(num - 1) && !set.has(num + 1)) {
-        result.add(num);
+        result.add(num)
       }
     }
-    return result;
+    return result
   }
   const activateItem = (e: PointerEvent, index: number) => {
     if (e.getModifierState('Meta')) {
@@ -44,7 +60,7 @@ export const createActivationManager = (items: Ref<Item[]>, activeIds: Ref<Set<s
       activeIndexes.value = new Set([index])
       lastActiveIndex = index
     }
-    activeIds.value = new Set(Array.from(activeIndexes.value).map(index => items.value[index].id))
+    activeIds.value = new Set(Array.from(activeIndexes.value).map((index) => items.value[index].id))
   }
   const handlePointerDown = (e: PointerEvent) => {
     e.stopPropagation()

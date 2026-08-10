@@ -8,7 +8,7 @@ interface Props {
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
-  enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
+  enterkeyhint?: 'enter' | 'search' | 'done' | 'go' | 'next' | 'previous' | 'send'
   /** 是否禁用 */
   disabled?: boolean
   /** 回车事件 */
@@ -17,7 +17,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   minrow: 1,
   disabled: false,
-  placeholder: '输入...'
+  placeholder: '输入...',
 })
 const inputValue = defineModel<string>('value', { required: true })
 
@@ -38,15 +38,15 @@ const autoResize = () => {
 }
 
 // 中文输入法下回车防止搜索
-let isComposing = false;
+let isComposing = false
 const compositionend = () => {
   setTimeout(() => {
-    isComposing = false;
+    isComposing = false
   }, 10)
-};
+}
 const compositionstart = () => {
-  isComposing = true;
-};
+  isComposing = true
+}
 
 // 回车事件
 const enter = (e: KeyboardEvent) => {
@@ -58,16 +58,27 @@ const enter = (e: KeyboardEvent) => {
 defineExpose({
   focus: () => textareaRef.value?.focus(),
   blur: () => textareaRef.value?.blur(),
-  select: () => textareaRef.value?.select()
+  select: () => textareaRef.value?.select(),
 })
 </script>
 
 <template>
-  <Card :class="$style.TextArea" :ref="(el) => TextAreaRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
-    <textarea :rows="props.minrow" ref="textareaRef" :value="inputValue"
-      @input="(e) => inputValue = (e.target as HTMLTextAreaElement).value" :placeholder="props.placeholder"
-      :enterkeyhint="props.enterkeyhint" :disabled="props.disabled" @keydown.enter.prevent="enter"
-      @compositionstart="compositionstart" @compositionend="compositionend" />
+  <Card
+    :class="$style.TextArea"
+    :ref="(el) => (TextAreaRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
+  >
+    <textarea
+      :rows="props.minrow"
+      ref="textareaRef"
+      :value="inputValue"
+      @input="(e) => (inputValue = (e.target as HTMLTextAreaElement).value)"
+      :placeholder="props.placeholder"
+      :enterkeyhint="props.enterkeyhint"
+      :disabled="props.disabled"
+      @keydown.enter.prevent="enter"
+      @compositionstart="compositionstart"
+      @compositionend="compositionend"
+    />
   </Card>
 </template>
 
@@ -96,7 +107,7 @@ textarea {
   line-height: var(--line-height);
   caret-color: var(--lovelymai-color-blue-200);
   outline: 0px solid transparent;
-  transition: outline .2s ease;
+  transition: outline 0.2s ease;
   resize: none;
   overflow-y: auto;
   scrollbar-width: thin;

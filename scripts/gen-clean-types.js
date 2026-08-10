@@ -1,3 +1,4 @@
+import { writeFileSync, readFileSync, mkdirSync } from 'node:fs'
 /**
  * 生成组件库的可读类型声明 (.d.ts)
  *
@@ -15,11 +16,10 @@
  *   dist/index.d.ts                 入口类型（tsc 编译 + 移除 CSS import）
  */
 import { readdir, readFile, writeFile, mkdir, rm, stat } from 'node:fs/promises'
-import { writeFileSync, readFileSync, mkdirSync } from 'node:fs'
 import { join, dirname, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import pkg from 'vue-component-meta'
 import ts from 'typescript'
+import pkg from 'vue-component-meta'
 
 const { createChecker } = pkg
 
@@ -52,7 +52,10 @@ function cleanParens(type) {
       if (s[i] === '(') depth++
       else if (s[i] === ')') {
         depth--
-        if (depth === 0 && i < s.length - 1) { wraps = false; break }
+        if (depth === 0 && i < s.length - 1) {
+          wraps = false
+          break
+        }
       }
     }
     if (!wraps) break
@@ -100,7 +103,9 @@ async function extractSharedTypeNames() {
       await scan(dirPath)
       return [...names]
     }
-  } catch { /* 目录不存在，回退单文件 */ }
+  } catch {
+    /* 目录不存在，回退单文件 */
+  }
 
   // 单文件形态：src/types.ts
   await scanFile(join(srcDir, 'types.ts'))
@@ -126,7 +131,13 @@ function collectSharedImports(texts, outPath) {
 function extractExportTypes(vueSource) {
   const m = vueSource.match(/<script setup[^>]*>([\s\S]*?)<\/script>/)
   if (!m) return []
-  const sf = ts.createSourceFile('comp.vue.ts', m[1], ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
+  const sf = ts.createSourceFile(
+    'comp.vue.ts',
+    m[1],
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  )
   const types = []
   for (const stmt of sf.statements) {
     if (ts.isTypeAliasDeclaration(stmt) || ts.isInterfaceDeclaration(stmt)) {
@@ -141,7 +152,7 @@ function extractExportTypes(vueSource) {
 
 /** 渲染 Props 接口（过滤 Vue 全局 props，带 JSDoc） */
 function renderProps(meta) {
-  const props = meta.props.filter(p => !p.global)
+  const props = meta.props.filter((p) => !p.global)
   if (props.length === 0) return null
 
   const lines = []
@@ -156,7 +167,7 @@ function renderProps(meta) {
 /** 渲染 Slots 类型 */
 function renderSlots(meta) {
   if (meta.slots.length === 0) return null
-  const lines = meta.slots.map(slot => {
+  const lines = meta.slots.map((slot) => {
     const type = cleanType(slot.type).replace(/;\s*\}$/, '}')
     const params = type === '{}' || type === '' ? '()' : `(props: ${type})`
     return `    ${slot.name}?: ${params} => any`
@@ -167,7 +178,7 @@ function renderSlots(meta) {
 /** 渲染 Exposed 类型 */
 function renderExposed(meta) {
   if (meta.exposed.length === 0) return null
-  const lines = meta.exposed.map(e => {
+  const lines = meta.exposed.map((e) => {
     const head = e.description ? `    /** ${e.description.replace(/\n/g, '\n     * ')} */\n` : ''
     return `${head}    ${e.name}: ${cleanType(e.type)}`
   })
@@ -176,11 +187,14 @@ function renderExposed(meta) {
 
 /** 渲染 Emits 类型（v-model 的 update:xxx 事件） */
 function renderEmits(meta) {
-  const events = meta.events.filter(e => e.name.startsWith('update:'))
+  const events = meta.events.filter((e) => e.name.startsWith('update:'))
   if (events.length === 0) return null
-  const lines = events.map(e => {
+  const lines = events.map((e) => {
     // e.type 形如 "[value: string | number]" 或 "[]"
-    const params = e.type.trim().replace(/^\[|\]$/g, '').trim()
+    const params = e.type
+      .trim()
+      .replace(/^\[|\]$/g, '')
+      .trim()
     const sig = params ? `(${params})` : '()'
     return `    '${e.name}': ${sig} => any`
   })
@@ -263,7 +277,7 @@ async function scanVueFiles(dir) {
   const files = []
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name)
-    if (entry.isDirectory()) files.push(...await scanVueFiles(full))
+    if (entry.isDirectory()) files.push(...(await scanVueFiles(full)))
     else if (entry.name.endsWith('.vue')) files.push(full)
   }
   return files
@@ -274,7 +288,7 @@ async function scanTsFiles(dir) {
   const files = []
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name)
-    if (entry.isDirectory()) files.push(...await scanTsFiles(full))
+    if (entry.isDirectory()) files.push(...(await scanTsFiles(full)))
     else if (entry.name.endsWith('.ts') && entry.name !== 'env.d.ts') files.push(full)
   }
   return files
@@ -300,7 +314,10 @@ async function compileTsDeclarations() {
     let m
     while ((m = importRe.exec(src)) !== null) {
       for (const name of m[1].split(',')) {
-        const clean = name.trim().replace(/^type\s+/, '').split(/\s+as\s+/)[0]
+        const clean = name
+          .trim()
+          .replace(/^type\s+/, '')
+          .split(/\s+as\s+/)[0]
         if (clean) vueNamedImports.add(clean)
       }
     }
@@ -312,7 +329,7 @@ async function compileTsDeclarations() {
   import type { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
-${[...vueNamedImports].map(n => `  export type ${n} = any`).join('\n')}
+${[...vueNamedImports].map((n) => `  export type ${n} = any`).join('\n')}
 }
 `
   await writeFile(shimPath, shim, 'utf-8')
@@ -327,10 +344,12 @@ ${[...vueNamedImports].map(n => `  export type ${n} = any`).join('\n')}
   })
 
   const diags = ts.getPreEmitDiagnostics(program)
-  const errors = diags.filter(d => d.category === ts.DiagnosticCategory.Error)
+  const errors = diags.filter((d) => d.category === ts.DiagnosticCategory.Error)
   if (errors.length > 0) {
     for (const d of errors) {
-      console.log(`  ⚠️  ${d.file?.fileName?.replace(rootDir + '/', '') ?? '?'}: ${typeof d.messageText === 'string' ? d.messageText : d.messageText.messageText}`)
+      console.log(
+        `  ⚠️  ${d.file?.fileName?.replace(rootDir + '/', '') ?? '?'}: ${typeof d.messageText === 'string' ? d.messageText : d.messageText.messageText}`,
+      )
     }
   }
 
@@ -345,7 +364,10 @@ ${[...vueNamedImports].map(n => `  export type ${n} = any`).join('\n')}
     })
     // index.d.ts：移除 CSS import
     if (fileName.endsWith('index.d.ts')) {
-      out = out.split('\n').filter(l => !l.includes('assets/styles/') && !l.includes('assets/icons/')).join('\n')
+      out = out
+        .split('\n')
+        .filter((l) => !l.includes('assets/styles/') && !l.includes('assets/icons/'))
+        .join('\n')
     }
     // 4 空格缩进 → 2 空格，顶层声明之间空一行
     writeFileSync(fileName, separateDeclarations(dedent4to2(out)))
@@ -367,8 +389,8 @@ async function main() {
     const full = join(distDir, entry.name)
     if (entry.isDirectory()) {
       const hasDts = await readdir(full).then(
-        files => files.some(f => f.endsWith('.d.ts')),
-        () => false
+        (files) => files.some((f) => f.endsWith('.d.ts')),
+        () => false,
       )
       if (hasDts) await rm(full, { recursive: true, force: true })
     } else if (entry.name.endsWith('.d.ts')) {

@@ -1,0 +1,54 @@
+{
+  "tabWidth": 2,
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "sortImports": {
+    "newlinesBetween": false,
+    "groups": [
+      "value-builtin",
+      "value-external",
+      "components",
+      { "newlinesBetween": true },
+      "type-import",
+      "assets",
+      "utils",
+      "apis",
+      "stores",
+      "services",
+      "unknown"
+    ],
+    "customGroups": [
+      {
+        "groupName": "components",
+        "elementNamePattern": ["**/*.vue", "@/components/**", "@/modules/**", "./src", "../src"],
+        "modifiers": ["value"]
+      },
+      {
+        "groupName": "assets",
+        "elementNamePattern": ["@/assets/**", "**/assets/**"],
+        "modifiers": ["value"]
+      },
+      {
+        "groupName": "utils",
+        "elementNamePattern": ["@/utils/**", "**/utils/**"],
+        "modifiers": ["value"]
+      },
+      {
+        "groupName": "apis",
+        "elementNamePattern": ["@/apis/**", "**/apis/**"],
+        "modifiers": ["value"]
+      },
+      {
+        "groupName": "stores",
+        "elementNamePattern": ["@/stores/**", "**/stores/**"],
+        "modifiers": ["value"]
+      },
+      {
+        "groupName": "services",
+        "elementNamePattern": ["@/services/**", "**/services/**"],
+        "modifiers": ["value"]
+      }
+    ]
+  }
+}

@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
-import Card from './Card.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
+import Card from './Card.vue'
 
 import type { OptionItem } from '@/types'
-import { watchDOM } from '@/utils/dom'
 import { useCssVar } from '@/utils/css-var.js'
+import { watchDOM } from '@/utils/dom'
 import { createWindowManager, type WindowManager } from '@/utils/window.js'
 
 interface Props {
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
-  enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
+  enterkeyhint?: 'enter' | 'search' | 'done' | 'go' | 'next' | 'previous' | 'send'
   /** 是否禁用 */
   disabled?: boolean
   /** 是否只读 */
@@ -30,14 +30,20 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   readonly: false,
   options: () => [],
-  filter: false
+  filter: false,
 })
 const selectedValue = defineModel<string[]>('value', { required: true })
 const warning = defineModel<boolean>('warning', { default: false })
 
 // 输入框展示文本：输入时显示过滤关键词，否则显示已选中项
 const keyword = ref('')
-const showValue = computed<string>(() => MenuManager.value?.visible ? keyword.value : selectedValue.value.length > 0 ? `已选择 ${selectedValue.value.length} 项` : '')
+const showValue = computed<string>(() =>
+  MenuManager.value?.visible
+    ? keyword.value
+    : selectedValue.value.length > 0
+      ? `已选择 ${selectedValue.value.length} 项`
+      : '',
+)
 
 // 初始化
 const InputRef = ref<HTMLElement | null>(null)
@@ -46,14 +52,14 @@ const slots = useSlots()
 const style = reactive({
   Input: {
     width: 0,
-    height: 0
+    height: 0,
   },
   input: {
     height: 0,
     get paddingLeft() {
       return slots.default ? style.Input.height : style.Input.height / 2
-    }
-  }
+    },
+  },
 })
 let cleanup: () => void
 onMounted(() => {
@@ -68,15 +74,15 @@ onMounted(() => {
 onUnmounted(() => cleanup())
 
 // 中文输入法下回车防止搜索
-let isComposing = false;
+let isComposing = false
 const compositionend = () => {
   setTimeout(() => {
-    isComposing = false;
-  }, 10);
-};
+    isComposing = false
+  }, 10)
+}
 const compositionstart = () => {
-  isComposing = true;
-};
+  isComposing = true
+}
 
 // 菜单
 const MenuRef = ref<HTMLElement | null>(null)
@@ -88,11 +94,12 @@ onMounted(() => {
 onUnmounted(() => {
   MenuManager.value?.cleanup()
 })
-const collectLeafNames = (options: OptionItem[]): string[] => options.map(option => option.options ? collectLeafNames(option.options) : option.name).flat()
+const collectLeafNames = (options: OptionItem[]): string[] =>
+  options.map((option) => (option.options ? collectLeafNames(option.options) : option.name)).flat()
 const checkState = (option: OptionItem): 0 | 1 | 2 => {
   if (!option.options) return selectedValue.value.includes(option.name) ? 2 : 0
   const leaves = collectLeafNames(option.options)
-  const selectedCount = leaves.filter(name => selectedValue.value.includes(name)).length
+  const selectedCount = leaves.filter((name) => selectedValue.value.includes(name)).length
   if (selectedCount === 0) return 0
   return selectedCount === leaves.length ? 2 : 1
 }
@@ -100,27 +107,32 @@ const onOptionClick = (option: OptionItem) => {
   inputRef.value?.focus()
   const leaves = option.options ? collectLeafNames(option.options) : [option.name]
   const leafSet = new Set(leaves)
-  selectedValue.value = checkState(option) === 2 ? selectedValue.value.filter(name => !leafSet.has(name)) : [...new Set([...selectedValue.value, ...leaves])]
+  selectedValue.value =
+    checkState(option) === 2
+      ? selectedValue.value.filter((name) => !leafSet.has(name))
+      : [...new Set([...selectedValue.value, ...leaves])]
 }
 
 // 过滤
 const filterOptions = (options: OptionItem[], keyword: string): OptionItem[] =>
   options.reduce<OptionItem[]>((acc, option) => {
     if (option.name.includes(keyword)) {
-      acc.push(option);
+      acc.push(option)
     } else if (option.options) {
-      const children = filterOptions(option.options, keyword);
+      const children = filterOptions(option.options, keyword)
       if (children.length > 0) {
-        acc.push({ ...option, options: children });
+        acc.push({ ...option, options: children })
       }
     }
-    return acc;
+    return acc
   }, [])
 const filteredOptions = computed<OptionItem[]>(() => {
   const text = keyword.value.trim()
   return text ? filterOptions(props.options, text) : props.options
 })
-const showingOptions = computed<OptionItem[]>(() => props.filter ? filteredOptions.value : props.options)
+const showingOptions = computed<OptionItem[]>(() =>
+  props.filter ? filteredOptions.value : props.options,
+)
 
 // 回车
 const enter = () => {
@@ -132,7 +144,7 @@ const enter = () => {
 const tab = () => {
   if (!MenuManager.value || !keyword.value) return
   const leaves = collectLeafNames(filteredOptions.value)
-  selectedValue.value = [...leaves.filter(leave => leave.includes(keyword.value))]
+  selectedValue.value = [...leaves.filter((leave) => leave.includes(keyword.value))]
 }
 
 // 清空
@@ -158,28 +170,51 @@ defineExpose({
     inputRef.value?.blur()
     MenuManager.value?.close()
   },
-  select: () => inputRef.value?.select()
+  select: () => inputRef.value?.select(),
 })
 </script>
 
 <template>
-  <Card :class="$style.Input" :ref="(el) => InputRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
+  <Card
+    :class="$style.Input"
+    :ref="(el) => (InputRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
+  >
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" ref="inputRef"
-      :style="{ outline: warning ? '3px solid var(--lovelymai-color-red-200)' : '' }" type="text" :value="showValue"
-      @input="(e) => keyword = (e.target as HTMLInputElement).value" :placeholder="props.placeholder ?? '选择...'"
-      :enterkeyhint="props.enterkeyhint" :disabled="props.disabled" :readonly="props.readonly"
-      @keydown.enter.prevent="enter" @keydown.tab.prevent="tab" @compositionstart="compositionstart"
-      @compositionend="compositionend" />
+    <input
+      :class="$style.input"
+      ref="inputRef"
+      :style="{ outline: warning ? '3px solid var(--lovelymai-color-red-200)' : '' }"
+      type="text"
+      :value="showValue"
+      @input="(e) => (keyword = (e.target as HTMLInputElement).value)"
+      :placeholder="props.placeholder ?? '选择...'"
+      :enterkeyhint="props.enterkeyhint"
+      :disabled="props.disabled"
+      :readonly="props.readonly"
+      @keydown.enter.prevent="enter"
+      @keydown.tab.prevent="tab"
+      @compositionstart="compositionstart"
+      @compositionend="compositionend"
+    />
     <div :class="[$style.icon, $style.clear]">
-      <span class="lovelymai lovely-clear" v-show="!props.disabled && selectedValue.length > 0"
-        @mouseup.stop="() => clear()"></span>
+      <span
+        class="lovelymai lovely-clear"
+        v-show="!props.disabled && selectedValue.length > 0"
+        @mouseup.stop="() => clear()"
+      ></span>
     </div>
-    <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" :visible="MenuManager?.visible ?? false"
-      :position="MenuManager?.position ?? [0, 0]" :options="showingOptions" :min-width="style.Input.width + 'px'"
-      :z-index="props.zIndex" :on-option-click="onOptionClick" v-slot="{ item }">
+    <Menu
+      :ref="(ins) => (MenuRef = (ins as MenuInstance | null)?.root ?? null)"
+      :visible="MenuManager?.visible ?? false"
+      :position="MenuManager?.position ?? [0, 0]"
+      :options="showingOptions"
+      :min-width="style.Input.width + 'px'"
+      :z-index="props.zIndex"
+      :on-option-click="onOptionClick"
+      v-slot="{ item }"
+    >
       <span class="lovelymai lovely-horizontal" v-if="checkState(item) === 1"></span>
       <span class="lovelymai lovely-check" v-else-if="checkState(item) === 2"></span>
     </Menu>
@@ -235,7 +270,7 @@ defineExpose({
 .input {
   caret-color: var(--lovelymai-color-blue-200);
   outline: 0px solid transparent;
-  transition: outline .2s ease;
+  transition: outline 0.2s ease;
 }
 
 .input::placeholder {

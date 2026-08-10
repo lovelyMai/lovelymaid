@@ -3,8 +3,8 @@ import { ref, computed } from 'vue'
 import Card from '../external/Card.vue'
 import Scroll from '../internal/Scroll.vue'
 
-import { formatDate } from '@/utils/date.js'
 import type { ListItem, DateItem } from '@/types'
+import { formatDate } from '@/utils/date.js'
 
 interface Props {
   /** 是否显示 */
@@ -17,15 +17,19 @@ interface Props {
   onDateClick?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
-  zIndex: 0
+  zIndex: 0,
 })
 const date = defineModel<DateItem>('date', { default: () => formatDate(Date.now()) })
 
 // 初始化
 const today = formatDate(Date.now())
 const weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-const months: ListItem[] = Array(12).fill(null).map((_, index) => ({ id: index + 1, name: `${index + 1}月` }))
-const years: ListItem[] = Array(200).fill(null).map((_, index) => ({ id: 1900 + index, name: `${1900 + index}年` }))
+const months: ListItem[] = Array(12)
+  .fill(null)
+  .map((_, index) => ({ id: index + 1, name: `${index + 1}月` }))
+const years: ListItem[] = Array(200)
+  .fill(null)
+  .map((_, index) => ({ id: 1900 + index, name: `${1900 + index}年` }))
 
 // 年月切换
 const year = ref<number>(today[0])
@@ -36,7 +40,7 @@ const activeIds = computed<[string | number, string | number]>({
   set: ([newYearId, newMonthId]: [string | number, string | number]) => {
     year.value = Number(newYearId)
     month.value = Number(newMonthId)
-  }
+  },
 })
 const decreaseMonth = () => {
   month.value = month.value - 1 >= 1 ? month.value - 1 : 12
@@ -75,39 +79,70 @@ defineExpose<DateInstance>({
   get root() {
     return DateRef.value
   },
-  props
+  props,
 })
 </script>
 
 <template>
   <teleport to="body">
     <transition name="lovelymai-fade-leave">
-      <Card :class="$style.Date" :ref="(ins) => DateRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null"
+      <Card
+        :class="$style.Date"
+        :ref="(ins) => (DateRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
         v-if="props.visible"
-        :style="{ left: `${props.position[0]}px`, top: `${props.position[1]}px`, zIndex: props.zIndex }">
+        :style="{
+          left: `${props.position[0]}px`,
+          top: `${props.position[1]}px`,
+          zIndex: props.zIndex,
+        }"
+      >
         <div :class="$style.header">
-          <h5 :class="$style.date" @click.stop="() => scrollIsOpen = !scrollIsOpen">
-            <span :style="{ color: scrollIsOpen ? 'var(--lovelymai-color-blue-300)' : '' }">{{ `${year} 年 ${month} 月`
-              }}</span>
-            <span :class="['lovelymai', 'lovely-right-arrow', $style.arrow]"
-              :style="{ transform: scrollIsOpen ? 'translateY(1px) rotate(90deg)' : 'translateY(1px) rotate(0deg)' }"></span>
+          <h5 :class="$style.date" @click.stop="() => (scrollIsOpen = !scrollIsOpen)">
+            <span :style="{ color: scrollIsOpen ? 'var(--lovelymai-color-blue-300)' : '' }">{{
+              `${year} 年 ${month} 月`
+            }}</span>
+            <span
+              :class="['lovelymai', 'lovely-right-arrow', $style.arrow]"
+              :style="{
+                transform: scrollIsOpen
+                  ? 'translateY(1px) rotate(90deg)'
+                  : 'translateY(1px) rotate(0deg)',
+              }"
+            ></span>
           </h5>
           <div :class="$style.button">
-            <span :class="['lovelymai', 'lovely-left-arrow', $style.arrow]" @click.stop="() => decreaseMonth()"></span>
-            <span :class="['lovelymai', 'lovely-right-arrow', $style.arrow]" @click.stop="() => increaseMonth()"></span>
+            <span
+              :class="['lovelymai', 'lovely-left-arrow', $style.arrow]"
+              @click.stop="() => decreaseMonth()"
+            ></span>
+            <span
+              :class="['lovelymai', 'lovely-right-arrow', $style.arrow]"
+              @click.stop="() => increaseMonth()"
+            ></span>
           </div>
         </div>
         <transition name="lovelymai-fade" mode="out-in">
           <Scroll v-if="scrollIsOpen" :lists="[years, months]" v-model:active-ids="activeIds" />
           <div :class="$style.days" v-else>
             <ul :class="$style.weekdays">
-              <li v-for="(weekday) in weekDays">{{ weekday }}</li>
+              <li v-for="weekday in weekDays">{{ weekday }}</li>
             </ul>
             <ul :class="$style.monthDays" @click.stop="onDayClick">
               <li v-for="(day, index) in calendarDays" :key="index" :class="$style.dayCell">
                 <span
-                  :class="[$style.day, { [$style.today]: year === today[0] && month === today[1] && Number(day) === today[2], [$style.active]: year === date[0] && month === date[1] && Number(day) === date[2] }]"
-                  v-if="day" :data-day="day">{{ day }}</span>
+                  :class="[
+                    $style.day,
+                    {
+                      [$style.today]:
+                        year === today[0] && month === today[1] && Number(day) === today[2],
+                      [$style.active]:
+                        year === date[0] && month === date[1] && Number(day) === date[2],
+                    },
+                  ]"
+                  v-if="day"
+                  :data-day="day"
+                  >{{ day }}</span
+                >
               </li>
             </ul>
           </div>
@@ -146,7 +181,7 @@ defineExpose<DateInstance>({
 
 .header .date .arrow {
   font-size: 14px;
-  transition: transform .5s;
+  transition: transform 0.5s;
 }
 
 .header .button {
@@ -190,7 +225,7 @@ defineExpose<DateInstance>({
   font-weight: 450;
   border-radius: 50%;
   cursor: pointer;
-  transition: background-color .2s;
+  transition: background-color 0.2s;
 }
 
 .days .day.today {

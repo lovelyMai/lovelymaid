@@ -9,7 +9,7 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
   showMask: true,
-  zIndex: 0
+  zIndex: 0,
 })
 
 // 锁定包含块，加载期间禁止滚动
@@ -18,7 +18,10 @@ let scrollParent: HTMLElement | null = null
 let originalOverflow = ''
 const lockScroll = () => {
   if (scrollParent) return
-  scrollParent = (LoadingRef.value?.offsetParent as HTMLElement | null) ?? LoadingRef.value?.parentElement ?? null
+  scrollParent =
+    (LoadingRef.value?.offsetParent as HTMLElement | null) ??
+    LoadingRef.value?.parentElement ??
+    null
   if (!scrollParent) return
   originalOverflow = scrollParent.style.overflow
   scrollParent.style.overflow = 'hidden'
@@ -32,20 +35,29 @@ onMounted(() => {
   if (!props.loading) return
   lockScroll()
 })
-watch(() => props.loading, (newLoading) => {
-  if (newLoading) {
-    lockScroll()
-  } else {
-    unlockScroll()
-  }
-}, { flush: 'post' })
+watch(
+  () => props.loading,
+  (newLoading) => {
+    if (newLoading) {
+      lockScroll()
+    } else {
+      unlockScroll()
+    }
+  },
+  { flush: 'post' },
+)
 onUnmounted(() => {
   unlockScroll()
 })
 </script>
 
 <template>
-  <div :class="$style.Loading" v-if="props.loading" ref="LoadingRef" :style="{ zIndex: props.zIndex }">
+  <div
+    :class="$style.Loading"
+    v-if="props.loading"
+    ref="LoadingRef"
+    :style="{ zIndex: props.zIndex }"
+  >
     <div :class="$style.spinner"></div>
   </div>
 </template>
@@ -61,7 +73,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   background-color: var(--lovelymai-color-gray-100);
-  opacity: .8;
+  opacity: 0.8;
 }
 
 .spinner {
@@ -70,12 +82,12 @@ onUnmounted(() => {
   border: 3px solid var(--lovelymai-color-gray-200);
   border-top-color: var(--lovelymai-color-blue-300);
   border-radius: 50%;
-  animation: lovelymai-spin .8s linear infinite;
+  animation: lovelymai-spin 0.8s linear infinite;
 }
 
 @keyframes lovelymai-spin {
   to {
-    transform: rotate(360deg)
+    transform: rotate(360deg);
   }
 }
 </style>

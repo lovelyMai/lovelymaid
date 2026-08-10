@@ -1,7 +1,7 @@
 // 通用防抖函数
 export function debounce<T extends (...args: any[]) => any>(
   fn: T,
-  delay: number
+  delay: number,
 ): (...args: Parameters<T>) => void {
   let timer: number | undefined
   return function (this: any, ...args: Parameters<T>) {
@@ -18,19 +18,19 @@ export function debounce<T extends (...args: any[]) => any>(
 // 通用节流函数
 export function throttle<T extends (...args: any[]) => any>(
   fn: T,
-  interval: number
+  interval: number,
 ): (...args: Parameters<T>) => void {
   let timer: number | undefined
   return function (this: any, ...args: Parameters<T>) {
     if (timer) return
-    timer = setTimeout(() => timer = undefined, interval)
+    timer = setTimeout(() => (timer = undefined), interval)
     fn.apply(this, args)
   }
 }
 
 // 清理定时器
 export const clearTimer = (...args: (number | undefined)[]) => {
-  args.forEach(timer => {
+  args.forEach((timer) => {
     if (timer) {
       clearInterval(timer)
       clearTimeout(timer)

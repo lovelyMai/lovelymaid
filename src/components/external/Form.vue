@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import TextArea from './TextArea.vue'
 import CheckBox from './CheckBox.vue'
 import Input from './Input.vue'
+import TextArea from './TextArea.vue'
 
 import type { DateItem, OptionItem } from '@/types'
 
@@ -65,35 +65,78 @@ const verifications = computed<Record<string, boolean>>(() => {
 // 暴露
 defineExpose({
   /** 校验结果（key 为表单项 id，textarea 和 checkbox 不参与校验） */
-  verifications
+  verifications,
 })
 </script>
 <template>
   <ul :class="$style.Form" ref="FormRef">
-    <li :class="$style.FormItem" v-for="(item, index) in items" :key="item.id" :style="{
-      width: item.type === 'textarea' ? '100%' : (item.width ?? props.itemWidth ?? (item.type === 'checkbox' || item.type === 'date') ? '200px' : '150px'),
-      height: item.type === 'textarea' ? '' : (item.height ?? props.itemHeight ?? '35px')
-    }">
-      <span :class="$style.name" v-if="item.name"
-        :style="{ lineHeight: item.type === 'textarea' ? '42px' : (item.height ?? props.itemHeight ?? 35) + 'px' }">
-        {{ item.name }}</span>
-      <TextArea :class="$style.TextArea" v-if="item.type === 'textarea'"
-        :ref="(el) => TextAreaInstancesRef[index] = (el as InstanceType<typeof TextArea> | null)"
-        v-model:value="(item.value as string)" :placeholder="item.placeholder"
-        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled"
-        :on-enter="() => onEnter(index)" />
-      <CheckBox :class="$style.CheckBox" v-else-if="item.type === 'checkbox'"
-        :ref="(el) => CheckBoxInstancesRef[index] = (el as InstanceType<typeof CheckBox> | null)"
-        v-model:value="(item.value as string[])" :placeholder="item.placeholder"
-        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled" :readonly="item.readonly"
-        :options="item.options" :filter="item.filter" :z-index="item.zIndex" v-model:warning="item.warning"
-        :on-enter="() => onEnter(index)" />
-      <Input :class="$style.Input" v-else
-        :ref="(el) => InputInstancesRef[index] = (el as InstanceType<typeof Input> | null)" :type="item.type"
-        v-model:value="(item.value as string)" :placeholder="item.placeholder"
-        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'" :disabled="item.disabled" :readonly="item.readonly"
-        :options="item.options" :filter="item.filter" :format="item.format" :verify="item.verify" :z-index="item.zIndex"
-        v-model:warning="item.warning" :on-enter="() => onEnter(index)" />
+    <li
+      :class="$style.FormItem"
+      v-for="(item, index) in items"
+      :key="item.id"
+      :style="{
+        width:
+          item.type === 'textarea'
+            ? '100%'
+            : (item.width ?? props.itemWidth ?? (item.type === 'checkbox' || item.type === 'date'))
+              ? '200px'
+              : '150px',
+        height: item.type === 'textarea' ? '' : (item.height ?? props.itemHeight ?? '35px'),
+      }"
+    >
+      <span
+        :class="$style.name"
+        v-if="item.name"
+        :style="{
+          lineHeight:
+            item.type === 'textarea' ? '42px' : (item.height ?? props.itemHeight ?? 35) + 'px',
+        }"
+      >
+        {{ item.name }}</span
+      >
+      <TextArea
+        :class="$style.TextArea"
+        v-if="item.type === 'textarea'"
+        :ref="(el) => (TextAreaInstancesRef[index] = el as InstanceType<typeof TextArea> | null)"
+        v-model:value="item.value as string"
+        :placeholder="item.placeholder"
+        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'"
+        :disabled="item.disabled"
+        :on-enter="() => onEnter(index)"
+      />
+      <CheckBox
+        :class="$style.CheckBox"
+        v-else-if="item.type === 'checkbox'"
+        :ref="(el) => (CheckBoxInstancesRef[index] = el as InstanceType<typeof CheckBox> | null)"
+        v-model:value="item.value as string[]"
+        :placeholder="item.placeholder"
+        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'"
+        :disabled="item.disabled"
+        :readonly="item.readonly"
+        :options="item.options"
+        :filter="item.filter"
+        :z-index="item.zIndex"
+        v-model:warning="item.warning"
+        :on-enter="() => onEnter(index)"
+      />
+      <Input
+        :class="$style.Input"
+        v-else
+        :ref="(el) => (InputInstancesRef[index] = el as InstanceType<typeof Input> | null)"
+        :type="item.type"
+        v-model:value="item.value as string"
+        :placeholder="item.placeholder"
+        :enterkeyhint="index === items.length - 1 ? 'done' : 'next'"
+        :disabled="item.disabled"
+        :readonly="item.readonly"
+        :options="item.options"
+        :filter="item.filter"
+        :format="item.format"
+        :verify="item.verify"
+        :z-index="item.zIndex"
+        v-model:warning="item.warning"
+        :on-enter="() => onEnter(index)"
+      />
     </li>
   </ul>
 </template>

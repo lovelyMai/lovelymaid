@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
-import Menu, { type MenuInstance } from '../internal/Menu.vue';
+import { onMounted, onUnmounted, ref } from 'vue'
+import Menu, { type MenuInstance } from '../internal/Menu.vue'
 
 import type { OptionItem } from '@/types'
-import { createWindowManager, type WindowManager } from '@/utils/window.js';
+import { createWindowManager, type WindowManager } from '@/utils/window.js'
 
 interface Props {
   /** 选项配置 */
@@ -30,11 +30,20 @@ onUnmounted(() => {
 
 <template>
   <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" ref="SelectRef">
-    <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" :visible="MenuManager?.visible ?? false"
-      :position="MenuManager?.position ?? [0, 0]" :z-index="props.zIndex" :options="props.options" :on-option-click="(option, index) => {
-        props.onOptionClick?.(option, index)
-        MenuManager?.close()
-      }" v-slot="{ item, index }">
+    <Menu
+      :ref="(ins) => (MenuRef = (ins as MenuInstance | null)?.root ?? null)"
+      :visible="MenuManager?.visible ?? false"
+      :position="MenuManager?.position ?? [0, 0]"
+      :z-index="props.zIndex"
+      :options="props.options"
+      :on-option-click="
+        (option, index) => {
+          props.onOptionClick?.(option, index)
+          MenuManager?.close()
+        }
+      "
+      v-slot="{ item, index }"
+    >
       <slot :item="item" :index="index"></slot>
     </Menu>
   </span>

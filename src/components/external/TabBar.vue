@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
-import Card from './Card.vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import Button from './Button.vue'
+import Card from './Card.vue'
 import Input from './Input.vue'
 
-import type { Item } from '@/types';
-import { clearTimer, throttle } from '@/utils/function';
-import { watchDOM } from '@/utils/dom';
-import { getLayoutLeft } from '@/utils/layout-offset.js';
-import { useCssVar } from '@/utils/css-var.js';
+import type { Item } from '@/types'
+import { useCssVar } from '@/utils/css-var.js'
+import { watchDOM } from '@/utils/dom'
+import { clearTimer, throttle } from '@/utils/function'
+import { getLayoutLeft } from '@/utils/layout-offset.js'
 
 interface Props {
   /** 标签 */
@@ -37,7 +37,7 @@ const style = reactive({
     'border-radius': 0,
     'background-color': 'var(--lovelymai-color-gray-100)',
     scale: 1,
-    transition: 'none'
+    transition: 'none',
   },
   slide: {
     width: 0,
@@ -57,12 +57,12 @@ const style = reactive({
     clipRight: 0,
     get scale() {
       return style.slide.scale === 1.2 ? 1.1 : 1
-    }
-  }
+    },
+  },
 })
 const activeIndex = computed<number>({
-  get: () => props.tabs.findIndex(tab => tab.id === activeId.value),
-  set: (newActiveIndex) => activeId.value = props.tabs[newActiveIndex].id
+  get: () => props.tabs.findIndex((tab) => tab.id === activeId.value),
+  set: (newActiveIndex) => (activeId.value = props.tabs[newActiveIndex].id),
 })
 const maxDistance = ref<number>(0)
 let cleanup: () => void
@@ -72,14 +72,16 @@ let backgroundTimer: number | undefined
 onMounted(() => {
   if (!TabBarRef.value) return
   cleanup = watchDOM(TabBarRef.value, () => {
-    style.Bar.width = props.showSearch ? TabBarRef.value!.offsetWidth - style.Bar.height - 5 : TabBarRef.value!.offsetWidth
+    style.Bar.width = props.showSearch
+      ? TabBarRef.value!.offsetWidth - style.Bar.height - 5
+      : TabBarRef.value!.offsetWidth
     style.Bar.height = TabBarRef.value!.offsetHeight
     style.search.width = TabBarRef.value!.offsetWidth - style.Bar.height * 0.8 - 5
     style.Bar['border-radius'] = style.Bar.height / 2
     style.slide.width = (style.Bar.width - 6) / props.tabs.length
     style['content-top'].clipLeft = activeIndex.value * style.slide.width
     style['content-top'].clipRight = style['content-top'].clipLeft + style.slide.width
-    maxDistance.value = (style.Bar.width - 6) * (props.tabs.length - 1) / props.tabs.length
+    maxDistance.value = ((style.Bar.width - 6) * (props.tabs.length - 1)) / props.tabs.length
     style.slide.translateX = activeIndex.value * style.slide.width
     style.slide.center = style.slide.translateX + style.slide.width / 2
   })
@@ -110,13 +112,14 @@ const getTargetLeft = (e: PointerEvent) => {
 }
 const stepToTarget = (targetLeft: number) => {
   const realLeft = getSlideX()
-  if (Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
+  if (Math.abs(targetLeft - realLeft) < maxDistance.value / 10) {
     style.slide.transition = `background .1s`
     style.slide.translateX = targetLeft
     followed = true
     calcPosFrame = undefined
   } else {
-    style.slide.translateX += (targetLeft - realLeft) > 0 ? maxDistance.value / 10 : -maxDistance.value / 10
+    style.slide.translateX +=
+      targetLeft - realLeft > 0 ? maxDistance.value / 10 : -maxDistance.value / 10
     calcPosFrame = requestAnimationFrame(() => stepToTarget(targetLeft))
   }
 }
@@ -127,7 +130,7 @@ const jumpToTarget = (targetLeft: number) => {
 const moveTowardTarget = (targetLeft: number) => {
   if (!slideRef.value) return
   const realLeft = getSlideX()
-  if (followed || Math.abs(targetLeft - realLeft) < (maxDistance.value / 10)) {
+  if (followed || Math.abs(targetLeft - realLeft) < maxDistance.value / 10) {
     style.slide.transition = `background .1s`
     style.slide.translateX = targetLeft
     followed = true
@@ -141,7 +144,7 @@ const updateVirtualPos = (duration: number | undefined) => {
   const calc = () => {
     const realLeft = getSlideX()
     style.slide.center = realLeft + style.slide.width / 2
-    const virtualWidth = style.slide.width * 1.2 / 1.1
+    const virtualWidth = (style.slide.width * 1.2) / 1.1
     style['content-top'].clipLeft = style.slide.center - virtualWidth / 2
     style['content-top'].clipRight = style.slide.center + virtualWidth / 2
   }
@@ -227,7 +230,7 @@ const resetHighlight = () => {
   style.slide.scale = 1
 }
 const stopSlide = (e: PointerEvent) => {
-  if ((Date.now() - startTime) < 100) {
+  if (Date.now() - startTime < 100) {
     clearTimer(backgroundTimer)
   }
   resetHighlight()
@@ -256,9 +259,12 @@ const stopSlide = (e: PointerEvent) => {
 watch(activeIndex, (newIndex) => {
   runStopAnimation(newIndex)
 })
-watch(() => props.tabs.length, () => {
-  style.slide.translateX = 0
-})
+watch(
+  () => props.tabs.length,
+  () => {
+    style.slide.translateX = 0
+  },
+)
 
 // 模式切换
 const searchIsActive = ref<boolean>(false)
@@ -269,10 +275,9 @@ const clickSearch = () => {
 }
 watch(searchIsActive, (newValue) => {
   if (newValue) {
-    setTimeout(() => searchIsShow.value = true, 100)
-  }
-  else {
-    setTimeout(() => searchIsShow.value = false, 200)
+    setTimeout(() => (searchIsShow.value = true), 100)
+  } else {
+    setTimeout(() => (searchIsShow.value = false), 200)
   }
 })
 </script>
@@ -287,7 +292,11 @@ watch(searchIsActive, (newValue) => {
         <li :class="$style.tab" v-for="(tab, index) in props.tabs" :key="index">
           <slot :tab="tab" :index="index"></slot>
         </li>
-        <div :class="$style.slide" ref="slideRef" v-show="activeIndex !== -1 && !searchIsActive"></div>
+        <div
+          :class="$style.slide"
+          ref="slideRef"
+          v-show="activeIndex !== -1 && !searchIsActive"
+        ></div>
         <ul :class="[$style.content, $style.top]" v-show="!searchIsActive">
           <li :class="[$style.tab, $style.top]" v-for="(tab, index) in props.tabs" :key="index">
             <slot :tab="tab" :index="index"></slot>
@@ -299,8 +308,15 @@ watch(searchIsActive, (newValue) => {
       <Button :class="$style.Button" v-show="!searchIsShow" type="glass" :on-click="clickSearch">
         <span class="lovelymai lovely-search button"></span>
       </Button>
-      <Input :class="$style.Input" v-show="searchIsShow" type="text" v-model:value="inputValue"
-        :placeholder="props.placeholder" enterkeyhint="search" :on-enter="props.onSearch">
+      <Input
+        :class="$style.Input"
+        v-show="searchIsShow"
+        type="text"
+        v-model:value="inputValue"
+        :placeholder="props.placeholder"
+        enterkeyhint="search"
+        :on-enter="props.onSearch"
+      >
         <span class="lovelymai lovely-search input"></span>
       </Input>
     </div>
@@ -363,10 +379,13 @@ watch(searchIsActive, (newValue) => {
   left: 0;
   top: 0;
   z-index: 1;
-  clip-path: inset(0 calc(100% - var(--content-top-clipRight) * 1px) 0 calc(var(--content-top-clipLeft) * 1px) round calc((var(--Bar-border-radius) - 3) * 1px));
+  clip-path: inset(
+    0 calc(100% - var(--content-top-clipRight) * 1px) 0 calc(var(--content-top-clipLeft) * 1px)
+      round calc((var(--Bar-border-radius) - 3) * 1px)
+  );
   transform: translateZ(0) scale(var(--content-top-scale));
   transform-origin: calc(var(--slide-center) * 1px) center;
-  transition: transform .2s;
+  transition: transform 0.2s;
   backface-visibility: hidden;
 }
 

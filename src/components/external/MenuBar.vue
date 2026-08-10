@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
-import Card from './Card.vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import Card from './Card.vue'
 
-import type { Item } from '@/types';
-import { watchDOM } from '@/utils/dom';
-import { useCssVar } from '@/utils/css-var.js';
+import type { Item } from '@/types'
+import { useCssVar } from '@/utils/css-var.js'
+import { watchDOM } from '@/utils/dom'
 
 type MenuItem = Item & {
   /** 是否禁用 */
@@ -22,8 +22,8 @@ const props = defineProps<Props>()
 const MenuBarRef = ref<HTMLElement | null>(null)
 const style = reactive({
   MenuBar: {
-    'border-radius': '0'
-  }
+    'border-radius': '0',
+  },
 })
 let cleanup: (() => void) | undefined
 onMounted(() => {
@@ -40,10 +40,16 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Card :class="$style.MenuBar" :ref="(el) => MenuBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
+  <Card
+    :class="$style.MenuBar"
+    :ref="(el) => (MenuBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
+  >
     <ul :class="$style.menus">
-      <li :class="[$style.menu, { [$style.disabled]: menu.disabled }]" v-for="(menu, index) in props.menus"
-        @click.stop="() => props.onMenuClick?.(menu, index)">
+      <li
+        :class="[$style.menu, { [$style.disabled]: menu.disabled }]"
+        v-for="(menu, index) in props.menus"
+        @click.stop="() => props.onMenuClick?.(menu, index)"
+      >
         <slot :menu="menu" :index="index"></slot>
       </li>
     </ul>
@@ -75,7 +81,7 @@ onUnmounted(() => {
 }
 
 .menus .menu.disabled {
-  opacity: .3;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 

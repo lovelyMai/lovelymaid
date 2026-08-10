@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
-import Card from './Card.vue'
-import Menu, { type MenuInstance } from '../internal/Menu.vue'
 import DateWindow, { type DateInstance } from '../internal/Date.vue'
+import Menu, { type MenuInstance } from '../internal/Menu.vue'
+import Card from './Card.vue'
 
 import type { OptionItem, DateItem } from '@/types'
+import { useCssVar } from '@/utils/css-var.js'
 import { formatDate, verifyDate } from '@/utils/date'
 import { watchDOM } from '@/utils/dom'
-import { useCssVar } from '@/utils/css-var.js'
 import { createWindowManager, type WindowManager } from '@/utils/window.js'
 
 interface Props {
   /** 输入框类型 */
-  type?: "text" | "password" | "number" | "radio" | "date"
+  type?: 'text' | 'password' | 'number' | 'radio' | 'date'
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
-  enterkeyhint?: "enter" | "search" | "done" | "go" | "next" | "previous" | "send"
+  enterkeyhint?: 'enter' | 'search' | 'done' | 'go' | 'next' | 'previous' | 'send'
   /** 是否禁用 */
   disabled?: boolean
   /** 是否只读 */
@@ -40,8 +40,9 @@ const props = withDefaults(defineProps<Props>(), {
   readonly: false,
   options: () => [],
   filter: false,
-  format: ([year, month, day]: DateItem): string => `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`,
-  verify: true
+  format: ([year, month, day]: DateItem): string =>
+    `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`,
+  verify: true,
 })
 const inputValue = defineModel<string>('value', { required: true })
 const warning = defineModel<boolean>('warning', { default: false })
@@ -53,14 +54,14 @@ const slots = useSlots()
 const style = reactive({
   Input: {
     width: 0,
-    height: 0
+    height: 0,
   },
   input: {
     height: 0,
     get paddingLeft() {
       return slots.default ? style.Input.height : style.Input.height / 2
-    }
-  }
+    },
+  },
 })
 let cleanup: () => void
 onMounted(() => {
@@ -75,15 +76,15 @@ onMounted(() => {
 onUnmounted(() => cleanup())
 
 // 中文输入法下回车防止搜索
-let isComposing = false;
+let isComposing = false
 const compositionend = () => {
   setTimeout(() => {
-    isComposing = false;
-  }, 10);
-};
+    isComposing = false
+  }, 10)
+}
 const compositionstart = () => {
-  isComposing = true;
-};
+  isComposing = true
+}
 
 // 菜单
 const MenuRef = ref<HTMLElement | null>(null)
@@ -93,8 +94,12 @@ let isFocused: boolean = false
 onMounted(() => {
   if (!inputRef.value || props.type !== 'radio') return
   MenuManager.value = createWindowManager(inputRef.value, MenuRef)
-  inputRef.value.addEventListener('focus', () => { isFocused = true })
-  inputRef.value.addEventListener('blur', () => { isFocused = false })
+  inputRef.value.addEventListener('focus', () => {
+    isFocused = true
+  })
+  inputRef.value.addEventListener('blur', () => {
+    isFocused = false
+  })
 })
 onUnmounted(() => {
   MenuManager.value?.cleanup()
@@ -109,20 +114,22 @@ const onOptionClick = (option: OptionItem) => {
 const filterOptions = (options: OptionItem[], keyword: string): OptionItem[] =>
   options.reduce<OptionItem[]>((acc, option) => {
     if (option.name.includes(keyword)) {
-      acc.push(option);
+      acc.push(option)
     } else if (option.options) {
-      const children = filterOptions(option.options, keyword);
+      const children = filterOptions(option.options, keyword)
       if (children.length > 0) {
-        acc.push({ ...option, options: children });
+        acc.push({ ...option, options: children })
       }
     }
-    return acc;
+    return acc
   }, [])
 const filteredOptions = computed<OptionItem[]>(() => {
   const keyword = inputValue.value.trim()
   return keyword ? filterOptions(props.options, keyword) : props.options
 })
-const showingOptions = computed<OptionItem[]>(() => props.filter ? filteredOptions.value : props.options)
+const showingOptions = computed<OptionItem[]>(() =>
+  props.filter ? filteredOptions.value : props.options,
+)
 watch(showingOptions, () => {
   if (!MenuManager.value) return
   if (isSelecting) {
@@ -172,7 +179,7 @@ watch(inputValue, () => {
 
 // Tab 补全
 const collectLeafNames = (options: OptionItem[]): string[] =>
-  options.map(option => option.options ? collectLeafNames(option.options) : option.name).flat()
+  options.map((option) => (option.options ? collectLeafNames(option.options) : option.name)).flat()
 const tab = () => {
   if (!inputValue.value) return
   if (props.type === 'radio') {
@@ -198,7 +205,10 @@ const verified = computed<boolean>(() => {
   if (!inputValue.value || !props.verify) return true
   if (props.type === 'radio') {
     const isValidOption = (options: OptionItem[]): boolean =>
-      options.some(option => option.name === inputValue.value || (!!option.options && isValidOption(option.options)))
+      options.some(
+        (option) =>
+          option.name === inputValue.value || (!!option.options && isValidOption(option.options)),
+      )
     return isValidOption(props.options)
   }
   if (props.type === 'date') {
@@ -231,32 +241,63 @@ defineExpose({
     MenuManager.value?.close()
     DateManager.value?.close()
   },
-  select: () => inputRef.value?.select()
+  select: () => inputRef.value?.select(),
 })
 </script>
 
 <template>
-  <Card :class="$style.Input" :ref="(el) => InputRef = (el as InstanceType<typeof Card> | null)?.$el ?? null">
+  <Card
+    :class="$style.Input"
+    :ref="(el) => (InputRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
+  >
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
     </div>
-    <input :class="$style.input" ref="inputRef"
+    <input
+      :class="$style.input"
+      ref="inputRef"
       :style="{ outline: warning ? '3px solid var(--lovelymai-color-red-200)' : '' }"
-      :type="props.type === 'radio' || props.type === 'date' ? 'text' : props.type" :value="inputValue"
-      @input="(e) => inputValue = (e.target as HTMLInputElement).value"
-      :placeholder="props.placeholder ?? (props.type === 'radio' || props.type === 'date' ? '选择...' : '输入...')"
-      :enterkeyhint="props.enterkeyhint" :disabled="props.disabled" :readonly="props.readonly"
-      @keydown.enter.prevent="enter" @keydown.tab.prevent="tab" @compositionstart="compositionstart"
-      @compositionend="compositionend" />
+      :type="props.type === 'radio' || props.type === 'date' ? 'text' : props.type"
+      :value="inputValue"
+      @input="(e) => (inputValue = (e.target as HTMLInputElement).value)"
+      :placeholder="
+        props.placeholder ??
+        (props.type === 'radio' || props.type === 'date' ? '选择...' : '输入...')
+      "
+      :enterkeyhint="props.enterkeyhint"
+      :disabled="props.disabled"
+      :readonly="props.readonly"
+      @keydown.enter.prevent="enter"
+      @keydown.tab.prevent="tab"
+      @compositionstart="compositionstart"
+      @compositionend="compositionend"
+    />
     <div :class="[$style.icon, $style.clear]">
-      <span class="lovelymai lovely-clear" v-show="!props.disabled && inputValue" @mouseup.stop="() => clear()"></span>
+      <span
+        class="lovelymai lovely-clear"
+        v-show="!props.disabled && inputValue"
+        @mouseup.stop="() => clear()"
+      ></span>
     </div>
-    <Menu :ref="(ins) => MenuRef = (ins as MenuInstance | null)?.root ?? null" v-if="props.type === 'radio'"
-      :visible="MenuManager?.visible ?? false" :position="MenuManager?.position ?? [0, 0]" :options="showingOptions"
-      :min-width="style.Input.width + 'px'" :z-index="props.zIndex" :on-option-click="onOptionClick" />
-    <DateWindow :ref="(ins) => DateRef = (ins as DateInstance | null)?.root ?? null" v-if="props.type === 'date'"
-      :visible="DateManager?.visible ?? false" :position="DateManager?.position ?? [0, 0]" v-model:date="date"
-      :z-index="props.zIndex" :on-date-click="onDateClick" />
+    <Menu
+      :ref="(ins) => (MenuRef = (ins as MenuInstance | null)?.root ?? null)"
+      v-if="props.type === 'radio'"
+      :visible="MenuManager?.visible ?? false"
+      :position="MenuManager?.position ?? [0, 0]"
+      :options="showingOptions"
+      :min-width="style.Input.width + 'px'"
+      :z-index="props.zIndex"
+      :on-option-click="onOptionClick"
+    />
+    <DateWindow
+      :ref="(ins) => (DateRef = (ins as DateInstance | null)?.root ?? null)"
+      v-if="props.type === 'date'"
+      :visible="DateManager?.visible ?? false"
+      :position="DateManager?.position ?? [0, 0]"
+      v-model:date="date"
+      :z-index="props.zIndex"
+      :on-date-click="onDateClick"
+    />
   </Card>
 </template>
 
@@ -309,7 +350,7 @@ defineExpose({
 .input {
   caret-color: var(--lovelymai-color-blue-200);
   outline: 0px solid transparent;
-  transition: outline .2s ease;
+  transition: outline 0.2s ease;
 }
 
 .input::placeholder {
@@ -320,7 +361,7 @@ defineExpose({
   outline: 3px solid var(--lovelymai-color-blue-100);
 }
 
-.input[type="number"]::-webkit-inner-spin-button {
+.input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
 </style>

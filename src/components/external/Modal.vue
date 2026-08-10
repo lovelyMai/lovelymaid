@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
-import ContentBar from './ContentBar.vue';
+import { onMounted, reactive, ref } from 'vue'
+import ContentBar from './ContentBar.vue'
 
-import { useCssVar } from '@/utils/css-var.js';
+import { useCssVar } from '@/utils/css-var.js'
 
 interface Props {
   /** 宽 */
@@ -14,10 +14,10 @@ interface Props {
   /** 关闭事件 */
   onClose?: () => void
   /** 加载状态 */
-  loading?: boolean;
+  loading?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
-  zIndex: 0
+  zIndex: 0,
 })
 const visible = defineModel<boolean>('visible', { required: true })
 
@@ -36,8 +36,8 @@ const style = reactive({
     },
     get height() {
       return props.height ?? '90dvh'
-    }
-  }
+    },
+  },
 })
 onMounted(() => {
   if (!ModalRef.value) return
@@ -57,8 +57,13 @@ const close = () => {
       <transition name="lovelymai-fade">
         <div :class="$style.mask" v-if="visible" @click.capture.stop="close"></div>
       </transition>
-      <ContentBar :class="$style.ContentBar" :visible="visible" :is-open="true" :on-close-click="close"
-        :loading="props.loading">
+      <ContentBar
+        :class="$style.ContentBar"
+        :visible="visible"
+        :is-open="true"
+        :on-close-click="close"
+        :loading="props.loading"
+      >
         <template #header>
           <slot name="header"></slot>
         </template>

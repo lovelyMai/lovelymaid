@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
 
-import { watchDOM } from '@/utils/dom';
-import { useCssVar } from '@/utils/css-var';
+import { useCssVar } from '@/utils/css-var'
+import { watchDOM } from '@/utils/dom'
 
 interface Props {
   /** 类型 */
@@ -14,16 +14,16 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'common',
-  title: ''
-});
+  title: '',
+})
 
 // 初始化
 const ButtonRef = ref<HTMLElement | null>(null)
 const style = reactive({
   Button: {
     'border-radius': '0',
-    'font-size': '0'
-  }
+    'font-size': '0',
+  },
 })
 let cleanup: (() => void) | undefined
 onMounted(() => {
@@ -42,8 +42,17 @@ onUnmounted(() => {
 
 <template>
   <div
-    :class="[$style.Button, { 'lovelymai-glass-container': props.type === 'glass', [$style.common]: props.type === 'common', }]"
-    ref="ButtonRef" :title="props.title" @click.stop="() => props.onClick?.()">
+    :class="[
+      $style.Button,
+      {
+        'lovelymai-glass-container': props.type === 'glass',
+        [$style.common]: props.type === 'common',
+      },
+    ]"
+    ref="ButtonRef"
+    :title="props.title"
+    @click.stop="() => props.onClick?.()"
+  >
     <slot></slot>
   </div>
 </template>
@@ -59,7 +68,7 @@ onUnmounted(() => {
   font-size: var(--Button-font-size);
   font-weight: 500;
   color: var(--lovelymai-color-gray-600);
-  transition: transform .2s;
+  transition: transform 0.2s;
   cursor: pointer;
   touch-action: none;
   user-select: none;

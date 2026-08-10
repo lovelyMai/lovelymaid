@@ -1,10 +1,13 @@
 import { reactive, ref } from 'vue'
+import { type MenuInstance } from '@/components/internal/Menu.vue'
 
 import { type WindowManager } from '../utils/window'
-import { type MenuInstance } from '@/components/internal/Menu.vue'
 import { watchDOM } from '@/utils/dom'
 
-export const createSubMenuManager = (TriggerEl: HTMLElement, MenuInstance: MenuInstance): WindowManager => {
+export const createSubMenuManager = (
+  TriggerEl: HTMLElement,
+  MenuInstance: MenuInstance,
+): WindowManager => {
   const visible = ref<boolean>(false)
   const parentEl = TriggerEl.parentElement
   const position = ref<[number, number]>([0, 0])

@@ -1,5 +1,5 @@
 export type Item = {
-  id: string | number,
+  id: string | number
   [key: string]: any
 }
 

@@ -5,7 +5,7 @@
  * @returns 相对于文档左侧的视觉像素值
  */
 export const getViewLeft = (el: HTMLElement): number => {
-  return el.getBoundingClientRect().left + document.documentElement.scrollLeft;
+  return el.getBoundingClientRect().left + document.documentElement.scrollLeft
 }
 
 /**
@@ -15,7 +15,7 @@ export const getViewLeft = (el: HTMLElement): number => {
  * @returns 相对于文档顶部的视觉像素值
  */
 export const getViewTop = (el: HTMLElement): number => {
-  return el.getBoundingClientRect().top + document.documentElement.scrollTop;
+  return el.getBoundingClientRect().top + document.documentElement.scrollTop
 }
 
 /**
@@ -25,7 +25,10 @@ export const getViewTop = (el: HTMLElement): number => {
  * @returns 相对于文档右侧的视觉像素值
  */
 export const getViewRight = (el: HTMLElement): number => {
-  return document.documentElement.scrollWidth - (el.getBoundingClientRect().right + document.documentElement.scrollLeft);
+  return (
+    document.documentElement.scrollWidth -
+    (el.getBoundingClientRect().right + document.documentElement.scrollLeft)
+  )
 }
 
 /**
@@ -35,5 +38,8 @@ export const getViewRight = (el: HTMLElement): number => {
  * @returns 相对于文档底部的视觉像素值
  */
 export const getViewBottom = (el: HTMLElement): number => {
-  return document.documentElement.scrollHeight - (el.getBoundingClientRect().bottom + document.documentElement.scrollTop);
+  return (
+    document.documentElement.scrollHeight -
+    (el.getBoundingClientRect().bottom + document.documentElement.scrollTop)
+  )
 }

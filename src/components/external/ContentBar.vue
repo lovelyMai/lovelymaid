@@ -1,28 +1,28 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
-import Card from './Card.vue';
-import Button from './Button.vue';
-import Loading from './Loading.vue';
+import Button from './Button.vue'
+import Card from './Card.vue'
+import Loading from './Loading.vue'
 
-import { debounce } from '@/utils/function';
-import { watchDOM } from '@/utils/dom';
-import { getLayoutLeft } from '@/utils/layout-offset.js';
-import { useCssVar } from '@/utils/css-var.js';
+import { useCssVar } from '@/utils/css-var.js'
+import { watchDOM } from '@/utils/dom'
+import { debounce } from '@/utils/function'
+import { getLayoutLeft } from '@/utils/layout-offset.js'
 
 interface Props {
   /** 是否显示 */
-  visible?: boolean;
+  visible?: boolean
   /** 是否展开 */
-  isOpen: boolean;
+  isOpen: boolean
   /** 关闭事件 */
-  onCloseClick: () => void;
+  onCloseClick: () => void
   /** 加载状态 */
-  loading?: boolean;
+  loading?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   visible: true,
   isOpen: true,
-  loading: false
+  loading: false,
 })
 
 // 初始化
@@ -32,8 +32,8 @@ const style = reactive({
       return props.isOpen ? '0' : `${-transformDistance.value}px`
     },
     scale: props.visible ? '1' : '0',
-    transition: 'none'
-  }
+    transition: 'none',
+  },
 })
 onMounted(() => {
   if (!ContentBarRef.value) return
@@ -46,7 +46,8 @@ const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
   if (!ContentBarRef.value) return
-  transformDistance.value = getLayoutLeft(ContentBarRef.value) + ContentBarRef.value.offsetWidth + 10
+  transformDistance.value =
+    getLayoutLeft(ContentBarRef.value) + ContentBarRef.value.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
@@ -67,24 +68,29 @@ onUnmounted(() => {
 
 // 切换 visilble
 let timer: number | undefined
-watch(() => props.visible, async (newVisible) => {
-  clearTimeout(timer)
-  style.ContentBar.transition = 'transform .3s'
-  timer = setTimeout(() => {
-    style.ContentBar.transition = 'transform .5s'
-  }, 300)
-  if (newVisible) {
-    await nextTick()
-    style.ContentBar.scale = '1'
-  } else {
-    style.ContentBar.scale = '0'
-  }
-})
+watch(
+  () => props.visible,
+  async (newVisible) => {
+    clearTimeout(timer)
+    style.ContentBar.transition = 'transform .3s'
+    timer = setTimeout(() => {
+      style.ContentBar.transition = 'transform .5s'
+    }, 300)
+    if (newVisible) {
+      await nextTick()
+      style.ContentBar.scale = '1'
+    } else {
+      style.ContentBar.scale = '0'
+    }
+  },
+)
 </script>
 
 <template>
-  <Card :class="$style.ContentBar"
-    :ref="(ins) => ContentBarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null">
+  <Card
+    :class="$style.ContentBar"
+    :ref="(ins) => (ContentBarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
+  >
     <div :class="$style.header">
       <div :class="$style.title">
         <slot name="header"></slot>

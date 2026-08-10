@@ -4,23 +4,23 @@
  * @returns 相对于左侧的布局像素值
  */
 export const getLayoutLeft = (el: HTMLElement): number => {
-  let left = 0;
-  let current: HTMLElement | null = el;
-  let hasFixed = false;
+  let left = 0
+  let current: HTMLElement | null = el
+  let hasFixed = false
 
   while (current && current !== document.body) {
     if (getComputedStyle(current).position === 'fixed') {
-      hasFixed = true;
+      hasFixed = true
     }
-    left += current.offsetLeft;
-    current = current.offsetParent as HTMLElement | null;
+    left += current.offsetLeft
+    current = current.offsetParent as HTMLElement | null
   }
 
   if (hasFixed) {
-    left += document.documentElement.scrollLeft;
+    left += document.documentElement.scrollLeft
   }
 
-  return left;
+  return left
 }
 
 /**
@@ -29,24 +29,24 @@ export const getLayoutLeft = (el: HTMLElement): number => {
  * @returns 相对于顶部的布局像素值
  */
 export const getLayoutTop = (el: HTMLElement): number => {
-  let top = 0;
-  let current: HTMLElement | null = el;
-  let hasFixed = false;
+  let top = 0
+  let current: HTMLElement | null = el
+  let hasFixed = false
 
   while (current && current !== document.body) {
     if (getComputedStyle(current).position === 'fixed') {
-      hasFixed = true;
+      hasFixed = true
     }
-    top += current.offsetTop;
-    current = current.offsetParent as HTMLElement | null;
+    top += current.offsetTop
+    current = current.offsetParent as HTMLElement | null
   }
 
   if (hasFixed) {
-    top += document.documentElement.scrollTop;
+    top += document.documentElement.scrollTop
   }
 
-  return top;
-};
+  return top
+}
 
 /**
  * 获取元素布局右侧距离（不受 transform/scale 影响）

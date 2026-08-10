@@ -3,8 +3,8 @@
   --lovelymai-color-blue-50: #bfd0f4;
   --lovelymai-color-blue-100: #94bbf0;
   --lovelymai-color-blue-200: #3b86f7;
-  --lovelymai-color-blue-300: #0067EC;
-  --lovelymai-color-blue-450: #2962D9;
+  --lovelymai-color-blue-300: #0067ec;
+  --lovelymai-color-blue-450: #2962d9;
   /* 灰色 */
   --lovelymai-color-gray-100: rgba(250, 250, 250, 0.9);
   --lovelymai-color-gray-150: rgba(245, 245, 245, 0.9);
@@ -18,7 +18,7 @@
   /* 红色 */
   --lovelymai-color-red-200: #ef6b6bcc;
   /* 阴影 */
-  --lovelymai-box-shadow-100: 0 0 20px 0 rgba(0, 0, 0, .1);
+  --lovelymai-box-shadow-100: 0 0 20px 0 rgba(0, 0, 0, 0.1);
   --lovelymai-box-shadow-200: 0 0 10px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -36,7 +36,7 @@
 
 .lovelymai-fade-enter-active,
 .lovelymai-fade-leave-active {
-  transition: opacity .2s;
+  transition: opacity 0.2s;
 }
 
 .lovelymai-fade-leave-leave-to {
@@ -44,5 +44,5 @@
 }
 
 .lovelymai-fade-leave-leave-active {
-  transition: opacity .2s;
+  transition: opacity 0.2s;
 }

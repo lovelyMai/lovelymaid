@@ -2,9 +2,9 @@
 import { ref, nextTick, onMounted, watch, computed, reactive } from 'vue'
 
 import type { ListItem } from '@/types'
-import { getSlideCount } from '@/utils/slide'
-import { watchDOM } from '@/utils/dom'
 import { useCssVar } from '@/utils/css-var'
+import { watchDOM } from '@/utils/dom'
+import { getSlideCount } from '@/utils/slide'
 
 interface Props {
   /** 标题 */
@@ -17,7 +17,7 @@ interface Props {
   onItemClick?: (item: ListItem, index: number) => void
 }
 const props = withDefaults(defineProps<Props>(), {
-  title: '标题'
+  title: '标题',
 })
 const isOpen = defineModel<boolean>('open', { required: true })
 const activeId = defineModel<string | number>('active-id')
@@ -30,8 +30,8 @@ const style = reactive({
   container: {
     get height() {
       return isOpen.value ? `${ListHeight.value}px` : '0px'
-    }
-  }
+    },
+  },
 })
 onMounted(() => {
   if (!FoldListRef.value || !ListRef.value) return
@@ -44,16 +44,20 @@ onMounted(() => {
 // 列表项动画
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
-const oldlist = ref<{ id: string | number, name: string }[]>(props.list)
-const listSnapshot = computed(() => props.list.map(item => item.id).join(','))
-watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
-  if (newSnapshot === oldSnapshot) return
-  slideAnimating.value = false
-  slideCount.value = getSlideCount(props.list, oldlist.value)
-  await nextTick()
-  slideAnimating.value = true
-  oldlist.value = [...props.list]
-}, { deep: true })
+const oldlist = ref<{ id: string | number; name: string }[]>(props.list)
+const listSnapshot = computed(() => props.list.map((item) => item.id).join(','))
+watch(
+  listSnapshot,
+  async (newSnapshot, oldSnapshot) => {
+    if (newSnapshot === oldSnapshot) return
+    slideAnimating.value = false
+    slideCount.value = getSlideCount(props.list, oldlist.value)
+    await nextTick()
+    slideAnimating.value = true
+    oldlist.value = [...props.list]
+  },
+  { deep: true },
+)
 
 // 列表项点击事件
 const onItemClick = (item: ListItem, index: number) => {
@@ -68,15 +72,29 @@ const onItemClick = (item: ListItem, index: number) => {
       <span :class="$style.title">
         {{ props.title }}
       </span>
-      <span class="lovelymai lovely-right-arrow" :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
-        :title="isOpen ? '收起列表' : '展开列表'" @click.stop="() => isOpen = !isOpen"></span>
+      <span
+        class="lovelymai lovely-right-arrow"
+        :style="{ transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }"
+        :title="isOpen ? '收起列表' : '展开列表'"
+        @click.stop="() => (isOpen = !isOpen)"
+      ></span>
     </div>
     <div :class="$style.container">
       <ul :class="[$style.list, { [$style.close]: !isOpen }]" ref="ListRef">
-        <li :class="[$style.item, { [$style.active]: item.id === activeId, [$style.slideAnimation]: slideAnimating }]"
-          v-for="(item, index) in props.list" :key="item.id"
-          :style="{ '--translateY': `${slideCount[index] * 100}%`, 'z-index': `${props.list.length - index}` }"
-          @click.stop="() => onItemClick(item, index)" @animationend="() => slideAnimating = false">
+        <li
+          :class="[
+            $style.item,
+            { [$style.active]: item.id === activeId, [$style.slideAnimation]: slideAnimating },
+          ]"
+          v-for="(item, index) in props.list"
+          :key="item.id"
+          :style="{
+            '--translateY': `${slideCount[index] * 100}%`,
+            'z-index': `${props.list.length - index}`,
+          }"
+          @click.stop="() => onItemClick(item, index)"
+          @animationend="() => (slideAnimating = false)"
+        >
           <slot :item="item" :index="index">{{ item.name }}</slot>
         </li>
       </ul>
@@ -111,12 +129,12 @@ const onItemClick = (item: ListItem, index: number) => {
 .container {
   height: var(--container-height);
   overflow: hidden;
-  transition: height .5s ease;
+  transition: height 0.5s ease;
 }
 
 .list {
   transform: translateY(0);
-  transition: transform .5s ease;
+  transition: transform 0.5s ease;
 }
 
 .list.close {
@@ -133,7 +151,7 @@ const onItemClick = (item: ListItem, index: number) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: all .2s;
+  transition: all 0.2s;
 }
 
 .list .item.active {
@@ -152,7 +170,7 @@ const onItemClick = (item: ListItem, index: number) => {
 }
 
 .slideAnimation {
-  animation: slideAnimation .5s;
+  animation: slideAnimation 0.5s;
 }
 </style>
 
@@ -161,7 +179,7 @@ const onItemClick = (item: ListItem, index: number) => {
   font-size: 16px;
   color: var(--header-color);
   font-weight: 700;
-  transition: transform .3s;
+  transition: transform 0.3s;
   cursor: pointer;
 }
 </style>

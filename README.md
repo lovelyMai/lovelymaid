@@ -14,7 +14,7 @@ import 'lovelymaid/dist/lovelymaid.css'
 
 ```javascript
 // main.js 或 main.ts
-import 'lovelymaid/dist/lovelymaid.css'  // ← 必须放在最前面！
+import 'lovelymaid/dist/lovelymaid.css' // ← 必须放在最前面！
 import './your-own-styles.css'
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -32,7 +32,6 @@ import { SideBar } from 'lovelymaid'
 </script>
 
 <template>
-  <SideBar :visible="true">
-    侧边栏内容
-  </SideBar>
+  <SideBar :visible="true"> 侧边栏内容 </SideBar>
 </template>
+```

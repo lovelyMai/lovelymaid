@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
-import Card from './Card.vue';
+import Card from './Card.vue'
+import Loading from './Loading.vue'
 
-import { debounce } from '@/utils/function';
-import { watchDOM } from '@/utils/dom';
-import { getLayoutLeft } from '@/utils/layout-offset.js';
-import { useCssVar } from '@/utils/css-var.js';
-import Loading from './Loading.vue';
+import { useCssVar } from '@/utils/css-var.js'
+import { watchDOM } from '@/utils/dom'
+import { debounce } from '@/utils/function'
+import { getLayoutLeft } from '@/utils/layout-offset.js'
 
 interface Props {
   /** 是否显示 */
-  visible?: boolean;
+  visible?: boolean
   /** 按钮点击事件 */
   onButtonClick?: () => void
   /** 加载状态 */
   loading?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
-  visible: true
+  visible: true,
 })
 const isOpen = defineModel<boolean>('open', { required: true })
 
@@ -28,13 +28,15 @@ const style = reactive({
       return isOpen.value ? '0' : `${-transformDistance.value}px`
     },
     scale: props.visible ? '1' : '0',
-    transition: 'none'
+    transition: 'none',
   },
   button: {
     get translateX() {
-      return isOpen.value ? '0' : `${transformDistance.value - (SideBarRef.value?.offsetWidth ?? 0) + 55}px`
-    }
-  }
+      return isOpen.value
+        ? '0'
+        : `${transformDistance.value - (SideBarRef.value?.offsetWidth ?? 0) + 55}px`
+    },
+  },
 })
 onMounted(() => {
   if (!SideBarRef.value) return
@@ -68,31 +70,43 @@ onUnmounted(() => {
 
 // 切换 visilble
 let timer: number | undefined
-watch(() => props.visible, async (newVisible) => {
-  clearTimeout(timer)
-  style.SideBar.transition = 'transform .3s'
-  timer = setTimeout(() => {
-    style.SideBar.transition = 'transform .5s'
-  }, 300)
-  if (newVisible) {
-    await nextTick()
-    style.SideBar.scale = '1'
-  } else {
-    style.SideBar.scale = '0'
-  }
-})
+watch(
+  () => props.visible,
+  async (newVisible) => {
+    clearTimeout(timer)
+    style.SideBar.transition = 'transform .3s'
+    timer = setTimeout(() => {
+      style.SideBar.transition = 'transform .5s'
+    }, 300)
+    if (newVisible) {
+      await nextTick()
+      style.SideBar.scale = '1'
+    } else {
+      style.SideBar.scale = '0'
+    }
+  },
+)
 </script>
 
 <template>
-  <Card :class="$style.SideBar" :ref="(ins) => SideBarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null">
+  <Card
+    :class="$style.SideBar"
+    :ref="(ins) => (SideBarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
+  >
     <div :class="$style.header">
       <div :class="$style.text">
         <slot name="header"></slot>
       </div>
-      <div :class="[$style.button, { [$style.close]: !isOpen }]" :title="isOpen ? '收起侧边栏' : '打开侧边栏'" @click.stop="() => {
-        isOpen = !isOpen
-        props.onButtonClick?.()
-      }">
+      <div
+        :class="[$style.button, { [$style.close]: !isOpen }]"
+        :title="isOpen ? '收起侧边栏' : '打开侧边栏'"
+        @click.stop="
+          () => {
+            isOpen = !isOpen
+            props.onButtonClick?.()
+          }
+        "
+      >
         <span class="lovelymai lovely-left-sidebar"></span>
       </div>
     </div>
@@ -140,7 +154,9 @@ watch(() => props.visible, async (newVisible) => {
   border: none;
   border-radius: 15px;
   transform: translateX(var(--button-translateX));
-  transition: transform .5s, box-shadow .5s;
+  transition:
+    transform 0.5s,
+    box-shadow 0.5s;
   cursor: pointer;
 }
 

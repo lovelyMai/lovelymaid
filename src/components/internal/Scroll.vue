@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 
-import { ListItem } from '@/types';
-import { debounce } from '@/utils/function';
+import { debounce } from '@/utils/function'
+import { ListItem } from '@/types'
 
 interface Props {
   /** 列表 */
@@ -10,11 +10,15 @@ interface Props {
 }
 const props = defineProps<Props>()
 const activeIds = defineModel<[string | number, string | number]>('active-ids')
-watch(() => props.lists, (newLists) => {
-  if (activeIds.value === undefined) {
-    activeIds.value = newLists.map(list => list[0].id) as [string | number, string | number]
-  }
-}, { immediate: true })
+watch(
+  () => props.lists,
+  (newLists) => {
+    if (activeIds.value === undefined) {
+      activeIds.value = newLists.map((list) => list[0].id) as [string | number, string | number]
+    }
+  },
+  { immediate: true },
+)
 
 // 激活 id
 const leftRef = ref<HTMLElement | null>(null)
@@ -32,10 +36,14 @@ const calculateActiveIds = debounce((el: 'left' | 'right') => {
 }, 100)
 onMounted(() => {
   if (!leftRef.value || !rightRef.value) return
-  stopWatch = watch([() => props.lists, activeIds], ([newLists, newActiveIds]) => {
-    leftRef.value!.scrollTop = 24 * newLists[0].findIndex(item => item.id === newActiveIds![0])
-    rightRef.value!.scrollTop = 24 * newLists[1].findIndex(item => item.id === newActiveIds![1])
-  }, { immediate: true, deep: true })
+  stopWatch = watch(
+    [() => props.lists, activeIds],
+    ([newLists, newActiveIds]) => {
+      leftRef.value!.scrollTop = 24 * newLists[0].findIndex((item) => item.id === newActiveIds![0])
+      rightRef.value!.scrollTop = 24 * newLists[1].findIndex((item) => item.id === newActiveIds![1])
+    },
+    { immediate: true, deep: true },
+  )
 })
 onUnmounted(() => {
   stopWatch?.()
@@ -60,8 +68,12 @@ const onListClick = (e: MouseEvent, side: 'left' | 'right') => {
 <template>
   <div :class="$style.Scroll">
     <div :class="$style.selected"></div>
-    <ul :class="[$style.list, $style.left]" ref="leftRef" @scroll="() => calculateActiveIds('left')"
-      @click="(e) => onListClick(e, 'left')">
+    <ul
+      :class="[$style.list, $style.left]"
+      ref="leftRef"
+      @scroll="() => calculateActiveIds('left')"
+      @click="(e) => onListClick(e, 'left')"
+    >
       <li :class="$style.item" v-for="item in Array(3).fill('')">
         <span>{{ item }}</span>
       </li>
@@ -72,8 +84,12 @@ const onListClick = (e: MouseEvent, side: 'left' | 'right') => {
         <span>{{ item }}</span>
       </li>
     </ul>
-    <ul :class="[$style.list, $style.right]" ref="rightRef" @scroll="() => calculateActiveIds('right')"
-      @click="(e) => onListClick(e, 'right')">
+    <ul
+      :class="[$style.list, $style.right]"
+      ref="rightRef"
+      @scroll="() => calculateActiveIds('right')"
+      @click="(e) => onListClick(e, 'right')"
+    >
       <li :class="$style.item" v-for="item in Array(3).fill('')">
         <span>{{ item }}</span>
       </li>
