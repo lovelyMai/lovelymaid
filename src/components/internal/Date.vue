@@ -70,14 +70,14 @@ const onDayClick = (e: MouseEvent) => {
 }
 
 // 暴露日历
-const DateRef = ref<HTMLElement | null>(null)
+const dateRef = ref<HTMLElement | null>(null)
 export type DateInstance = {
   root: HTMLElement | null
   props: Props
 }
 defineExpose<DateInstance>({
   get root() {
-    return DateRef.value
+    return dateRef.value
   },
   props,
 })
@@ -87,8 +87,8 @@ defineExpose<DateInstance>({
   <teleport to="body">
     <transition name="lovelymai-fade-leave">
       <Card
-        :class="$style.Date"
-        :ref="(ins) => (DateRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
+        :class="$style.dateContainer"
+        :ref="(ins) => (dateRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
         v-if="props.visible"
         :style="{
           left: `${props.position[0]}px`,
@@ -153,7 +153,7 @@ defineExpose<DateInstance>({
 </template>
 
 <style module>
-.Date {
+.dateContainer {
   position: absolute;
   z-index: 0;
   width: 250px;

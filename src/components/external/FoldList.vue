@@ -23,22 +23,22 @@ const isOpen = defineModel<boolean>('open', { required: true })
 const activeId = defineModel<string | number>('active-id')
 
 // 初始化
-const FoldListRef = ref<HTMLElement | null>(null)
-const ListRef = ref<HTMLElement | null>(null)
-const ListHeight = ref<number>(0)
+const foldlistRef = ref<HTMLElement | null>(null)
+const listRef = ref<HTMLElement | null>(null)
+const listHeight = ref<number>(0)
 const style = reactive({
   container: {
     get height() {
-      return isOpen.value ? `${ListHeight.value}px` : '0px'
+      return isOpen.value ? `${listHeight.value}px` : '0px'
     },
   },
 })
 onMounted(() => {
-  if (!FoldListRef.value || !ListRef.value) return
-  watchDOM(ListRef.value, ({ height }) => {
-    ListHeight.value = height
+  if (!foldlistRef.value || !listRef.value) return
+  watchDOM(listRef.value, ({ height }) => {
+    listHeight.value = height
   })
-  useCssVar(FoldListRef.value, style)
+  useCssVar(foldlistRef.value, style)
 })
 
 // 列表项动画
@@ -67,7 +67,7 @@ const onItemClick = (item: ListItem, index: number) => {
 </script>
 
 <template>
-  <div :class="$style.FoldList" ref="FoldListRef">
+  <div :class="$style.foldlist" ref="foldlistRef">
     <div :class="$style.header" @click="onHeaderClick">
       <span :class="$style.title">
         {{ props.title }}
@@ -80,7 +80,7 @@ const onItemClick = (item: ListItem, index: number) => {
       ></span>
     </div>
     <div :class="$style.container">
-      <ul :class="[$style.list, { [$style.close]: !isOpen }]" ref="ListRef">
+      <ul :class="[$style.list, { [$style.close]: !isOpen }]" ref="listRef">
         <li
           :class="[
             $style.item,
@@ -103,7 +103,7 @@ const onItemClick = (item: ListItem, index: number) => {
 </template>
 
 <style module>
-.FoldList {
+.foldlist {
   --header-height: 30px;
   --header-font-size: 12px;
   --header-color: var(--lovelymai-color-gray-300);

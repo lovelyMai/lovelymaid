@@ -27,11 +27,11 @@ const activeId = defineModel<string | number>('active-id', { required: true })
 const inputValue = defineModel<string>('value', { default: '' })
 
 // 初始化
-const TabBarRef = ref<HTMLElement | null>(null)
+const tabbarRef = ref<HTMLElement | null>(null)
 const contentRef = ref<HTMLElement | null>(null)
 const slideRef = ref<HTMLElement | null>(null)
 const style = reactive({
-  Bar: {
+  bar: {
     width: 0,
     height: 0,
     'border-radius': 0,
@@ -52,7 +52,7 @@ const style = reactive({
   search: {
     width: 0,
   },
-  'content-top': {
+  contentTop: {
     clipLeft: 0,
     clipRight: 0,
     get scale() {
@@ -70,24 +70,24 @@ let virtualFrame: number | undefined
 let calcPosFrame: number | undefined
 let backgroundTimer: number | undefined
 onMounted(() => {
-  if (!TabBarRef.value) return
-  cleanup = watchDOM(TabBarRef.value, () => {
-    style.Bar.width = props.showSearch
-      ? TabBarRef.value!.offsetWidth - style.Bar.height - 5
-      : TabBarRef.value!.offsetWidth
-    style.Bar.height = TabBarRef.value!.offsetHeight
-    style.search.width = TabBarRef.value!.offsetWidth - style.Bar.height * 0.8 - 5
-    style.Bar['border-radius'] = style.Bar.height / 2
-    style.slide.width = (style.Bar.width - 6) / props.tabs.length
-    style['content-top'].clipLeft = activeIndex.value * style.slide.width
-    style['content-top'].clipRight = style['content-top'].clipLeft + style.slide.width
-    maxDistance.value = ((style.Bar.width - 6) * (props.tabs.length - 1)) / props.tabs.length
+  if (!tabbarRef.value) return
+  cleanup = watchDOM(tabbarRef.value, () => {
+    style.bar.width = props.showSearch
+      ? tabbarRef.value!.offsetWidth - style.bar.height - 5
+      : tabbarRef.value!.offsetWidth
+    style.bar.height = tabbarRef.value!.offsetHeight
+    style.search.width = tabbarRef.value!.offsetWidth - style.bar.height * 0.8 - 5
+    style.bar['border-radius'] = style.bar.height / 2
+    style.slide.width = (style.bar.width - 6) / props.tabs.length
+    style.contentTop.clipLeft = activeIndex.value * style.slide.width
+    style.contentTop.clipRight = style.contentTop.clipLeft + style.slide.width
+    maxDistance.value = ((style.bar.width - 6) * (props.tabs.length - 1)) / props.tabs.length
     style.slide.translateX = activeIndex.value * style.slide.width
     style.slide.center = style.slide.translateX + style.slide.width / 2
   })
-  useCssVar(TabBarRef.value, style)
+  useCssVar(tabbarRef.value, style)
   setTimeout(() => {
-    style.Bar.transition = 'width .3s, height .3s, transform .2s'
+    style.bar.transition = 'width .3s, height .3s, transform .2s'
   }, 500)
 })
 onUnmounted(() => {
@@ -145,8 +145,8 @@ const updateVirtualPos = (duration: number | undefined) => {
     const realLeft = getSlideX()
     style.slide.center = realLeft + style.slide.width / 2
     const virtualWidth = (style.slide.width * 1.2) / 1.1
-    style['content-top'].clipLeft = style.slide.center - virtualWidth / 2
-    style['content-top'].clipRight = style.slide.center + virtualWidth / 2
+    style.contentTop.clipLeft = style.slide.center - virtualWidth / 2
+    style.contentTop.clipRight = style.slide.center + virtualWidth / 2
   }
   if (duration) {
     cancelAnimationFrame(virtualFrame!)
@@ -187,10 +187,10 @@ const runStopAnimation = (stopIndex: number) => {
   updateVirtualPos(500)
 }
 const applyHighlight = () => {
-  style.Bar['background-color'] = '#fff'
+  style.bar['background-color'] = '#fff'
   style.slide.border = '1px solid rgba(255, 255, 255, 0.5)'
   style.slide['box-shadow'] = '0 0 10px 0 rgba(0, 0, 0, 0.1)'
-  style.Bar.scale = 1.05
+  style.bar.scale = 1.05
   style.slide.scale = 1.2
   backgroundTimer = setTimeout(() => {
     style.slide.background = '#fff'
@@ -223,10 +223,10 @@ const moveSlide = throttle((e: PointerEvent) => {
 }, 8)
 const resetHighlight = () => {
   style.slide.background = 'var(--lovelymai-color-gray-200)'
-  style.Bar['background-color'] = 'var(--lovelymai-color-gray-100)'
+  style.bar['background-color'] = 'var(--lovelymai-color-gray-100)'
   style.slide.border = 'none'
   style.slide['box-shadow'] = 'none'
-  style.Bar.scale = 1
+  style.bar.scale = 1
   style.slide.scale = 1
 }
 const stopSlide = (e: PointerEvent) => {
@@ -283,8 +283,8 @@ watch(searchIsActive, (newValue) => {
 </script>
 
 <template>
-  <div :class="$style.TabBar" ref="TabBarRef">
-    <Card :class="[$style.Bar, { [$style.active]: !searchIsActive }]">
+  <div :class="$style.tabbar" ref="tabbarRef">
+    <Card :class="[$style.bar, { [$style.active]: !searchIsActive }]">
       <ul :class="$style.content" ref="contentRef" @pointerdown.prevent="startSlide">
         <li :class="[$style.tab, $style.small]" v-show="searchIsActive">
           <slot :tab="props.tabs[activeIndex]" :index="activeIndex"></slot>
@@ -305,11 +305,11 @@ watch(searchIsActive, (newValue) => {
       </ul>
     </Card>
     <div :class="[$style.search, { [$style.active]: searchIsActive }]" v-if="props.showSearch">
-      <Button :class="$style.Button" v-show="!searchIsShow" type="glass" :on-click="clickSearch">
+      <Button :class="$style.button" v-show="!searchIsShow" type="glass" :on-click="clickSearch">
         <span class="lovelymai lovely-search button"></span>
       </Button>
       <Input
-        :class="$style.Input"
+        :class="$style.input"
         v-show="searchIsShow"
         type="text"
         v-model:value="inputValue"
@@ -324,7 +324,7 @@ watch(searchIsActive, (newValue) => {
 </template>
 
 <style module>
-.TabBar {
+.tabbar {
   display: flex;
   gap: 5px;
   height: 50px;
@@ -333,32 +333,32 @@ watch(searchIsActive, (newValue) => {
   --top-color: var(--lovelymai-color-blue-300);
 }
 
-.Bar {
-  width: calc(var(--Bar-height) * 0.8px);
+.bar {
+  width: calc(var(--bar-height) * 0.8px);
   height: 80%;
   padding: 2px;
-  background-color: var(--Bar-background-color) !important;
-  border-radius: calc(var(--Bar-border-radius) * 1px);
+  background-color: var(--bar-background-color) !important;
+  border-radius: calc(var(--bar-border-radius) * 1px);
   cursor: pointer;
   overflow: hidden;
-  transition: var(--Bar-transition);
+  transition: var(--bar-transition);
 }
 
-.Bar.active {
-  width: calc(var(--Bar-width) * 1px);
+.bar.active {
+  width: calc(var(--bar-width) * 1px);
   height: 100%;
   overflow: visible;
-  transform: scale(var(--Bar-scale));
+  transform: scale(var(--bar-scale));
 }
 
-.Bar:not(.active):active {
+.bar:not(.active):active {
   transform: scale(1.2);
 }
 
 .search {
-  width: calc(var(--Bar-height) * 1px);
+  width: calc(var(--bar-height) * 1px);
   height: 100%;
-  transition: var(--Bar-transition);
+  transition: var(--bar-transition);
 }
 
 .search.active {
@@ -380,10 +380,10 @@ watch(searchIsActive, (newValue) => {
   top: 0;
   z-index: 1;
   clip-path: inset(
-    0 calc(100% - var(--content-top-clipRight) * 1px) 0 calc(var(--content-top-clipLeft) * 1px)
-      round calc((var(--Bar-border-radius) - 3) * 1px)
+    0 calc(100% - var(--contentTop-clipRight) * 1px) 0 calc(var(--contentTop-clipLeft) * 1px) round
+      calc((var(--bar-border-radius) - 3) * 1px)
   );
-  transform: translateZ(0) scale(var(--content-top-scale));
+  transform: translateZ(0) scale(var(--contentTop-scale));
   transform-origin: calc(var(--slide-center) * 1px) center;
   transition: transform 0.2s;
   backface-visibility: hidden;
@@ -409,12 +409,12 @@ watch(searchIsActive, (newValue) => {
   color: var(--top-color);
 }
 
-.search .Button {
+.search .button {
   width: 100%;
   height: 100%;
 }
 
-.search .Input {
+.search .input {
   height: 100%;
   --font-size: 18px;
 }
@@ -428,7 +428,7 @@ watch(searchIsActive, (newValue) => {
   height: 100%;
   background: var(--slide-background);
   border: var(--slide-border);
-  border-radius: calc((var(--Bar-border-radius) - 3) * 1px);
+  border-radius: calc((var(--bar-border-radius) - 3) * 1px);
   box-shadow: var(--slide-box-shadow);
   transform: translateX(calc(var(--slide-translateX) * 1px)) scale(var(--slide-scale));
   transition: var(--slide-transition);

@@ -18,22 +18,22 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // 初始化
-const ButtonRef = ref<HTMLElement | null>(null)
+const buttonRef = ref<HTMLElement | null>(null)
 const style = reactive({
-  Button: {
+  button: {
     'border-radius': '0',
     'font-size': '0',
   },
 })
 let cleanup: (() => void) | undefined
 onMounted(() => {
-  if (!ButtonRef.value) return
-  cleanup = watchDOM(ButtonRef.value, ({ width, height }) => {
+  if (!buttonRef.value) return
+  cleanup = watchDOM(buttonRef.value, ({ width, height }) => {
     const shorter = Math.min(width, height)
-    style.Button['border-radius'] = `${shorter / 2}px`
-    style.Button['font-size'] = `${shorter / 2}px`
+    style.button['border-radius'] = `${shorter / 2}px`
+    style.button['font-size'] = `${shorter / 2}px`
   })
-  useCssVar(ButtonRef.value, style)
+  useCssVar(buttonRef.value, style)
 })
 onUnmounted(() => {
   cleanup?.()
@@ -43,13 +43,13 @@ onUnmounted(() => {
 <template>
   <div
     :class="[
-      $style.Button,
+      $style.button,
       {
         'lovelymai-glass-container': props.type === 'glass',
         [$style.common]: props.type === 'common',
       },
     ]"
-    ref="ButtonRef"
+    ref="buttonRef"
     :title="props.title"
     @click.stop="() => props.onClick?.()"
   >
@@ -58,14 +58,14 @@ onUnmounted(() => {
 </template>
 
 <style module>
-.Button {
+.button {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 30px;
   height: 30px;
-  border-radius: var(--Button-border-radius);
-  font-size: var(--Button-font-size);
+  border-radius: var(--button-border-radius);
+  font-size: var(--button-font-size);
   font-weight: 500;
   color: var(--lovelymai-color-gray-600);
   transition: transform 0.2s;
@@ -76,15 +76,15 @@ onUnmounted(() => {
   --background-color: var(--lovelymai-color-blue-200);
 }
 
-.Button.common {
+.button.common {
   background-color: var(--background-color);
 }
 
-.Button.lovelymai-glass-container:active {
+.button.lovelymai-glass-container:active {
   background-color: #fff;
 }
 
-.Button:active {
+.button:active {
   transform: scale(1.2);
 }
 </style>

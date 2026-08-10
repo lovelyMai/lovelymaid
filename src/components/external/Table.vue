@@ -59,19 +59,19 @@ const sortedRows = computed<Item[]>(() => {
 })
 
 // 列表项激活
-const ListRef = ref<HTMLElement | null>(null)
-const ActivationManager = ref<ActivationManager | null>(null)
+const listRef = ref<HTMLElement | null>(null)
+const activationManager = ref<ActivationManager | null>(null)
 onMounted(() => {
-  if (!ListRef.value) return
-  ActivationManager.value = createActivationManager(sortedRows, activeIds, ListRef.value)
+  if (!listRef.value) return
+  activationManager.value = createActivationManager(sortedRows, activeIds, listRef.value)
 })
 onUnmounted(() => {
-  ActivationManager.value?.cleanup()
+  activationManager.value?.cleanup()
 })
 const getBorderRadius = (index: number): string => {
-  if (!ActivationManager.value?.activeIndexes.has(index)) return '8px'
-  const hasPrev = ActivationManager.value.activeIndexes.has(index - 1)
-  const hasNext = ActivationManager.value.activeIndexes.has(index + 1)
+  if (!activationManager.value?.activeIndexes.has(index)) return '8px'
+  const hasPrev = activationManager.value.activeIndexes.has(index - 1)
+  const hasNext = activationManager.value.activeIndexes.has(index + 1)
   if (!hasPrev && !hasNext) return '8px'
   if (hasPrev && hasNext) return '0'
   if (!hasPrev && hasNext) return '8px 8px 0 0'
@@ -80,19 +80,19 @@ const getBorderRadius = (index: number): string => {
 
 // 启用/关闭排序
 const headerRef = ref<HTMLElement | null>(null)
-const MenuRef = ref<HTMLElement | null>(null)
-const MenuManager = ref<WindowManager | null>(null)
+const menuRef = ref<HTMLElement | null>(null)
+const menuManager = ref<WindowManager | null>(null)
 onMounted(() => {
   if (!headerRef.value) return
-  MenuManager.value = createWindowManager(headerRef.value, MenuRef, 'flex', 'contextmenu')
+  menuManager.value = createWindowManager(headerRef.value, menuRef, 'flex', 'contextmenu')
 })
 onUnmounted(() => {
-  MenuManager.value?.cleanup()
+  menuManager.value?.cleanup()
 })
 </script>
 
 <template>
-  <Card :class="$style.Table">
+  <Card :class="$style.table">
     <ul :class="$style.header" ref="headerRef">
       <li
         :class="$style.column"
@@ -112,26 +112,26 @@ onUnmounted(() => {
         ></span>
       </li>
       <Menu
-        :ref="(ins) => (MenuRef = (ins as MenuInstance | null)?.root ?? null)"
-        :visible="MenuManager?.visible ?? false"
-        :position="MenuManager?.position ?? [0, 0]"
+        :ref="(ins) => (menuRef = (ins as MenuInstance | null)?.root ?? null)"
+        :visible="menuManager?.visible ?? false"
+        :position="menuManager?.position ?? [0, 0]"
         :z-index="props.zIndex"
         :options="[{ id: '1', name: '关闭排序' }]"
         :on-option-click="
           () => {
             sort = undefined
-            MenuManager?.close()
+            menuManager?.close()
           }
         "
       />
     </ul>
-    <ul :class="$style.list" ref="ListRef">
+    <ul :class="$style.list" ref="listRef">
       <li
         :class="$style.row"
         v-for="(row, index) in sortedRows"
         :key="row.id"
         :style="{
-          backgroundColor: ActivationManager?.activeIndexes.has(index)
+          backgroundColor: activationManager?.activeIndexes.has(index)
             ? 'var(--lovelymai-color-blue-450)'
             : '',
           borderRadius: getBorderRadius(index),
@@ -143,7 +143,7 @@ onUnmounted(() => {
           :key="column.id"
           :style="{
             width: column.width ?? '200px',
-            color: ActivationManager?.activeIndexes.has(index)
+            color: activationManager?.activeIndexes.has(index)
               ? sort?.id === column.id
                 ? '#fff'
                 : 'var(--lovelymai-color-blue-50)'
@@ -161,7 +161,7 @@ onUnmounted(() => {
 </template>
 
 <style module>
-.Table {
+.table {
   position: relative;
   z-index: 0;
   padding: 12px;

@@ -39,17 +39,17 @@ const props = defineProps<Props>()
 const items = defineModel<FormItem[]>('items', { required: true })
 
 // 回车聚焦下一个输入框
-const TextAreaInstancesRef = ref<Record<string, InstanceType<typeof TextArea> | null>>({})
-const CheckBoxInstancesRef = ref<Record<string, InstanceType<typeof CheckBox> | null>>({})
-const InputInstancesRef = ref<Record<string, InstanceType<typeof Input> | null>>({})
+const textareaInstancesRef = ref<Record<string, InstanceType<typeof TextArea> | null>>({})
+const checkboxInstancesRef = ref<Record<string, InstanceType<typeof CheckBox> | null>>({})
+const inputInstancesRef = ref<Record<string, InstanceType<typeof Input> | null>>({})
 
 const onEnter = (index: number) => {
-  TextAreaInstancesRef.value[index]?.blur()
-  TextAreaInstancesRef.value[index + 1]?.focus()
-  CheckBoxInstancesRef.value[index]?.blur()
-  CheckBoxInstancesRef.value[index + 1]?.focus()
-  InputInstancesRef.value[index]?.blur()
-  InputInstancesRef.value[index + 1]?.focus()
+  textareaInstancesRef.value[index]?.blur()
+  textareaInstancesRef.value[index + 1]?.focus()
+  checkboxInstancesRef.value[index]?.blur()
+  checkboxInstancesRef.value[index + 1]?.focus()
+  inputInstancesRef.value[index]?.blur()
+  inputInstancesRef.value[index + 1]?.focus()
 }
 
 // 校验结果
@@ -57,7 +57,7 @@ const verifications = computed<Record<string, boolean>>(() => {
   const result: Record<string, boolean> = {}
   items.value.forEach((item, index) => {
     if (item.type === 'textarea' || item.type === 'checkbox') return
-    result[item.id] = InputInstancesRef.value[index]?.verification ?? false
+    result[item.id] = inputInstancesRef.value[index]?.verification ?? false
   })
   return result
 })
@@ -69,9 +69,9 @@ defineExpose({
 })
 </script>
 <template>
-  <ul :class="$style.Form" ref="FormRef">
+  <ul :class="$style.form" ref="FormRef">
     <li
-      :class="$style.FormItem"
+      :class="$style.formItem"
       v-for="(item, index) in items"
       :key="item.id"
       :style="{
@@ -95,9 +95,9 @@ defineExpose({
         {{ item.name }}</span
       >
       <TextArea
-        :class="$style.TextArea"
+        :class="$style.textarea"
         v-if="item.type === 'textarea'"
-        :ref="(el) => (TextAreaInstancesRef[index] = el as InstanceType<typeof TextArea> | null)"
+        :ref="(el) => (textareaInstancesRef[index] = el as InstanceType<typeof TextArea> | null)"
         v-model:value="item.value as string"
         :placeholder="item.placeholder"
         :enterkeyhint="index === items.length - 1 ? 'done' : 'next'"
@@ -105,9 +105,9 @@ defineExpose({
         :on-enter="() => onEnter(index)"
       />
       <CheckBox
-        :class="$style.CheckBox"
+        :class="$style.checkbox"
         v-else-if="item.type === 'checkbox'"
-        :ref="(el) => (CheckBoxInstancesRef[index] = el as InstanceType<typeof CheckBox> | null)"
+        :ref="(el) => (checkboxInstancesRef[index] = el as InstanceType<typeof CheckBox> | null)"
         v-model:value="item.value as string[]"
         :placeholder="item.placeholder"
         :enterkeyhint="index === items.length - 1 ? 'done' : 'next'"
@@ -120,9 +120,9 @@ defineExpose({
         :on-enter="() => onEnter(index)"
       />
       <Input
-        :class="$style.Input"
+        :class="$style.input"
         v-else
-        :ref="(el) => (InputInstancesRef[index] = el as InstanceType<typeof Input> | null)"
+        :ref="(el) => (inputInstancesRef[index] = el as InstanceType<typeof Input> | null)"
         :type="item.type"
         v-model:value="item.value as string"
         :placeholder="item.placeholder"
@@ -141,27 +141,27 @@ defineExpose({
   </ul>
 </template>
 <style module>
-.Form {
+.form {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 10px;
 }
 
-.FormItem {
+.formItem {
   display: flex;
   align-items: flex-start;
   gap: 10px;
 }
 
-.FormItem .TextArea,
-.FormItem .CheckBox,
-.FormItem .Input {
+.formItem .textarea,
+.formItem .checkbox,
+.formItem .input {
   flex: 1;
   min-width: 0;
 }
 
-.FormItem .Input {
+.formItem .input {
   height: 100%;
 }
 </style>

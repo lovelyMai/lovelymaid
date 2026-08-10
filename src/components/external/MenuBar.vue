@@ -19,20 +19,20 @@ interface Props {
 const props = defineProps<Props>()
 
 // 初始化
-const MenuBarRef = ref<HTMLElement | null>(null)
+const menubarRef = ref<HTMLElement | null>(null)
 const style = reactive({
-  MenuBar: {
+  menubar: {
     'border-radius': '0',
   },
 })
 let cleanup: (() => void) | undefined
 onMounted(() => {
-  if (!MenuBarRef.value) return
-  cleanup = watchDOM(MenuBarRef.value, ({ width, height }) => {
+  if (!menubarRef.value) return
+  cleanup = watchDOM(menubarRef.value, ({ width, height }) => {
     const shorter = Math.min(width, height)
-    style.MenuBar['border-radius'] = `${shorter / 2}px`
+    style.menubar['border-radius'] = `${shorter / 2}px`
   })
-  useCssVar(MenuBarRef.value, style)
+  useCssVar(menubarRef.value, style)
 })
 onUnmounted(() => {
   cleanup?.()
@@ -41,8 +41,8 @@ onUnmounted(() => {
 
 <template>
   <Card
-    :class="$style.MenuBar"
-    :ref="(el) => (MenuBarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
+    :class="$style.menubar"
+    :ref="(el) => (menubarRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
     <ul :class="$style.menus">
       <li
@@ -57,9 +57,9 @@ onUnmounted(() => {
 </template>
 
 <style module>
-.MenuBar {
+.menubar {
   padding: 3px;
-  border-radius: var(--MenuBar-border-radius);
+  border-radius: var(--menubar-border-radius);
   user-select: none;
   -webkit-user-select: none;
 }

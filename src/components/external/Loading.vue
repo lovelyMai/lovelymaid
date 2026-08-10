@@ -13,14 +13,14 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // 锁定包含块，加载期间禁止滚动
-const LoadingRef = ref<HTMLElement | null>(null)
+const loadingRef = ref<HTMLElement | null>(null)
 let scrollParent: HTMLElement | null = null
 let originalOverflow = ''
 const lockScroll = () => {
   if (scrollParent) return
   scrollParent =
-    (LoadingRef.value?.offsetParent as HTMLElement | null) ??
-    LoadingRef.value?.parentElement ??
+    (loadingRef.value?.offsetParent as HTMLElement | null) ??
+    loadingRef.value?.parentElement ??
     null
   if (!scrollParent) return
   originalOverflow = scrollParent.style.overflow
@@ -53,9 +53,9 @@ onUnmounted(() => {
 
 <template>
   <div
-    :class="$style.Loading"
+    :class="$style.loading"
     v-if="props.loading"
-    ref="LoadingRef"
+    ref="loadingRef"
     :style="{ zIndex: props.zIndex }"
   >
     <div :class="$style.spinner"></div>
@@ -63,7 +63,7 @@ onUnmounted(() => {
 </template>
 
 <style module>
-.Loading {
+.loading {
   position: absolute;
   left: 0;
   top: 0;

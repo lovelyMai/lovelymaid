@@ -23,7 +23,7 @@ const isOpen = defineModel<boolean>('open', { required: true })
 
 // 初始化
 const style = reactive({
-  SideBar: {
+  sidebar: {
     get translateX() {
       return isOpen.value ? '0' : `${-transformDistance.value}px`
     },
@@ -34,32 +34,32 @@ const style = reactive({
     get translateX() {
       return isOpen.value
         ? '0'
-        : `${transformDistance.value - (SideBarRef.value?.offsetWidth ?? 0) + 55}px`
+        : `${transformDistance.value - (sidebarRef.value?.offsetWidth ?? 0) + 55}px`
     },
   },
 })
 onMounted(() => {
-  if (!SideBarRef.value) return
-  useCssVar(SideBarRef.value, style)
+  if (!sidebarRef.value) return
+  useCssVar(sidebarRef.value, style)
 })
 
 // 计算平移距离
-const SideBarRef = ref<HTMLElement | null>(null)
+const sidebarRef = ref<HTMLElement | null>(null)
 const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
-  if (!SideBarRef.value) return
-  transformDistance.value = getLayoutLeft(SideBarRef.value) + SideBarRef.value.offsetWidth + 10
+  if (!sidebarRef.value) return
+  transformDistance.value = getLayoutLeft(sidebarRef.value) + sidebarRef.value.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
-  if (!SideBarRef.value) return
+  if (!sidebarRef.value) return
   calculateTransform()
-  cleanup = watchDOM(SideBarRef.value, () => {
+  cleanup = watchDOM(sidebarRef.value, () => {
     debounceCalculateTransform()
   })
   setTimeout(() => {
-    style.SideBar.transition = 'transform .5s'
+    style.sidebar.transition = 'transform .5s'
   }, 100)
   window.addEventListener('resize', debounceCalculateTransform)
 })
@@ -74,15 +74,15 @@ watch(
   () => props.visible,
   async (newVisible) => {
     clearTimeout(timer)
-    style.SideBar.transition = 'transform .3s'
+    style.sidebar.transition = 'transform .3s'
     timer = setTimeout(() => {
-      style.SideBar.transition = 'transform .5s'
+      style.sidebar.transition = 'transform .5s'
     }, 300)
     if (newVisible) {
       await nextTick()
-      style.SideBar.scale = '1'
+      style.sidebar.scale = '1'
     } else {
-      style.SideBar.scale = '0'
+      style.sidebar.scale = '0'
     }
   },
 )
@@ -90,8 +90,8 @@ watch(
 
 <template>
   <Card
-    :class="$style.SideBar"
-    :ref="(ins) => (SideBarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
+    :class="$style.sidebar"
+    :ref="(ins) => (sidebarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
     <div :class="$style.header">
       <div :class="$style.text">
@@ -119,10 +119,10 @@ watch(
 </template>
 
 <style module>
-.SideBar {
+.sidebar {
   border-radius: 20px;
-  transform: translateX(var(--SideBar-translateX)) scale(var(--SideBar-scale));
-  transition: var(--SideBar-transition);
+  transform: translateX(var(--sidebar-translateX)) scale(var(--sidebar-scale));
+  transition: var(--sidebar-transition);
 }
 
 .header {

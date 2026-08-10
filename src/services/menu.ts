@@ -5,33 +5,33 @@ import { type WindowManager } from '../utils/window'
 import { watchDOM } from '@/utils/dom'
 
 export const createSubMenuManager = (
-  TriggerEl: HTMLElement,
-  MenuInstance: MenuInstance,
+  triggerEl: HTMLElement,
+  menuInstance: MenuInstance,
 ): WindowManager => {
   const visible = ref<boolean>(false)
-  const parentEl = TriggerEl.parentElement
+  const parentEl = triggerEl.parentElement
   const position = ref<[number, number]>([0, 0])
   let cleanWatchDOM: (() => void) | undefined
 
   const open = () => {
     if (visible.value || !parentEl) return
-    cleanWatchDOM = watchDOM(TriggerEl, ({ width }) => {
+    cleanWatchDOM = watchDOM(triggerEl, ({ width }) => {
       position.value = [width, -5]
     })
     visible.value = true
     parentEl.addEventListener('mouseover', onParentOverToChange)
     parentEl.addEventListener('mouseover', onParentOverToClose)
   }
-  TriggerEl.addEventListener('mouseenter', open)
+  triggerEl.addEventListener('mouseenter', open)
   const onParentOverToChange = (e: MouseEvent) => {
-    if (!MenuInstance.root) return
+    if (!menuInstance.root) return
     const target = e.target as HTMLElement
-    if (MenuInstance.root.contains(target)) {
-      TriggerEl.style.backgroundColor = 'var(--lovelymai-color-gray-225)'
-      TriggerEl.style.color = '#000'
+    if (menuInstance.root.contains(target)) {
+      triggerEl.style.backgroundColor = 'var(--lovelymai-color-gray-225)'
+      triggerEl.style.color = '#000'
     } else {
-      TriggerEl.style.backgroundColor = ''
-      TriggerEl.style.color = ''
+      triggerEl.style.backgroundColor = ''
+      triggerEl.style.color = ''
     }
   }
   const close = () => {
@@ -44,16 +44,16 @@ export const createSubMenuManager = (
   const onParentOverToClose = (e: MouseEvent) => {
     if (!parentEl) return
     const target = e.target as HTMLElement
-    // 离开 TriggerEl 但还在它的父元素内时关闭
-    if (parentEl.contains(target) && !TriggerEl.contains(target) && visible.value) {
+    // 离开 triggerEl 但还在它的父元素内时关闭
+    if (parentEl.contains(target) && !triggerEl.contains(target) && visible.value) {
       close()
     }
   }
-  if (TriggerEl.matches(':hover')) {
+  if (triggerEl.matches(':hover')) {
     open()
   }
   const cleanup = () => {
-    TriggerEl.removeEventListener('mouseenter', open)
+    triggerEl.removeEventListener('mouseenter', open)
     parentEl?.removeEventListener('mouseover', onParentOverToChange)
     parentEl?.removeEventListener('mouseover', onParentOverToClose)
   }

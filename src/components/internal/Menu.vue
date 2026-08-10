@@ -26,24 +26,24 @@ const isSubMenu = inject('menu-is-sub', false)
 provide('menu-is-sub', true)
 
 // 子菜单
-const MenuRef = ref<HTMLElement | null>(null)
-const SubMenuInstances = ref<Record<string, MenuInstance | null>>({})
-const SubMenuManagers = ref<Record<string, WindowManager>>({})
+const menuRef = ref<HTMLElement | null>(null)
+const submenuInstances = ref<Record<string, MenuInstance | null>>({})
+const submenuManagers = ref<Record<string, WindowManager>>({})
 const initSubManagers = async () => {
   await nextTick()
-  if (!MenuRef.value) return
-  MenuRef.value.querySelectorAll('[data-has-children="true"]').forEach((el) => {
+  if (!menuRef.value) return
+  menuRef.value.querySelectorAll('[data-has-children="true"]').forEach((el) => {
     const index = Number((el as HTMLElement).dataset.index)
-    if (SubMenuManagers.value[index] || !SubMenuInstances.value[index]) return
-    SubMenuManagers.value[index] = createSubMenuManager(
+    if (submenuManagers.value[index] || !submenuInstances.value[index]) return
+    submenuManagers.value[index] = createSubMenuManager(
       el as HTMLElement,
-      SubMenuInstances.value[index],
+      submenuInstances.value[index],
     )
   })
 }
 const clearSubManagers = () => {
-  Object.values(SubMenuManagers.value).forEach((manager) => manager.cleanup())
-  SubMenuManagers.value = {}
+  Object.values(submenuManagers.value).forEach((manager) => manager.cleanup())
+  submenuManagers.value = {}
 }
 watch(
   () => props.visible,
@@ -82,7 +82,7 @@ export type MenuInstance = {
 }
 defineExpose<MenuInstance>({
   get root() {
-    return MenuRef.value
+    return menuRef.value
   },
   props,
 })
@@ -96,8 +96,8 @@ defineSlots<{
   <teleport to="body" :disabled="isSubMenu">
     <transition name="lovelymai-fade-leave">
       <ul
-        :class="[$style.Menu, hasSubMenu ? $style.sub : '']"
-        ref="MenuRef"
+        :class="[$style.menu, hasSubMenu ? $style.sub : '']"
+        ref="menuRef"
         v-if="props.visible && props.options.length > 0"
         :style="{
           left: `${props.position[0]}px`,
@@ -122,9 +122,9 @@ defineSlots<{
           <span class="lovelymai lovely-right-arrow" v-if="item.options"></span>
           <Menu
             v-if="item.options"
-            :ref="(ins) => (SubMenuInstances[index] = ins as MenuInstance | null)"
-            :visible="SubMenuManagers[index]?.visible ?? false"
-            :position="SubMenuManagers[index]?.position ?? [0, 0]"
+            :ref="(ins) => (submenuInstances[index] = ins as MenuInstance | null)"
+            :visible="submenuManagers[index]?.visible ?? false"
+            :position="submenuManagers[index]?.position ?? [0, 0]"
             :options="item.options"
             :on-option-click="props.onOptionClick"
             v-slot="{ item, index }"
@@ -138,7 +138,7 @@ defineSlots<{
 </template>
 
 <style module>
-.Menu {
+.menu {
   position: absolute;
   padding: 4px;
   background-color: var(--lovelymai-color-gray-150);
@@ -150,7 +150,7 @@ defineSlots<{
   -webkit-user-select: none;
 }
 
-.Menu .item {
+.menu .item {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -164,23 +164,23 @@ defineSlots<{
   cursor: pointer;
 }
 
-.Menu.sub .item {
+.menu.sub .item {
   justify-content: space-between;
 }
 
 @media (hover: hover) {
-  .Menu .item:hover {
+  .menu .item:hover {
     background-color: var(--lovelymai-color-blue-200);
     color: #fff;
   }
 }
 
-.Menu .item .left {
+.menu .item .left {
   display: flex;
   gap: 5px;
 }
 
-.Menu .item .left .text {
+.menu .item .left .text {
   font-size: 12px;
   font-weight: 450;
   line-height: 18px;

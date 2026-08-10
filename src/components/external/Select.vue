@@ -16,30 +16,30 @@ interface Props {
 const props = defineProps<Props>()
 
 // 菜单
-const SelectRef = ref<HTMLElement | null>(null)
-const MenuRef = ref<HTMLElement | null>(null)
-const MenuManager = ref<WindowManager | null>(null)
+const selectRef = ref<HTMLElement | null>(null)
+const menuRef = ref<HTMLElement | null>(null)
+const menuManager = ref<WindowManager | null>(null)
 onMounted(() => {
-  if (!SelectRef.value) return
-  MenuManager.value = createWindowManager(SelectRef.value, MenuRef)
+  if (!selectRef.value) return
+  menuManager.value = createWindowManager(selectRef.value, menuRef)
 })
 onUnmounted(() => {
-  MenuManager.value?.cleanup()
+  menuManager.value?.cleanup()
 })
 </script>
 
 <template>
-  <span :class="['lovelymai', 'lovely-ellipsis', $style.Select]" ref="SelectRef">
+  <span :class="['lovelymai', 'lovely-ellipsis', $style.select]" ref="selectRef">
     <Menu
-      :ref="(ins) => (MenuRef = (ins as MenuInstance | null)?.root ?? null)"
-      :visible="MenuManager?.visible ?? false"
-      :position="MenuManager?.position ?? [0, 0]"
+      :ref="(ins) => (menuRef = (ins as MenuInstance | null)?.root ?? null)"
+      :visible="menuManager?.visible ?? false"
+      :position="menuManager?.position ?? [0, 0]"
       :z-index="props.zIndex"
       :options="props.options"
       :on-option-click="
         (option, index) => {
           props.onOptionClick?.(option, index)
-          MenuManager?.close()
+          menuManager?.close()
         }
       "
       v-slot="{ item, index }"
@@ -50,7 +50,7 @@ onUnmounted(() => {
 </template>
 
 <style module>
-.Select {
+.select {
   display: flex;
   justify-content: center;
   align-items: center;

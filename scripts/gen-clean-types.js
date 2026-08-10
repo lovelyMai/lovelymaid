@@ -31,7 +31,7 @@ const componentsSrcDir = join(srcDir, 'components')
 const componentsDistDir = join(distDir, 'components')
 
 // types 公共类型名（启动时从源码动态提取）
-let SHARED_TYPE_NAMES = []
+let sharedTypeNames = []
 
 const checker = createChecker(join(rootDir, 'tsconfig.build.json'), { schema: false })
 
@@ -114,9 +114,9 @@ async function extractSharedTypeNames() {
 
 /** 收集类型文本中出现的共享类型名，生成 import 语句（统一指向 dist/types，tsc 会生成该文件） */
 function collectSharedImports(texts, outPath) {
-  if (SHARED_TYPE_NAMES.length === 0) return []
+  if (sharedTypeNames.length === 0) return []
   const used = new Set()
-  const re = new RegExp(`\\b(${SHARED_TYPE_NAMES.join('|')})\\b`, 'g')
+  const re = new RegExp(`\\b(${sharedTypeNames.join('|')})\\b`, 'g')
   for (const text of texts) {
     let m
     while ((m = re.exec(text)) !== null) used.add(m[1])
@@ -378,7 +378,7 @@ ${[...vueNamedImports].map((n) => `  export type ${n} = any`).join('\n')}
 
 async function main() {
   // 动态提取公共类型名（供组件渲染推导 import 用）
-  SHARED_TYPE_NAMES = await extractSharedTypeNames()
+  sharedTypeNames = await extractSharedTypeNames()
 
   // 清理旧的脚本产物：
   //   - dist 下的类型声明目录：凡是含 .d.ts 的子目录整目录删除（避免残留空目录/旧目录）

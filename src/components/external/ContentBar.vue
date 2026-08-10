@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 初始化
 const style = reactive({
-  ContentBar: {
+  contentbar: {
     get translateX() {
       return props.isOpen ? '0' : `${-transformDistance.value}px`
     },
@@ -36,28 +36,28 @@ const style = reactive({
   },
 })
 onMounted(() => {
-  if (!ContentBarRef.value) return
-  useCssVar(ContentBarRef.value, style)
+  if (!contentbarRef.value) return
+  useCssVar(contentbarRef.value, style)
 })
 
 // 计算平移距离
-const ContentBarRef = ref<HTMLElement | null>(null)
+const contentbarRef = ref<HTMLElement | null>(null)
 const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
-  if (!ContentBarRef.value) return
+  if (!contentbarRef.value) return
   transformDistance.value =
-    getLayoutLeft(ContentBarRef.value) + ContentBarRef.value.offsetWidth + 10
+    getLayoutLeft(contentbarRef.value) + contentbarRef.value.offsetWidth + 10
 }
 const debounceCalculateTransform = debounce(calculateTransform, 100)
 onMounted(() => {
-  if (!ContentBarRef.value) return
+  if (!contentbarRef.value) return
   calculateTransform()
-  cleanup = watchDOM(ContentBarRef.value, () => {
+  cleanup = watchDOM(contentbarRef.value, () => {
     debounceCalculateTransform()
   })
   setTimeout(() => {
-    style.ContentBar.transition = 'transform .5s'
+    style.contentbar.transition = 'transform .5s'
   }, 100)
   window.addEventListener('resize', debounceCalculateTransform)
 })
@@ -72,15 +72,15 @@ watch(
   () => props.visible,
   async (newVisible) => {
     clearTimeout(timer)
-    style.ContentBar.transition = 'transform .3s'
+    style.contentbar.transition = 'transform .3s'
     timer = setTimeout(() => {
-      style.ContentBar.transition = 'transform .5s'
+      style.contentbar.transition = 'transform .5s'
     }, 300)
     if (newVisible) {
       await nextTick()
-      style.ContentBar.scale = '1'
+      style.contentbar.scale = '1'
     } else {
-      style.ContentBar.scale = '0'
+      style.contentbar.scale = '0'
     }
   },
 )
@@ -88,14 +88,14 @@ watch(
 
 <template>
   <Card
-    :class="$style.ContentBar"
-    :ref="(ins) => (ContentBarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
+    :class="$style.contentbar"
+    :ref="(ins) => (contentbarRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
     <div :class="$style.header">
       <div :class="$style.title">
         <slot name="header"></slot>
       </div>
-      <Button :class="$style.Button" type="glass" :on-click="props.onCloseClick" title="收起内容栏">
+      <Button :class="$style.button" type="glass" :on-click="props.onCloseClick" title="收起内容栏">
         <span class="lovelymai lovely-close"></span>
       </Button>
     </div>
@@ -107,10 +107,10 @@ watch(
 </template>
 
 <style module>
-.ContentBar {
+.contentbar {
   border-radius: 20px;
-  transform: translateX(var(--ContentBar-translateX)) scale(var(--ContentBar-scale));
-  transition: var(--ContentBar-transition);
+  transform: translateX(var(--contentbar-translateX)) scale(var(--contentbar-scale));
+  transition: var(--contentbar-transition);
   overflow: auto;
   scrollbar-width: thin;
 }
@@ -141,7 +141,7 @@ watch(
   white-space: nowrap;
 }
 
-.Button {
+.button {
   margin-top: 10px;
   font-size: 20px;
 }

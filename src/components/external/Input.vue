@@ -48,30 +48,30 @@ const inputValue = defineModel<string>('value', { required: true })
 const warning = defineModel<boolean>('warning', { default: false })
 
 // 初始化
-const InputRef = ref<HTMLElement | null>(null)
+const inputContainerRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLInputElement | null>(null)
 const slots = useSlots()
 const style = reactive({
-  Input: {
+  inputContainer: {
     width: 0,
     height: 0,
   },
   input: {
     height: 0,
     get paddingLeft() {
-      return slots.default ? style.Input.height : style.Input.height / 2
+      return slots.default ? style.inputContainer.height : style.inputContainer.height / 2
     },
   },
 })
 let cleanup: () => void
 onMounted(() => {
-  if (!InputRef.value) return
-  cleanup = watchDOM(InputRef.value, ({ width, height }) => {
-    style.Input.width = width
-    style.Input.height = height
-    style.input.height = height - 2
+  if (!inputContainerRef.value) return
+  cleanup = watchDOM(inputContainerRef.value, ({ width, height }) => {
+    style.inputContainer.width = width
+    style.inputContainer.height = height
+    style.inputContainer.height = height - 2
   })
-  useCssVar(InputRef.value, style)
+  useCssVar(inputContainerRef.value, style)
 })
 onUnmounted(() => cleanup())
 
@@ -87,13 +87,13 @@ const compositionstart = () => {
 }
 
 // 菜单
-const MenuRef = ref<HTMLElement | null>(null)
-const MenuManager = ref<WindowManager | null>(null)
+const menuRef = ref<HTMLElement | null>(null)
+const menuManager = ref<WindowManager | null>(null)
 let isSelecting: boolean = false
 let isFocused: boolean = false
 onMounted(() => {
   if (!inputRef.value || props.type !== 'radio') return
-  MenuManager.value = createWindowManager(inputRef.value, MenuRef)
+  menuManager.value = createWindowManager(inputRef.value, menuRef)
   inputRef.value.addEventListener('focus', () => {
     isFocused = true
   })
@@ -102,14 +102,14 @@ onMounted(() => {
   })
 })
 onUnmounted(() => {
-  MenuManager.value?.cleanup()
+  menuManager.value?.cleanup()
 })
 const onOptionClick = (option: OptionItem) => {
   inputRef.value?.focus()
   if (option.options) return
   isSelecting = true
   inputValue.value = option.name
-  MenuManager.value?.close()
+  menuManager.value?.close()
 }
 const filterOptions = (options: OptionItem[], keyword: string): OptionItem[] =>
   options.reduce<OptionItem[]>((acc, option) => {
@@ -131,30 +131,30 @@ const showingOptions = computed<OptionItem[]>(() =>
   props.filter ? filteredOptions.value : props.options,
 )
 watch(showingOptions, () => {
-  if (!MenuManager.value) return
+  if (!menuManager.value) return
   if (isSelecting) {
     isSelecting = false
   } else {
     if (!isFocused) return
-    MenuManager.value.open()
+    menuManager.value.open()
   }
 })
 
 // 日历
 const date = ref<DateItem>(formatDate(Date.now()))
-const DateRef = ref<HTMLElement | null>(null)
-const DateManager = ref<WindowManager | null>(null)
+const dateRef = ref<HTMLElement | null>(null)
+const dateManager = ref<WindowManager | null>(null)
 onMounted(() => {
   if (!inputRef.value || props.type !== 'date') return
-  DateManager.value = createWindowManager(inputRef.value, DateRef)
+  dateManager.value = createWindowManager(inputRef.value, dateRef)
 })
 onUnmounted(() => {
-  DateManager.value?.cleanup()
+  dateManager.value?.cleanup()
 })
 const onDateClick = () => {
   inputRef.value?.focus()
   inputValue.value = props.format(date.value)
-  DateManager.value?.close()
+  dateManager.value?.close()
 }
 
 // 回车
@@ -167,8 +167,8 @@ const enter = () => {
 const clear = () => {
   inputValue.value = ''
   inputRef.value?.focus()
-  MenuManager.value?.open()
-  DateManager.value?.open()
+  menuManager.value?.open()
+  dateManager.value?.open()
 }
 
 // 非弹窗类时输入自动清除警告
@@ -183,20 +183,20 @@ const collectLeafNames = (options: OptionItem[]): string[] =>
 const tab = () => {
   if (!inputValue.value) return
   if (props.type === 'radio') {
-    if (!MenuManager.value) return
+    if (!menuManager.value) return
     const leaves = collectLeafNames(filteredOptions.value)
     if (leaves.length !== 1) return
     isSelecting = true
     inputValue.value = leaves[0]
-    MenuManager.value.close()
+    menuManager.value.close()
   } else if (props.type === 'date') {
-    if (!DateManager.value) return
+    if (!dateManager.value) return
     const match = inputValue.value.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/)
     if (!match) return
     const newDate: DateItem = [Number(match[1]), Number(match[2]), Number(match[3])]
     date.value = newDate
     inputValue.value = props.format(newDate)
-    DateManager.value.close()
+    dateManager.value.close()
   }
 }
 
@@ -233,13 +233,13 @@ defineExpose({
   verification: verified,
   focus: () => {
     inputRef.value?.focus()
-    MenuManager.value?.open()
-    DateManager.value?.open()
+    menuManager.value?.open()
+    dateManager.value?.open()
   },
   blur: () => {
     inputRef.value?.blur()
-    MenuManager.value?.close()
-    DateManager.value?.close()
+    menuManager.value?.close()
+    dateManager.value?.close()
   },
   select: () => inputRef.value?.select(),
 })
@@ -247,8 +247,8 @@ defineExpose({
 
 <template>
   <Card
-    :class="$style.Input"
-    :ref="(el) => (InputRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
+    :class="$style.inputContainer"
+    :ref="(ins) => (inputContainerRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
@@ -280,20 +280,20 @@ defineExpose({
       ></span>
     </div>
     <Menu
-      :ref="(ins) => (MenuRef = (ins as MenuInstance | null)?.root ?? null)"
+      :ref="(ins) => (menuRef = (ins as MenuInstance | null)?.root ?? null)"
       v-if="props.type === 'radio'"
-      :visible="MenuManager?.visible ?? false"
-      :position="MenuManager?.position ?? [0, 0]"
+      :visible="menuManager?.visible ?? false"
+      :position="menuManager?.position ?? [0, 0]"
       :options="showingOptions"
-      :min-width="style.Input.width + 'px'"
+      :min-width="style.inputContainer.width + 'px'"
       :z-index="props.zIndex"
       :on-option-click="onOptionClick"
     />
     <DateWindow
-      :ref="(ins) => (DateRef = (ins as DateInstance | null)?.root ?? null)"
+      :ref="(ins) => (dateRef = (ins as DateInstance | null)?.root ?? null)"
       v-if="props.type === 'date'"
-      :visible="DateManager?.visible ?? false"
-      :position="DateManager?.position ?? [0, 0]"
+      :visible="dateManager?.visible ?? false"
+      :position="dateManager?.position ?? [0, 0]"
       v-model:date="date"
       :z-index="props.zIndex"
       :on-date-click="onDateClick"
@@ -302,11 +302,11 @@ defineExpose({
 </template>
 
 <style module>
-.Input {
+.inputContainer {
   display: flex;
   position: relative;
   height: 35px;
-  border-radius: calc(var(--Input-height) * 0.5px);
+  border-radius: calc(var(--inputContainer-height) * 0.5px);
   --font-size: 14px;
   --font-weight: 400;
   --line-height: 18px;

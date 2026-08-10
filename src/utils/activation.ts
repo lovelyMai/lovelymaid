@@ -10,7 +10,7 @@ export type ActivationManager = {
 export const createActivationManager = (
   items: Ref<Item[]>,
   activeIds: Ref<Set<string | number>>,
-  ParentEl: HTMLElement,
+  parentEl: HTMLElement,
 ): ActivationManager => {
   const activeIndexes = ref<Set<number>>(new Set())
   let lastActiveIndex: number | undefined = undefined
@@ -75,9 +75,9 @@ export const createActivationManager = (
     const index = Array.from(parent.children).indexOf(el)
     activateItem(e, Number(index))
   }
-  ParentEl.addEventListener('pointerdown', handlePointerDown)
+  parentEl.addEventListener('pointerdown', handlePointerDown)
   const cleanup = () => {
-    ParentEl.removeEventListener('pointerdown', handlePointerDown)
+    parentEl.removeEventListener('pointerdown', handlePointerDown)
   }
   return reactive({ activeIndexes, cleanup })
 }

@@ -22,9 +22,9 @@ const props = withDefaults(defineProps<Props>(), {
 const visible = defineModel<boolean>('visible', { required: true })
 
 // 初始化
-const ModalRef = ref<HTMLElement | null>(null)
+const modalRef = ref<HTMLElement | null>(null)
 const style = reactive({
-  ContentBar: {
+  contentbar: {
     get left() {
       return `calc(50% - ${this.width} / 2)`
     },
@@ -40,8 +40,8 @@ const style = reactive({
   },
 })
 onMounted(() => {
-  if (!ModalRef.value) return
-  useCssVar(ModalRef.value, style)
+  if (!modalRef.value) return
+  useCssVar(modalRef.value, style)
 })
 
 // 关闭
@@ -53,12 +53,12 @@ const close = () => {
 
 <template>
   <teleport to="body">
-    <div :class="$style.Modal" ref="ModalRef" :style="{ zIndex: props.zIndex }">
+    <div :class="$style.modal" ref="modalRef" :style="{ zIndex: props.zIndex }">
       <transition name="lovelymai-fade">
         <div :class="$style.mask" v-if="visible" @click.capture.stop="close"></div>
       </transition>
       <ContentBar
-        :class="$style.ContentBar"
+        :class="$style.contentbar"
         :visible="visible"
         :is-open="true"
         :on-close-click="close"
@@ -74,7 +74,7 @@ const close = () => {
 </template>
 
 <style module>
-.Modal {
+.modal {
   position: relative;
 }
 
@@ -87,11 +87,11 @@ const close = () => {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-.ContentBar {
+.contentbar {
   position: fixed;
-  left: var(--ContentBar-left);
-  top: var(--ContentBar-top);
-  width: var(--ContentBar-width);
-  height: var(--ContentBar-height);
+  left: var(--contentbar-left);
+  top: var(--contentbar-top);
+  width: var(--contentbar-width);
+  height: var(--contentbar-height);
 }
 </style>

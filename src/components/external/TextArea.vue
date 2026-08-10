@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
 const inputValue = defineModel<string>('value', { required: true })
 
 // 输入输入事件
-const TextAreaRef = ref<HTMLElement | null>(null)
+const textareaContainerRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 watch(inputValue, async () => {
   await nextTick()
@@ -30,11 +30,11 @@ watch(inputValue, async () => {
 })
 const autoResize = () => {
   const currentHeight = textareaRef.value!.clientHeight + 2
-  TextAreaRef.value!.style.height = `${currentHeight}px`
+  textareaContainerRef.value!.style.height = `${currentHeight}px`
   textareaRef.value!.style.height = 'auto'
   const newHeight = textareaRef.value!.scrollHeight
   textareaRef.value!.style.height = `${newHeight}px`
-  TextAreaRef.value!.style.height = 'auto'
+  textareaContainerRef.value!.style.height = 'auto'
 }
 
 // 中文输入法下回车防止搜索
@@ -64,8 +64,8 @@ defineExpose({
 
 <template>
   <Card
-    :class="$style.TextArea"
-    :ref="(el) => (TextAreaRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
+    :class="$style.textarea"
+    :ref="(el) => (textareaContainerRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
     <textarea
       :rows="props.minrow"
@@ -83,7 +83,7 @@ defineExpose({
 </template>
 
 <style module>
-.TextArea {
+.textarea {
   border-radius: var(--border-radius);
   --max-height: auto;
   --border-radius: 20px;

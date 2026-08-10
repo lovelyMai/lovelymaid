@@ -66,7 +66,7 @@ const onListClick = (e: MouseEvent, side: 'left' | 'right') => {
 </script>
 
 <template>
-  <div :class="$style.Scroll">
+  <div :class="$style.scroll">
     <div :class="$style.selected"></div>
     <ul
       :class="[$style.list, $style.left]"
@@ -104,7 +104,7 @@ const onListClick = (e: MouseEvent, side: 'left' | 'right') => {
 </template>
 
 <style module>
-.Scroll {
+.scroll {
   display: flex;
   justify-content: center;
   align-items: center;

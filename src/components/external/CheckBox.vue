@@ -38,7 +38,7 @@ const warning = defineModel<boolean>('warning', { default: false })
 // 输入框展示文本：输入时显示过滤关键词，否则显示已选中项
 const keyword = ref('')
 const showValue = computed<string>(() =>
-  MenuManager.value?.visible
+  menuManager.value?.visible
     ? keyword.value
     : selectedValue.value.length > 0
       ? `已选择 ${selectedValue.value.length} 项`
@@ -46,30 +46,30 @@ const showValue = computed<string>(() =>
 )
 
 // 初始化
-const InputRef = ref<HTMLElement | null>(null)
+const inputContainerRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLInputElement | null>(null)
 const slots = useSlots()
 const style = reactive({
-  Input: {
+  inputContainer: {
     width: 0,
     height: 0,
   },
   input: {
     height: 0,
     get paddingLeft() {
-      return slots.default ? style.Input.height : style.Input.height / 2
+      return slots.default ? style.inputContainer.height : style.inputContainer.height / 2
     },
   },
 })
 let cleanup: () => void
 onMounted(() => {
-  if (!InputRef.value) return
-  cleanup = watchDOM(InputRef.value, ({ width, height }) => {
-    style.Input.width = width
-    style.Input.height = height
+  if (!inputContainerRef.value) return
+  cleanup = watchDOM(inputContainerRef.value, ({ width, height }) => {
+    style.inputContainer.width = width
+    style.inputContainer.height = height
     style.input.height = height - 2
   })
-  useCssVar(InputRef.value, style)
+  useCssVar(inputContainerRef.value, style)
 })
 onUnmounted(() => cleanup())
 
@@ -85,14 +85,14 @@ const compositionstart = () => {
 }
 
 // 菜单
-const MenuRef = ref<HTMLElement | null>(null)
-const MenuManager = ref<WindowManager | null>(null)
+const menuRef = ref<HTMLElement | null>(null)
+const menuManager = ref<WindowManager | null>(null)
 onMounted(() => {
   if (!inputRef.value) return
-  MenuManager.value = createWindowManager(inputRef.value, MenuRef)
+  menuManager.value = createWindowManager(inputRef.value, menuRef)
 })
 onUnmounted(() => {
-  MenuManager.value?.cleanup()
+  menuManager.value?.cleanup()
 })
 const collectLeafNames = (options: OptionItem[]): string[] =>
   options.map((option) => (option.options ? collectLeafNames(option.options) : option.name)).flat()
@@ -142,7 +142,7 @@ const enter = () => {
 
 // Tab 补全
 const tab = () => {
-  if (!MenuManager.value || !keyword.value) return
+  if (!menuManager.value || !keyword.value) return
   const leaves = collectLeafNames(filteredOptions.value)
   selectedValue.value = [...leaves.filter((leave) => leave.includes(keyword.value))]
 }
@@ -152,7 +152,7 @@ const clear = () => {
   selectedValue.value = []
   keyword.value = ''
   inputRef.value?.focus()
-  MenuManager.value?.open()
+  menuManager.value?.open()
 }
 
 // 选中项变化时自动清除警告
@@ -164,11 +164,11 @@ watch(selectedValue, () => {
 defineExpose({
   focus: () => {
     inputRef.value?.focus()
-    MenuManager.value?.open()
+    menuManager.value?.open()
   },
   blur: () => {
     inputRef.value?.blur()
-    MenuManager.value?.close()
+    menuManager.value?.close()
   },
   select: () => inputRef.value?.select(),
 })
@@ -176,8 +176,8 @@ defineExpose({
 
 <template>
   <Card
-    :class="$style.Input"
-    :ref="(el) => (InputRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
+    :class="$style.inputContainer"
+    :ref="(el) => (inputContainerRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
@@ -206,11 +206,11 @@ defineExpose({
       ></span>
     </div>
     <Menu
-      :ref="(ins) => (MenuRef = (ins as MenuInstance | null)?.root ?? null)"
-      :visible="MenuManager?.visible ?? false"
-      :position="MenuManager?.position ?? [0, 0]"
+      :ref="(ins) => (menuRef = (ins as MenuInstance | null)?.root ?? null)"
+      :visible="menuManager?.visible ?? false"
+      :position="menuManager?.position ?? [0, 0]"
       :options="showingOptions"
-      :min-width="style.Input.width + 'px'"
+      :min-width="style.inputContainer.width + 'px'"
       :z-index="props.zIndex"
       :on-option-click="onOptionClick"
       v-slot="{ item }"
@@ -222,11 +222,11 @@ defineExpose({
 </template>
 
 <style module>
-.Input {
+.inputContainer {
   display: flex;
   position: relative;
   height: 35px;
-  border-radius: calc(var(--Input-height) * 0.5px);
+  border-radius: calc(var(--inputContainer-height) * 0.5px);
   --font-size: 14px;
   --font-weight: 400;
   --line-height: 18px;

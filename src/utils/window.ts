@@ -31,29 +31,29 @@ const getScrollableParents = (el: HTMLElement): (HTMLElement | Document)[] => {
 }
 
 export const createWindowManager = (
-  TriggerEl: HTMLElement,
-  WindowRef: Ref<HTMLElement | null>,
+  triggerEl: HTMLElement,
+  windowRef: Ref<HTMLElement | null>,
   type: 'fixed' | 'flex' = 'fixed',
   method: 'down' | 'contextmenu' = 'down',
 ): WindowManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
   const calcPos = (e?: MouseEvent) => {
-    if (!WindowRef.value) return
+    if (!windowRef.value) return
     let X: number = 0
     let Y: number = 0
     if (type === 'fixed') {
-      X = getViewLeft(TriggerEl) + Math.min(TriggerEl.offsetWidth, TriggerEl.offsetHeight) / 2
-      Y = getViewTop(TriggerEl) + TriggerEl.offsetHeight + 3
+      X = getViewLeft(triggerEl) + Math.min(triggerEl.offsetWidth, triggerEl.offsetHeight) / 2
+      Y = getViewTop(triggerEl) + triggerEl.offsetHeight + 3
       const offsetBottom =
         document.documentElement.scrollTop +
         document.documentElement.clientHeight -
-        (Y + WindowRef.value.offsetHeight)
+        (Y + windowRef.value.offsetHeight)
       const centerIsBottom =
-        getViewTop(TriggerEl) + TriggerEl.offsetHeight / 2 >
+        getViewTop(triggerEl) + triggerEl.offsetHeight / 2 >
         document.documentElement.scrollTop + document.documentElement.clientHeight / 2
       if (offsetBottom < 3 && centerIsBottom) {
-        Y = getViewTop(TriggerEl) - WindowRef.value.offsetHeight - 3
+        Y = getViewTop(triggerEl) - windowRef.value.offsetHeight - 3
       }
     } else {
       if (e) {
@@ -62,7 +62,7 @@ export const createWindowManager = (
         const offsetBottom =
           document.documentElement.scrollTop +
           document.documentElement.clientHeight -
-          (Y + WindowRef.value.offsetHeight)
+          (Y + windowRef.value.offsetHeight)
         if (offsetBottom < 3) {
           Y = Y + offsetBottom - 3
         }
@@ -73,7 +73,7 @@ export const createWindowManager = (
     const offsetRight =
       document.documentElement.scrollLeft +
       document.documentElement.clientWidth -
-      (X + WindowRef.value.offsetWidth)
+      (X + windowRef.value.offsetWidth)
     if (offsetRight < 3) {
       X = X + offsetRight - 3
     }
@@ -95,10 +95,10 @@ export const createWindowManager = (
     lastEvent = e
     visible.value = true
     await nextTick()
-    if (!WindowRef.value) return
+    if (!windowRef.value) return
     calcPos(e)
     scrollParents.forEach((p) => p.removeEventListener('scroll', onScroll))
-    scrollParents = getScrollableParents(TriggerEl)
+    scrollParents = getScrollableParents(triggerEl)
     scrollParents.forEach((p) => p.addEventListener('scroll', onScroll))
     // 重新注册前清理旧监听与挂起的定时器，避免重复注册 / 定时器残留
     clearTimeout(openTimer)
@@ -118,9 +118,9 @@ export const createWindowManager = (
     open(e)
   }
   if (method === 'down') {
-    TriggerEl.addEventListener('mousedown', onTrigger)
+    triggerEl.addEventListener('mousedown', onTrigger)
   } else {
-    TriggerEl.addEventListener('contextmenu', onTrigger)
+    triggerEl.addEventListener('contextmenu', onTrigger)
   }
   const close = () => {
     if (!visible.value) return
@@ -131,15 +131,15 @@ export const createWindowManager = (
     document.removeEventListener('click', onDocClick, true)
   }
   const onDocClick = (e: MouseEvent) => {
-    if (!WindowRef.value) return
-    if (WindowRef.value.contains(e.target as HTMLElement)) return
+    if (!windowRef.value) return
+    if (windowRef.value.contains(e.target as HTMLElement)) return
     e.stopPropagation()
     e.preventDefault()
     close()
   }
   const cleanup = () => {
-    TriggerEl.removeEventListener('mousedown', onTrigger)
-    TriggerEl.removeEventListener('contextmenu', onTrigger)
+    triggerEl.removeEventListener('mousedown', onTrigger)
+    triggerEl.removeEventListener('contextmenu', onTrigger)
     clearTimeout(openTimer)
     document.removeEventListener('click', stopClickPropagation, true)
     scrollParents.forEach((p) => p.removeEventListener('scroll', onScroll))
