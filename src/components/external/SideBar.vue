@@ -111,7 +111,6 @@ watch(
       </div>
     </div>
     <div :class="$style.mask">
-      <div :class="$style.empty"></div>
       <slot>111</slot>
       <Loading :loading="props.loading" />
     </div>
@@ -176,12 +175,9 @@ watch(
   position: relative;
   z-index: 0;
   min-height: 100%;
+  padding-top: 50px;
   border-radius: inherit;
   overflow-y: auto;
-}
-
-.mask .empty {
-  height: 50px;
 }
 </style>
 <style scoped>
