@@ -405,6 +405,10 @@ watch(searchIsActive, (newValue) => {
   aspect-ratio: 1 /1;
 }
 
+.tab.small :not(:nth-child(1)) {
+  display: none;
+}
+
 .tab.top {
   color: var(--top-color);
 }
