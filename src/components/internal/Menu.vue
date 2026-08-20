@@ -157,7 +157,7 @@ defineSlots<{
   gap: 5px;
   position: relative;
   z-index: 0;
-  padding: 5px;
+  padding: 5px 5px 5px 10px;
   height: 28px;
   border-radius: 8px;
   color: #000;
