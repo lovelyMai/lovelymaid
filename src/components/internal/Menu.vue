@@ -22,10 +22,10 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   zIndex: 0,
 })
-const isSubMenu = inject('menu-is-sub', false)
-provide('menu-is-sub', true)
 
 // 子菜单
+const isSubMenu = inject('menu-is-sub', false)
+provide('menu-is-sub', true)
 const menuRef = ref<HTMLElement | null>(null)
 const submenuInstances = ref<Record<string, MenuInstance | null>>({})
 const submenuManagers = ref<Record<string, WindowManager>>({})
@@ -96,7 +96,7 @@ defineSlots<{
   <teleport to="body" :disabled="isSubMenu">
     <transition name="lovelymai-fade-leave">
       <ul
-        :class="[$style.menu, hasSubMenu ? $style.sub : '']"
+        :class="$style.menu"
         ref="menuRef"
         v-if="props.visible && props.options.length > 0"
         :style="{
@@ -152,7 +152,7 @@ defineSlots<{
 
 .menu .item {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 5px;
   position: relative;
@@ -162,10 +162,6 @@ defineSlots<{
   border-radius: 8px;
   color: #000;
   cursor: pointer;
-}
-
-.menu.sub .item {
-  justify-content: space-between;
 }
 
 @media (hover: hover) {

@@ -100,7 +100,6 @@ export const createWindowManager = (
     scrollParents.forEach((p) => p.removeEventListener('scroll', onScroll))
     scrollParents = getScrollableParents(triggerEl)
     scrollParents.forEach((p) => p.addEventListener('scroll', onScroll))
-    // 重新注册前清理旧监听与挂起的定时器，避免重复注册 / 定时器残留
     clearTimeout(openTimer)
     document.removeEventListener('click', onDocClick, true)
     openTimer = setTimeout(() => {
