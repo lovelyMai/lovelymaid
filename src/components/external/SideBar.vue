@@ -12,7 +12,7 @@ interface Props {
   /** 是否显示 */
   visible?: boolean
   /** 按钮点击事件 */
-  onButtonClick?: () => void
+  onButtonClick?: (newIsOpen: boolean) => void
   /** 加载状态 */
   loading?: boolean
 }
@@ -103,7 +103,7 @@ watch(
         @click.stop="
           () => {
             isOpen = !isOpen
-            props.onButtonClick?.()
+            props.onButtonClick?.(!isOpen)
           }
         "
       >
