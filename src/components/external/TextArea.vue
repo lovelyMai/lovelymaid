@@ -95,7 +95,7 @@ defineExpose({
       @compositionstart="compositionstart"
       @compositionend="compositionend"
     />
-    <div :class="$style.footer">
+    <div :class="$style.footer" v-if="slots.default">
       <slot></slot>
     </div>
   </Card>
@@ -146,5 +146,6 @@ defineExpose({
   bottom: 0;
   width: 100%;
   height: 28px;
+  pointer-events: none;
 }
 </style>
