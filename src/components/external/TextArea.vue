@@ -29,12 +29,8 @@ watch(inputValue, async () => {
   autoResize()
 })
 const autoResize = () => {
-  const currentHeight = textareaRef.value!.clientHeight + 2
-  textareaContainerRef.value!.style.height = `${currentHeight}px`
   textareaRef.value!.style.height = 'auto'
-  const newHeight = textareaRef.value!.scrollHeight
-  textareaRef.value!.style.height = `${newHeight}px`
-  textareaContainerRef.value!.style.height = 'auto'
+  textareaRef.value!.style.height = `${textareaRef.value!.scrollHeight}px`
 }
 
 // 中文输入法下回车防止搜索
@@ -64,12 +60,13 @@ defineExpose({
 
 <template>
   <Card
-    :class="$style.textarea"
+    :class="$style.textareaContainer"
     :ref="(el) => (textareaContainerRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
     <textarea
-      :rows="props.minrow"
+      :class="$style.textarea"
       ref="textareaRef"
+      :rows="props.minrow"
       :value="inputValue"
       @input="(e) => (inputValue = (e.target as HTMLTextAreaElement).value)"
       :placeholder="props.placeholder"
@@ -83,7 +80,7 @@ defineExpose({
 </template>
 
 <style module>
-.textarea {
+.textareaContainer {
   border-radius: var(--border-radius);
   --max-height: auto;
   --border-radius: 20px;
@@ -92,9 +89,8 @@ defineExpose({
   --line-height: 18px;
   --placeholder-color: var(--lovelymai-color-gray-400);
 }
-</style>
-<style scoped>
-textarea {
+
+.textarea {
   display: block;
   width: 100%;
   max-height: var(--max-height);
@@ -113,11 +109,11 @@ textarea {
   scrollbar-width: thin;
 }
 
-textarea::placeholder {
+.textarea::placeholder {
   color: var(--placeholder-color);
 }
 
-textarea:focus {
+.textarea:focus {
   outline: 3px solid var(--lovelymai-color-blue-100);
 }
 </style>
