@@ -45,19 +45,15 @@ onMounted(() => {
 const slideCount = ref<number[]>([])
 const slideAnimating = ref<boolean>(false)
 const oldlist = ref<{ id: string | number; name: string }[]>(props.list)
-const listSnapshot = computed(() => props.list.map((item) => item.id).join(','))
-watch(
-  listSnapshot,
-  async (newSnapshot, oldSnapshot) => {
-    if (newSnapshot === oldSnapshot) return
-    slideAnimating.value = false
-    slideCount.value = getSlideCount(props.list, oldlist.value)
-    await nextTick()
-    slideAnimating.value = true
-    oldlist.value = [...props.list]
-  },
-  { deep: true },
-)
+const listSnapshot = computed<string>(() => props.list.map((item) => item.id).join(','))
+watch(listSnapshot, async (newSnapshot, oldSnapshot) => {
+  if (newSnapshot === oldSnapshot) return
+  slideAnimating.value = false
+  slideCount.value = getSlideCount(props.list, oldlist.value)
+  await nextTick()
+  slideAnimating.value = true
+  oldlist.value = [...props.list]
+})
 
 // 列表项点击事件
 const onItemClick = (item: ListItem, index: number) => {
