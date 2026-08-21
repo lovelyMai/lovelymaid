@@ -70,11 +70,6 @@ onUnmounted(() => {
   clearSubManagers()
 })
 
-// 是否存在子菜单
-const hasSubMenu = computed<boolean>(
-  () => props.options.filter((option) => option.options).length > 0,
-)
-
 // 暴露菜单
 export type MenuInstance = {
   root: HTMLElement | null
