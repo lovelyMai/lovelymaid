@@ -33,7 +33,7 @@ const autoResize = () => {
   textareaRef.value!.style.height = `${textareaRef.value!.scrollHeight}px`
 }
 
-// 中文输入法下回车防止搜索
+// 中文输入法下不触发回车事件
 let isComposing = false
 const compositionend = () => {
   setTimeout(() => {
@@ -46,7 +46,10 @@ const compositionstart = () => {
 
 // 回车事件
 const enter = (e: KeyboardEvent) => {
+  // 正在打字或按住了 shift 直接无视
   if (isComposing || e.shiftKey) return
+  // 普通 enter 才阻止换行+触发回车事件
+  e.preventDefault()
   props.onEnter?.()
 }
 
@@ -72,7 +75,7 @@ defineExpose({
       :placeholder="props.placeholder"
       :enterkeyhint="props.enterkeyhint"
       :disabled="props.disabled"
-      @keydown.enter.prevent="enter"
+      @keydown.enter="enter"
       @compositionstart="compositionstart"
       @compositionend="compositionend"
     />
