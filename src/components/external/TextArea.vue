@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, onMounted, reactive, ref, useSlots, watch } from 'vue'
 import Card from './Card.vue'
+
+import { useCssVar } from '@/utils/css-var'
 
 interface Props {
   /** 最小行数 */
@@ -21,9 +23,23 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const inputValue = defineModel<string>('value', { required: true })
 
-// 输入输入事件
+// 初始化
 const textareaContainerRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const slots = useSlots()
+const style = reactive({
+  textarea: {
+    get paddingBottom() {
+      return slots.default ? 40 : 12
+    },
+  },
+})
+onMounted(() => {
+  if (!textareaContainerRef.value) return
+  useCssVar(textareaContainerRef.value, style)
+})
+
+// 输入输入事件
 watch(inputValue, async () => {
   await nextTick()
   autoResize()
@@ -79,11 +95,15 @@ defineExpose({
       @compositionstart="compositionstart"
       @compositionend="compositionend"
     />
+    <div :class="$style.footer">
+      <slot></slot>
+    </div>
   </Card>
 </template>
 
 <style module>
 .textareaContainer {
+  position: relative;
   border-radius: var(--border-radius);
   --max-height: auto;
   --border-radius: 20px;
@@ -98,6 +118,7 @@ defineExpose({
   width: 100%;
   max-height: var(--max-height);
   padding: 12px;
+  padding-bottom: calc(var(--textarea-paddingBottom) * 1px);
   background-color: transparent;
   border: none;
   border-radius: calc(var(--border-radius) - 1px);
@@ -118,5 +139,12 @@ defineExpose({
 
 .textarea:focus {
   outline: 3px solid var(--lovelymai-color-blue-100);
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 28px;
 }
 </style>
