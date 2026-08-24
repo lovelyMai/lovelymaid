@@ -67,7 +67,7 @@ onUnmounted(() => {
   border-radius: var(--button-border-radius);
   font-size: var(--button-font-size);
   font-weight: 500;
-  color: var(--lovelymai-color-gray-600);
+  color: var(--lovelymai-color-gray-500);
   transition: transform 0.2s;
   cursor: pointer;
   touch-action: none;

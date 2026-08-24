@@ -310,8 +310,6 @@ defineExpose({
   --font-size: 14px;
   --font-weight: 400;
   --line-height: 18px;
-  --clear-color: var(--lovelymai-color-gray-300);
-  --placeholder-color: var(--lovelymai-color-gray-400);
 }
 
 .icon {
@@ -322,7 +320,7 @@ defineExpose({
   width: calc(var(--input-height) * 1px);
   height: 100%;
   font-size: calc(var(--input-height) * 0.5px);
-  color: var(--lovelymai-color-gray-600);
+  color: var(--lovelymai-color-gray-500);
   pointer-events: none;
 }
 
@@ -354,7 +352,7 @@ defineExpose({
 }
 
 .input::placeholder {
-  color: var(--placeholder-color);
+  color: var(--lovelymai-color-gray-400);
 }
 
 .input:focus {
@@ -368,7 +366,7 @@ defineExpose({
 <style scoped>
 .lovely-clear {
   font-size: calc(var(--input-height) * 0.5px);
-  color: var(--clear-color);
+  color: var(--lovelymai-color-gray-300);
   cursor: pointer;
   pointer-events: auto;
 }

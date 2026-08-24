@@ -183,6 +183,6 @@ watch(
 <style scoped>
 .lovely-left-sidebar {
   font-size: 20px;
-  color: var(--lovelymai-color-gray-600);
+  color: var(--lovelymai-color-gray-500);
 }
 </style>

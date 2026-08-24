@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, reactive, ref, useSlots, watch } from 'vue'
+import File from '../internal/File.vue'
 import Card from './Card.vue'
 
 import type { EnterKeyHint } from '@/types'
 import { useCssVar } from '@/utils/css-var'
 import { watchDOM } from '@/utils/dom'
+import { readDirectoryEntries } from '@/utils/file'
 
 interface Props {
   /** 最小行数 */
@@ -17,49 +19,50 @@ interface Props {
   disabled?: boolean
   /** 回车事件 */
   onEnter?: () => void
+  /** 粘贴文件 */
+  pasteFile?: boolean
+  /** 过滤文件 */
+  filterFile?: (files: File[]) => File[]
 }
 const props = withDefaults(defineProps<Props>(), {
   minrow: 1,
-  disabled: false,
   placeholder: '输入...',
+  disabled: false,
+  pasteFile: false,
+  filterFile: (files: File[]) => files,
 })
 const inputValue = defineModel<string>('value', { required: true })
+const files = defineModel<File[]>('files', { default: [] })
 
 // 初始化
 const textareaContainerRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
-const headerRef = ref<HTMLElement | null>(null)
 const footerRef = ref<HTMLElement | null>(null)
 const slots = useSlots()
 const style = reactive({
   textarea: {
-    paddingTop: 12,
+    get paddingTop() {
+      return props.pasteFile && files.value.length > 0 ? 80 + 12 : 12
+    },
     paddingBottom: 12,
   },
 })
-let cleanup1: (() => void) | undefined
-let cleanup2: (() => void) | undefined
+let cleanup: (() => void) | undefined
 onMounted(() => {
   if (!textareaContainerRef.value) return
-  if (headerRef.value) {
-    cleanup1 = watchDOM(headerRef.value, ({ height }) => {
-      style.textarea.paddingTop = height + 12
-    })
-  }
   if (footerRef.value) {
-    cleanup2 = watchDOM(footerRef.value, ({ height }) => {
+    cleanup = watchDOM(footerRef.value, ({ height }) => {
       style.textarea.paddingBottom = height + 12
     })
   }
   useCssVar(textareaContainerRef.value, style)
 })
 onUnmounted(() => {
-  cleanup1?.()
-  cleanup2?.()
+  cleanup?.()
 })
 
-// 输入输入事件
-watch(inputValue, async () => {
+// 输入事件
+watch([inputValue, files], async () => {
   await nextTick()
   autoResize()
 })
@@ -88,6 +91,33 @@ const enter = (e: KeyboardEvent) => {
   props.onEnter?.()
 }
 
+// 文件
+const pasteFile = async (e: ClipboardEvent) => {
+  if (!props.pasteFile) return
+  const items = e.clipboardData?.items
+  if (!items?.length) return
+  const pastedFiles: File[] = []
+  for (const item of [...items]) {
+    if (item.kind === 'file') {
+      const entry = item.webkitGetAsEntry?.()
+      if (entry?.isDirectory) {
+        const dirFiles = await readDirectoryEntries(entry as FileSystemDirectoryEntry)
+        pastedFiles.push(...dirFiles)
+      } else {
+        const file = item.getAsFile()
+        if (file) pastedFiles.push(file)
+      }
+    }
+  }
+  if (!pastedFiles.length) return
+  e.preventDefault()
+  const filtered = props.filterFile(pastedFiles)
+  files.value = [...files.value, ...filtered]
+}
+const removeFile = (file: File) => {
+  files.value = files.value.filter((f) => f !== file)
+}
+
 // 暴露
 defineExpose({
   focus: () => textareaRef.value?.focus(),
@@ -101,8 +131,13 @@ defineExpose({
     :class="$style.textareaContainer"
     :ref="(el) => (textareaContainerRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
-    <div :class="$style.header" v-if="slots.header" ref="headerRef">
-      <slot name="header"></slot>
+    <div :class="$style.header" v-if="props.pasteFile && files.length > 0">
+      <File
+        :class="$style.fileContainer"
+        v-for="file in files"
+        :file="file"
+        :on-close-click="() => removeFile(file)"
+      />
     </div>
     <textarea
       :class="$style.textarea"
@@ -116,9 +151,10 @@ defineExpose({
       @keydown.enter="enter"
       @compositionstart="compositionstart"
       @compositionend="compositionend"
+      @paste="pasteFile"
     />
-    <div :class="$style.footer" v-if="slots.footer" ref="footerRef">
-      <slot name="footer"></slot>
+    <div :class="$style.footer" v-if="slots.default" ref="footerRef">
+      <slot></slot>
     </div>
   </Card>
 </template>
@@ -139,7 +175,7 @@ defineExpose({
   display: block;
   width: 100%;
   max-height: var(--max-height);
-  padding: 0 12px;
+  padding: 12px;
   padding-top: calc(var(--textarea-paddingTop) * 1px);
   padding-bottom: calc(var(--textarea-paddingBottom) * 1px);
   background-color: transparent;
@@ -165,16 +201,27 @@ defineExpose({
 }
 
 .header {
+  display: flex;
+  gap: 10px;
   position: absolute;
   top: 0;
   width: 100%;
+  height: 80px;
   padding: 12px 12px 0 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.header .fileContainer {
+  flex-shrink: 0;
+  height: 100%;
 }
 
 .footer {
   position: absolute;
   bottom: 0;
   width: 100%;
+  padding: 0 12px 12px 12px;
   pointer-events: none;
 }
 </style>
