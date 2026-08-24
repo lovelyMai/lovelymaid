@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { nextTick, onMounted, reactive, ref, useSlots, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, reactive, ref, useSlots, watch } from 'vue'
 import Card from './Card.vue'
 
 import type { EnterKeyHint } from '@/types'
 import { useCssVar } from '@/utils/css-var'
+import { watchDOM } from '@/utils/dom'
 
 interface Props {
   /** 最小行数 */
@@ -27,17 +28,34 @@ const inputValue = defineModel<string>('value', { required: true })
 // 初始化
 const textareaContainerRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null)
+const footerRef = ref<HTMLElement | null>(null)
 const slots = useSlots()
 const style = reactive({
   textarea: {
-    get paddingBottom() {
-      return slots.default ? 40 : 12
-    },
+    paddingTop: 12,
+    paddingBottom: 12,
   },
 })
+let cleanup1: (() => void) | undefined
+let cleanup2: (() => void) | undefined
 onMounted(() => {
   if (!textareaContainerRef.value) return
+  if (headerRef.value) {
+    cleanup1 = watchDOM(headerRef.value, ({ height }) => {
+      style.textarea.paddingTop = height + 12
+    })
+  }
+  if (footerRef.value) {
+    cleanup2 = watchDOM(footerRef.value, ({ height }) => {
+      style.textarea.paddingBottom = height + 12
+    })
+  }
   useCssVar(textareaContainerRef.value, style)
+})
+onUnmounted(() => {
+  cleanup1?.()
+  cleanup2?.()
 })
 
 // 输入输入事件
@@ -83,6 +101,9 @@ defineExpose({
     :class="$style.textareaContainer"
     :ref="(el) => (textareaContainerRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
+    <div :class="$style.header" v-if="slots.header" ref="headerRef">
+      <slot name="header"></slot>
+    </div>
     <textarea
       :class="$style.textarea"
       ref="textareaRef"
@@ -96,8 +117,8 @@ defineExpose({
       @compositionstart="compositionstart"
       @compositionend="compositionend"
     />
-    <div :class="$style.footer" v-if="slots.default">
-      <slot></slot>
+    <div :class="$style.footer" v-if="slots.footer" ref="footerRef">
+      <slot name="footer"></slot>
     </div>
   </Card>
 </template>
@@ -118,7 +139,8 @@ defineExpose({
   display: block;
   width: 100%;
   max-height: var(--max-height);
-  padding: 12px;
+  padding: 0 12px;
+  padding-top: calc(var(--textarea-paddingTop) * 1px);
   padding-bottom: calc(var(--textarea-paddingBottom) * 1px);
   background-color: transparent;
   border: none;
@@ -142,11 +164,17 @@ defineExpose({
   outline: 3px solid var(--lovelymai-color-blue-100);
 }
 
+.header {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 12px 12px 0 12px;
+}
+
 .footer {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 28px;
   pointer-events: none;
 }
 </style>
