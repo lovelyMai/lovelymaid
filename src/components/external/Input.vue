@@ -4,7 +4,7 @@ import DateWindow, { type DateInstance } from '../internal/Date.vue'
 import Menu, { type MenuInstance } from '../internal/Menu.vue'
 import Card from './Card.vue'
 
-import type { OptionItem, DateItem } from '@/types'
+import type { OptionItem, DateItem, EnterKeyHint } from '@/types'
 import { useCssVar } from '@/utils/css-var.js'
 import { formatDate, verifyDate } from '@/utils/date'
 import { watchDOM } from '@/utils/dom'
@@ -16,7 +16,7 @@ interface Props {
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
-  enterkeyhint?: 'enter' | 'search' | 'done' | 'go' | 'next' | 'previous' | 'send'
+  enterkeyhint?: EnterKeyHint
   /** 是否禁用 */
   disabled?: boolean
   /** 是否只读 */

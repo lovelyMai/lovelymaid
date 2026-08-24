@@ -2,6 +2,7 @@
 import { nextTick, onMounted, reactive, ref, useSlots, watch } from 'vue'
 import Card from './Card.vue'
 
+import type { EnterKeyHint } from '@/types'
 import { useCssVar } from '@/utils/css-var'
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
-  enterkeyhint?: 'enter' | 'search' | 'done' | 'go' | 'next' | 'previous' | 'send'
+  enterkeyhint?: EnterKeyHint
   /** 是否禁用 */
   disabled?: boolean
   /** 回车事件 */
