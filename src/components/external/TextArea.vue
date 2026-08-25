@@ -3,7 +3,7 @@ import { nextTick, onMounted, onUnmounted, reactive, ref, useSlots, watch } from
 import File from '../internal/File.vue'
 import Card from './Card.vue'
 
-import type { EnterKeyHint } from '@/types'
+import type { EnterKeyHint, FileItem } from '@/types'
 import { useCssVar } from '@/utils/css-var'
 import { watchDOM } from '@/utils/dom'
 import { readDirectoryEntries } from '@/utils/file'
@@ -21,7 +21,7 @@ interface Props {
   onEnter?: () => void
   /** 粘贴文件 */
   pasteFile?: boolean
-  /** 过滤文件 */
+  /** 过滤文件（仅 pasteFile 开启时有效） */
   filterFile?: (files: File[]) => File[]
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -32,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
   filterFile: (files: File[]) => files,
 })
 const inputValue = defineModel<string>('value', { required: true })
-const files = defineModel<File[]>('files', { default: [] })
+const files = defineModel<FileItem[]>('files', { default: [] })
 
 // 初始化
 const textareaContainerRef = ref<HTMLElement | null>(null)
@@ -105,17 +105,19 @@ const pasteFile = async (e: ClipboardEvent) => {
         pastedFiles.push(...dirFiles)
       } else {
         const file = item.getAsFile()
-        if (file) pastedFiles.push(file)
+        if (file) {
+          pastedFiles.push(file)
+        }
       }
     }
   }
   if (!pastedFiles.length) return
   e.preventDefault()
   const filtered = props.filterFile(pastedFiles)
-  files.value = [...files.value, ...filtered]
+  files.value = [...files.value, ...filtered.map((file) => ({ id: crypto.randomUUID(), file }))]
 }
-const removeFile = (file: File) => {
-  files.value = files.value.filter((f) => f !== file)
+const removeFile = (id: string | number) => {
+  files.value = files.value.filter((file) => file.id !== id)
 }
 
 // 暴露
@@ -135,8 +137,9 @@ defineExpose({
       <File
         :class="$style.fileContainer"
         v-for="file in files"
-        :file="file"
-        :on-close-click="() => removeFile(file)"
+        :file="file.file"
+        :loading="file.loading"
+        :on-close-click="() => removeFile(file.id)"
       />
     </div>
     <textarea
@@ -162,13 +165,11 @@ defineExpose({
 <style module>
 .textareaContainer {
   position: relative;
-  border-radius: var(--border-radius);
+  border-radius: 20px;
   --max-height: auto;
-  --border-radius: 20px;
   --font-size: 14px;
   --font-weight: 400;
   --line-height: 18px;
-  --placeholder-color: var(--lovelymai-color-gray-400);
 }
 
 .textarea {
@@ -180,7 +181,7 @@ defineExpose({
   padding-bottom: calc(var(--textarea-paddingBottom) * 1px);
   background-color: transparent;
   border: none;
-  border-radius: calc(var(--border-radius) - 1px);
+  border-radius: calc(20px - 1px);
   font-size: var(--font-size);
   font-weight: var(--font-weight);
   line-height: var(--line-height);
@@ -193,7 +194,7 @@ defineExpose({
 }
 
 .textarea::placeholder {
-  color: var(--placeholder-color);
+  color: var(--lovelymai-color-gray-400);
 }
 
 .textarea:focus {
@@ -204,10 +205,12 @@ defineExpose({
   display: flex;
   gap: 10px;
   position: absolute;
-  top: 0;
-  width: 100%;
-  height: 80px;
-  padding: 12px 12px 0 12px;
+  left: 2px;
+  top: 2px;
+  width: calc(100% - 2 * 2px);
+  height: calc(80px - 2px);
+  padding: calc(12px - 2px) calc(12px - 2px) 0 calc(12px - 2px);
+  border-radius: calc(20px - 1px - 2px) calc(20px - 1px - 2px) 0 0;
   overflow-x: auto;
   scrollbar-width: none;
 }

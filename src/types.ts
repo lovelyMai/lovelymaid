@@ -10,3 +10,5 @@ export type OptionItem = ListItem & { options?: OptionItem[] }
 export type DateItem = [number, number, number]
 
 export type EnterKeyHint = 'enter' | 'search' | 'done' | 'go' | 'next' | 'previous' | 'send'
+
+export type FileItem = Item & { file: File; loading?: boolean }
