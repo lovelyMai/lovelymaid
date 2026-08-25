@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
 })
 
-// 图片
+// 文件内存 url
 const url = computed<string>(() => URL.createObjectURL(props.file))
 onUnmounted(() => {
   URL.revokeObjectURL(url.value)
@@ -36,18 +36,25 @@ const ICON_MAP: Record<string, string> = {
 const ext = computed<string>(() => props.file.name.split('.').pop()?.toUpperCase() ?? '')
 const fileIcon = computed<string>(() => ICON_MAP[ext.value.toLowerCase()])
 const extra = computed<string>(() => `${ext.value} ${formatFileSize(props.file.size)}`)
+
+// 打开文件
+const openFile = () => {
+  window.open(url.value, '_blank')
+}
 </script>
 
 <template>
-  <Card :class="$style.fileContainer">
+  <Card :class="$style.fileContainer" @click.stop="openFile">
     <span
       class="lovelymai lovely-clear"
       v-if="props.onCloseClick"
       @click.stop="() => props.onCloseClick?.()"
     ></span>
-    <img v-if="file.type.startsWith('image/')" :class="$style.img" :src="url" />
-    <div v-else :class="$style.other" :title="props.file.name">
-      <img v-if="fileIcon" :class="$style.icon" :src="fileIcon" />
+    <div :class="$style.img" v-if="file.type.startsWith('image/')">
+      <img :src="url" />
+    </div>
+    <div :class="$style.other" v-else :title="props.file.name">
+      <img :class="$style.icon" v-if="fileIcon" :src="fileIcon" />
       <div :class="$style.info">
         <div :class="$style.name">{{ props.file.name }}</div>
         <div :class="$style.extra">{{ extra }}</div>
@@ -63,9 +70,10 @@ const extra = computed<string>(() => `${ext.value} ${formatFileSize(props.file.s
   border-radius: 10px;
   overflow: hidden;
   box-shadow: none;
+  cursor: pointer;
 }
 
-:global(.lovely-clear) {
+.fileContainer :global(.lovely-clear) {
   position: absolute;
   top: 2px;
   right: 2px;
@@ -81,10 +89,11 @@ const extra = computed<string>(() => `${ext.value} ${formatFileSize(props.file.s
 }
 
 .fileContainer .img {
-  display: block;
   height: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+}
+
+.fileContainer .img img {
+  height: 100%;
 }
 
 .fileContainer .other {

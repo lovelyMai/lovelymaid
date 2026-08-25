@@ -22,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
 const isOpen = defineModel<boolean>('open', { required: true })
 
 // 初始化
+const sidebarRef = ref<HTMLElement | null>(null)
 const style = reactive({
   sidebar: {
     get translateX() {
@@ -43,8 +44,13 @@ onMounted(() => {
   useCssVar(sidebarRef.value, style)
 })
 
+// 按钮点击事件
+const clickButton = () => {
+  isOpen.value = !isOpen.value
+  props.onButtonClick?.(!isOpen.value)
+}
+
 // 计算平移距离
-const sidebarRef = ref<HTMLElement | null>(null)
 const transformDistance = ref<number>(0)
 let cleanup: () => void
 const calculateTransform = () => {
@@ -100,12 +106,7 @@ watch(
       <div
         :class="[$style.button, { [$style.close]: !isOpen }]"
         :title="isOpen ? '收起侧边栏' : '打开侧边栏'"
-        @click.stop="
-          () => {
-            isOpen = !isOpen
-            props.onButtonClick?.(!isOpen)
-          }
-        "
+        @click.stop="() => clickButton()"
       >
         <span class="lovelymai lovely-left-sidebar"></span>
       </div>
