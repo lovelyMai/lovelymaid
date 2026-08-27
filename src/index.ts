@@ -1,44 +1,19 @@
-import type { Item, ListItem, OptionItem, DateItem } from './types.js'
-import Button from './components/Button.vue'
-import Card from './components/Card.vue'
-import CheckBox from './components/CheckBox.vue'
-import ContentBar from './components/ContentBar.vue'
-import FoldList from './components/FoldList.vue'
-import Form, { type FormItem } from './components/Form.vue'
-import Input from './components/Input.vue'
-import Loading from './components/Loading.vue'
-import MenuBar from './components/MenuBar.vue'
-import Modal from './components/Modal.vue'
-import Select from './components/Select.vue'
-import SideBar from './components/SideBar.vue'
-import TabBar from './components/TabBar.vue'
-import Table, { type ColumnConfig, type SortConfig } from './components/Table.vue'
-import TextArea from './components/TextArea.vue'
+export { default as Button } from './components/Button.vue'
+export { default as Card } from './components/Card.vue'
+export { default as CheckBox } from './components/CheckBox.vue'
+export { default as ContentBar } from './components/ContentBar.vue'
+export { default as FoldList } from './components/FoldList.vue'
+export { default as Form, type FormItem } from './components/Form.vue'
+export { default as Input } from './components/Input.vue'
+export { default as Loading } from './components/Loading.vue'
+export { default as MenuBar } from './components/MenuBar.vue'
+export { default as Modal } from './components/Modal.vue'
+export { default as Select } from './components/Select.vue'
+export { default as SideBar } from './components/SideBar.vue'
+export { default as TabBar } from './components/TabBar.vue'
+export { default as Table, type ColumnConfig, type SortConfig } from './components/Table.vue'
+export { default as TextArea } from './components/TextArea.vue'
+export type { Item, ListItem, OptionItem, DateItem } from './types.js'
 import '@/assets/styles/reset.css'
 import '@/assets/styles/main.css'
 import '@/assets/icons/iconfont.css'
-
-export {
-  Button,
-  Card,
-  CheckBox,
-  ContentBar,
-  FoldList,
-  Form,
-  type FormItem,
-  Input,
-  Loading,
-  MenuBar,
-  Modal,
-  Select,
-  SideBar,
-  TabBar,
-  Table,
-  type ColumnConfig,
-  type SortConfig,
-  TextArea,
-  type Item,
-  type ListItem,
-  type OptionItem,
-  type DateItem,
-}
