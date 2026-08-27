@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, onUnmounted, provide, ref, watch, nextTick, computed } from 'vue'
+import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
 
 import type { OptionItem } from '@/types'
 import { type WindowManager } from '@/utils/window'

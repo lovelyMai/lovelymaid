@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import Menu, { type MenuInstance } from '../internal/Menu.vue'
+import Menu, { type MenuInstance } from './shared/Menu.vue'
 import Card from './Card.vue'
 import Loading from './Loading.vue'
 

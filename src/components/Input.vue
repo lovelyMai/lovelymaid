@@ -1,49 +1,51 @@
 <script setup lang="ts">
 import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
-import Menu, { type MenuInstance } from '../internal/Menu.vue'
 import Card from './Card.vue'
+import DateWindow, { type DateInstance } from './shared/Date.vue'
+import Menu, { type MenuInstance } from './shared/Menu.vue'
 
-import type { OptionItem } from '@/types'
+import type { OptionItem, DateItem, EnterKeyHint } from '@/types'
 import { useCssVar } from '@/utils/css-var.js'
+import { formatDate, verifyDate } from '@/utils/date'
 import { watchDOM } from '@/utils/dom'
 import { createWindowManager, type WindowManager } from '@/utils/window.js'
 
 interface Props {
+  /** 输入框类型 */
+  type?: 'text' | 'password' | 'number' | 'radio' | 'date'
   /** 输入框提示词 */
   placeholder?: string
   /** 移动端键盘回车图标 */
-  enterkeyhint?: 'enter' | 'search' | 'done' | 'go' | 'next' | 'previous' | 'send'
+  enterkeyhint?: EnterKeyHint
   /** 是否禁用 */
   disabled?: boolean
   /** 是否只读 */
   readonly?: boolean
-  /** 选项 */
+  /** 选项 (仅 type 为 radio 时有效) */
   options?: OptionItem[]
-  /** 是否启用选项过滤（输入文字时过滤选项） */
+  /** 是否启用选项过滤 (仅 type 为 radio 时有效) */
   filter?: boolean
-  /** 弹窗 z-index */
+  /** 格式化 (仅 type 为 date 时有效) */
+  format?: (date: DateItem) => string
+  /** 是否启用校验 (仅 type 为 radio 或 date 时有效) */
+  verify?: boolean
+  /** 弹窗 z-index（仅 type 为 radio 或 date 时有效）*/
   zIndex?: number
   /** 回车事件 */
   onEnter?: () => void
 }
 const props = withDefaults(defineProps<Props>(), {
+  type: 'text',
   disabled: false,
   readonly: false,
   options: () => [],
   filter: false,
+  format: ([year, month, day]: DateItem): string =>
+    `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`,
+  verify: true,
 })
-const selectedValue = defineModel<string[]>('value', { required: true })
+const inputValue = defineModel<string>('value', { required: true })
 const warning = defineModel<boolean>('warning', { default: false })
-
-// 输入框展示文本：输入时显示过滤关键词，否则显示已选中项
-const keyword = ref('')
-const showValue = computed<string>(() =>
-  menuManager.value?.visible
-    ? keyword.value
-    : selectedValue.value.length > 0
-      ? `已选择 ${selectedValue.value.length} 项`
-      : '',
-)
 
 // 初始化
 const inputContainerRef = ref<HTMLElement | null>(null)
@@ -87,33 +89,28 @@ const compositionstart = () => {
 // 菜单
 const menuRef = ref<HTMLElement | null>(null)
 const menuManager = ref<WindowManager | null>(null)
+let isSelecting: boolean = false
+let isFocused: boolean = false
 onMounted(() => {
-  if (!inputRef.value) return
+  if (!inputRef.value || props.type !== 'radio') return
   menuManager.value = createWindowManager(inputRef.value, menuRef)
+  inputRef.value.addEventListener('focus', () => {
+    isFocused = true
+  })
+  inputRef.value.addEventListener('blur', () => {
+    isFocused = false
+  })
 })
 onUnmounted(() => {
   menuManager.value?.cleanup()
 })
-const collectLeafNames = (options: OptionItem[]): string[] =>
-  options.map((option) => (option.options ? collectLeafNames(option.options) : option.name)).flat()
-const checkState = (option: OptionItem): 0 | 1 | 2 => {
-  if (!option.options) return selectedValue.value.includes(option.name) ? 2 : 0
-  const leaves = collectLeafNames(option.options)
-  const selectedCount = leaves.filter((name) => selectedValue.value.includes(name)).length
-  if (selectedCount === 0) return 0
-  return selectedCount === leaves.length ? 2 : 1
-}
 const onOptionClick = (option: OptionItem) => {
   inputRef.value?.focus()
-  const leaves = option.options ? collectLeafNames(option.options) : [option.name]
-  const leafSet = new Set(leaves)
-  selectedValue.value =
-    checkState(option) === 2
-      ? selectedValue.value.filter((name) => !leafSet.has(name))
-      : [...new Set([...selectedValue.value, ...leaves])]
+  if (option.options) return
+  isSelecting = true
+  inputValue.value = option.name
+  menuManager.value?.close()
 }
-
-// 过滤
 const filterOptions = (options: OptionItem[], keyword: string): OptionItem[] =>
   options.reduce<OptionItem[]>((acc, option) => {
     if (option.name.includes(keyword)) {
@@ -127,12 +124,38 @@ const filterOptions = (options: OptionItem[], keyword: string): OptionItem[] =>
     return acc
   }, [])
 const filteredOptions = computed<OptionItem[]>(() => {
-  const text = keyword.value.trim()
-  return text ? filterOptions(props.options, text) : props.options
+  const keyword = inputValue.value.trim()
+  return keyword ? filterOptions(props.options, keyword) : props.options
 })
 const showingOptions = computed<OptionItem[]>(() =>
   props.filter ? filteredOptions.value : props.options,
 )
+watch(showingOptions, () => {
+  if (!menuManager.value) return
+  if (isSelecting) {
+    isSelecting = false
+  } else {
+    if (!isFocused) return
+    menuManager.value.open()
+  }
+})
+
+// 日历
+const date = ref<DateItem>(formatDate(Date.now()))
+const dateRef = ref<HTMLElement | null>(null)
+const dateManager = ref<WindowManager | null>(null)
+onMounted(() => {
+  if (!inputRef.value || props.type !== 'date') return
+  dateManager.value = createWindowManager(inputRef.value, dateRef)
+})
+onUnmounted(() => {
+  dateManager.value?.cleanup()
+})
+const onDateClick = () => {
+  inputRef.value?.focus()
+  inputValue.value = props.format(date.value)
+  dateManager.value?.close()
+}
 
 // 回车
 const enter = () => {
@@ -140,35 +163,83 @@ const enter = () => {
   props.onEnter?.()
 }
 
-// Tab 补全
-const tab = () => {
-  if (!menuManager.value || !keyword.value) return
-  const leaves = collectLeafNames(filteredOptions.value)
-  selectedValue.value = [...leaves.filter((leave) => leave.includes(keyword.value))]
-}
-
 // 清空
 const clear = () => {
-  selectedValue.value = []
-  keyword.value = ''
+  inputValue.value = ''
   inputRef.value?.focus()
   menuManager.value?.open()
+  dateManager.value?.open()
 }
 
-// 选中项变化时自动清除警告
-watch(selectedValue, () => {
+// 非弹窗类时输入自动清除警告
+watch(inputValue, () => {
+  if (props.type === 'radio' || props.type === 'date') return
   warning.value = false
+})
+
+// Tab 补全
+const collectLeafNames = (options: OptionItem[]): string[] =>
+  options.map((option) => (option.options ? collectLeafNames(option.options) : option.name)).flat()
+const tab = () => {
+  if (!inputValue.value) return
+  if (props.type === 'radio') {
+    if (!menuManager.value) return
+    const leaves = collectLeafNames(filteredOptions.value)
+    if (leaves.length !== 1) return
+    isSelecting = true
+    inputValue.value = leaves[0]
+    menuManager.value.close()
+  } else if (props.type === 'date') {
+    if (!dateManager.value) return
+    const match = inputValue.value.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/)
+    if (!match) return
+    const newDate: DateItem = [Number(match[1]), Number(match[2]), Number(match[3])]
+    date.value = newDate
+    inputValue.value = props.format(newDate)
+    dateManager.value.close()
+  }
+}
+
+// 校验是否通过
+const verified = computed<boolean>(() => {
+  if (!inputValue.value || !props.verify) return true
+  if (props.type === 'radio') {
+    const isValidOption = (options: OptionItem[]): boolean =>
+      options.some(
+        (option) =>
+          option.name === inputValue.value || (!!option.options && isValidOption(option.options)),
+      )
+    return isValidOption(props.options)
+  }
+  if (props.type === 'date') {
+    const match = inputValue.value.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/)
+    if (!match) return false
+    const dateItem: DateItem = [Number(match[1]), Number(match[2]), Number(match[3])]
+    return verifyDate(dateItem) && props.format(dateItem) === inputValue.value
+  }
+  return true
+})
+watch(inputValue, () => {
+  if (props.type !== 'radio' && props.type !== 'date') return
+  if (verified.value) {
+    warning.value = false
+  } else {
+    warning.value = true
+  }
 })
 
 // 暴露
 defineExpose({
+  verification: verified,
   focus: () => {
     inputRef.value?.focus()
     menuManager.value?.open()
+    dateManager.value?.open()
   },
   blur: () => {
     inputRef.value?.blur()
     menuManager.value?.close()
+    dateManager.value?.close()
   },
   select: () => inputRef.value?.select(),
 })
@@ -177,7 +248,7 @@ defineExpose({
 <template>
   <Card
     :class="$style.inputContainer"
-    :ref="(el) => (inputContainerRef = (el as InstanceType<typeof Card> | null)?.$el ?? null)"
+    :ref="(ins) => (inputContainerRef = (ins as InstanceType<typeof Card> | null)?.$el ?? null)"
   >
     <div :class="[$style.icon, $style.custom]" v-if="$slots.default">
       <slot></slot>
@@ -186,10 +257,13 @@ defineExpose({
       :class="$style.input"
       ref="inputRef"
       :style="{ outline: warning ? '3px solid var(--lovelymai-color-red-200)' : '' }"
-      type="text"
-      :value="showValue"
-      @input="(e) => (keyword = (e.target as HTMLInputElement).value)"
-      :placeholder="props.placeholder ?? '选择...'"
+      :type="props.type === 'radio' || props.type === 'date' ? 'text' : props.type"
+      :value="inputValue"
+      @input="(e) => (inputValue = (e.target as HTMLInputElement).value)"
+      :placeholder="
+        props.placeholder ??
+        (props.type === 'radio' || props.type === 'date' ? '选择...' : '输入...')
+      "
       :enterkeyhint="props.enterkeyhint"
       :disabled="props.disabled"
       :readonly="props.readonly"
@@ -201,23 +275,29 @@ defineExpose({
     <div :class="[$style.icon, $style.clear]">
       <span
         class="lovelymai lovely-clear"
-        v-show="!props.disabled && selectedValue.length > 0"
+        v-show="!props.disabled && inputValue"
         @mouseup.stop="() => clear()"
       ></span>
     </div>
     <Menu
       :ref="(ins) => (menuRef = (ins as MenuInstance | null)?.root ?? null)"
+      v-if="props.type === 'radio'"
       :visible="menuManager?.visible ?? false"
       :position="menuManager?.position ?? [0, 0]"
       :options="showingOptions"
       :min-width="style.inputContainer.width + 'px'"
       :z-index="props.zIndex"
       :on-option-click="onOptionClick"
-      v-slot="{ item }"
-    >
-      <span class="lovelymai lovely-horizontal" v-if="checkState(item) === 1"></span>
-      <span class="lovelymai lovely-check" v-else-if="checkState(item) === 2"></span>
-    </Menu>
+    />
+    <DateWindow
+      :ref="(ins) => (dateRef = (ins as DateInstance | null)?.root ?? null)"
+      v-if="props.type === 'date'"
+      :visible="dateManager?.visible ?? false"
+      :position="dateManager?.position ?? [0, 0]"
+      v-model:date="date"
+      :z-index="props.zIndex"
+      :on-date-click="onDateClick"
+    />
   </Card>
 </template>
 
@@ -230,8 +310,6 @@ defineExpose({
   --font-size: 14px;
   --font-weight: 400;
   --line-height: 18px;
-  --clear-color: var(--lovelymai-color-gray-300);
-  --placeholder-color: var(--lovelymai-color-gray-400);
 }
 
 .icon {
@@ -274,23 +352,22 @@ defineExpose({
 }
 
 .input::placeholder {
-  color: var(--placeholder-color);
+  color: var(--lovelymai-color-gray-400);
 }
 
 .input:focus {
   outline: 3px solid var(--lovelymai-color-blue-100);
 }
+
+.input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
 </style>
 <style scoped>
 .lovely-clear {
   font-size: calc(var(--input-height) * 0.5px);
-  color: var(--clear-color);
+  color: var(--lovelymai-color-gray-300);
   cursor: pointer;
   pointer-events: auto;
-}
-
-.lovely-horizontal,
-.lovely-check {
-  font-size: 16px;
 }
 </style>

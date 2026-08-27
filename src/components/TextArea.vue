@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, reactive, ref, useSlots, watch } from 'vue'
-import File from '../internal/File.vue'
+import File from './shared/File.vue'
 import Card from './Card.vue'
 
 import type { EnterKeyHint, FileItem } from '@/types'

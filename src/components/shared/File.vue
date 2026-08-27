@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onUnmounted } from 'vue'
-import Card from '../external/Card.vue'
-import Loading from '../external/Loading.vue'
 
 import docxIcon from '@/assets/imgs/docx.svg'
 import pdfIcon from '@/assets/imgs/pdf.svg'
 import textIcon from '@/assets/imgs/text.svg'
 import { formatFileSize } from '@/utils/file'
+import Card from '../Card.vue'
+import Loading from '../Loading.vue'
 
 interface Props {
   /** 文件 */
