@@ -4,8 +4,8 @@
   "description": "一个基于 Vue 3, 模仿 iOS 26 风格的组件库",
   "keywords": ["components","ios26","lovelymaid","vue3"],
   "license": "MIT",
-  "files": ["dist"],
   "type": "module",
+  "files": ["dist"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
