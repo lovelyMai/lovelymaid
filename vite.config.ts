@@ -10,6 +10,7 @@ export default defineConfig({
         {
           src: 'src/assets/icons/iconfont.ttf',
           dest: 'assets/icons',
+          rename: { stripBase: 3 },
         },
       ],
     }),

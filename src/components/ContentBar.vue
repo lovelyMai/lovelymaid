@@ -4,10 +4,10 @@ import Button from './Button.vue'
 import Card from './Card.vue'
 import Loading from './Loading.vue'
 
-import { useCssVar } from '@/utils/css-var.js'
+import { useCssVar } from '@/utils/css-var'
 import { watchDOM } from '@/utils/dom'
 import { debounce } from '@/utils/function'
-import { getLayoutLeft } from '@/utils/layout-offset.js'
+import { getLayoutLeft } from '@/utils/layout-offset'
 
 interface Props {
   /** 是否显示 */

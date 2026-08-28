@@ -306,19 +306,20 @@ async function compileTsDeclarations() {
 
   const tsFiles = await scanTsFiles(srcDir)
 
-  // 1. 收集所有从 .vue 具名导入的类型名
+  // 1. 收集所有从 .vue 具名导入/重导出的类型名
   const vueNamedImports = new Set()
-  const importRe = /import\s*(?:[\w$]+\s*,\s*)?\{([^}]+)\}\s*from\s*['"][^'"]+\.vue['"]/g
+  const vueModuleRe =
+    /(?:import|export)\s*(?:[\w$]+\s*,\s*)?\{([^}]+)\}\s*from\s*['"][^'"]+\.vue['"]/g
   for (const file of tsFiles) {
     const src = await readFile(file, 'utf-8')
     let m
-    while ((m = importRe.exec(src)) !== null) {
+    while ((m = vueModuleRe.exec(src)) !== null) {
       for (const name of m[1].split(',')) {
         const clean = name
           .trim()
           .replace(/^type\s+/, '')
           .split(/\s+as\s+/)[0]
-        if (clean) vueNamedImports.add(clean)
+        if (clean && clean !== 'default') vueNamedImports.add(clean)
       }
     }
   }

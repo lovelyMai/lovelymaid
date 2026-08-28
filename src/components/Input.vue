@@ -5,10 +5,10 @@ import DateWindow, { type DateInstance } from './shared/Date.vue'
 import Menu, { type MenuInstance } from './shared/Menu.vue'
 
 import type { OptionItem, DateItem, EnterKeyHint } from '@/types'
-import { useCssVar } from '@/utils/css-var.js'
+import { useCssVar } from '@/utils/css-var'
 import { formatDate, verifyDate } from '@/utils/date'
 import { watchDOM } from '@/utils/dom'
-import { createWindowManager, type WindowManager } from '@/utils/window.js'
+import { createWindowManager, type WindowManager } from '@/utils/window'
 
 interface Props {
   /** 输入框类型 */

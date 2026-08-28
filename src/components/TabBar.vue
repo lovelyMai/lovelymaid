@@ -5,10 +5,10 @@ import Card from './Card.vue'
 import Input from './Input.vue'
 
 import type { Item } from '@/types'
-import { useCssVar } from '@/utils/css-var.js'
+import { useCssVar } from '@/utils/css-var'
 import { watchDOM } from '@/utils/dom'
 import { clearTimer, throttle } from '@/utils/function'
-import { getLayoutLeft } from '@/utils/layout-offset.js'
+import { getLayoutLeft } from '@/utils/layout-offset'
 
 interface Props {
   /** 标签 */

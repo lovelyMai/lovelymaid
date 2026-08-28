@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import Card from './Card.vue'
 
 import type { Item } from '@/types'
-import { useCssVar } from '@/utils/css-var.js'
+import { useCssVar } from '@/utils/css-var'
 import { watchDOM } from '@/utils/dom'
 
 type MenuItem = Item & {
