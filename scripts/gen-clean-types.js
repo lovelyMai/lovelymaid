@@ -336,13 +336,7 @@ ${[...vueNamedImports].map((n) => `  export type ${n} = any`).join('\n')}
   await writeFile(shimPath, shim, 'utf-8')
 
   // 3. 编译并 emit 到 dist
-  const program = ts.createProgram([...tsFiles, shimPath], {
-    ...parsed.options,
-    declaration: true,
-    emitDeclarationOnly: true,
-    noEmit: false,
-    outDir: distDir,
-  })
+  const program = ts.createProgram([...tsFiles, shimPath], parsed.options)
 
   const diags = ts.getPreEmitDiagnostics(program)
   const errors = diags.filter((d) => d.category === ts.DiagnosticCategory.Error)
