@@ -1,13 +1,17 @@
 {
   "name": "lovelymaid",
-  "version": "1.7.8",
+  "version": "1.8.0",
   "description": "一个基于 Vue 3, 模仿 iOS 26 风格的组件库",
   "keywords": ["components","ios26","lovelymaid","vue3"],
   "license": "MIT",
   "files": ["dist"],
   "type": "module",
-  "module": "dist/lovelymaid.js",
-  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/lovelymaid.js"
+    }
+  },
   "scripts": {
     "start": "vite",
     "build": "vite build && node scripts/gen-clean-types.js"
