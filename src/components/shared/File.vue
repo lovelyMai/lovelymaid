@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onUnmounted } from 'vue'
+import Card from '../Card.vue'
+import Loading from '../Loading.vue'
 
 import docxIcon from '@/assets/imgs/docx.svg'
 import pdfIcon from '@/assets/imgs/pdf.svg'
 import textIcon from '@/assets/imgs/text.svg'
 import { formatFileSize } from '@/utils/file'
-import Card from '../Card.vue'
-import Loading from '../Loading.vue'
 
 interface Props {
   /** 文件 */
@@ -84,8 +84,16 @@ const openFile = () => {
   transition: opacity 0.2s;
 }
 
-.fileContainer:hover :global(.lovely-clear) {
-  opacity: 1;
+@media (hover: none) {
+  .fileContainer :global(.lovely-clear) {
+    opacity: 1;
+  }
+}
+
+@media (hover: hover) {
+  .fileContainer:hover :global(.lovely-clear) {
+    opacity: 1;
+  }
 }
 
 .fileContainer .img {
