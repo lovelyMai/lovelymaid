@@ -32,7 +32,9 @@ const props = withDefaults(defineProps<Props>(), {
   options: () => [],
   filter: false,
 })
+/** 值 */
 const selectedValue = defineModel<string[]>('value', { required: true })
+/** 警告 */
 const warning = defineModel<boolean>('warning', { default: false })
 
 // 输入框展示文本：输入时显示过滤关键词，否则显示已选中项

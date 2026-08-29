@@ -9,6 +9,7 @@ interface Props {
   lists: [ListItem[], ListItem[]]
 }
 const props = defineProps<Props>()
+/** 激活项 */
 const activeIds = defineModel<[string | number, string | number]>('active-ids')
 watch(
   () => props.lists,

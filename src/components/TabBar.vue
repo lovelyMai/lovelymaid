@@ -23,7 +23,9 @@ interface Props {
   onSearch?: () => void
 }
 const props = defineProps<Props>()
+/** 激活项 id */
 const activeId = defineModel<string | number>('active-id', { required: true })
+/** 搜索值（仅 showSearch 为 true 时有效） */
 const inputValue = defineModel<string>('value', { default: '' })
 
 // 初始化

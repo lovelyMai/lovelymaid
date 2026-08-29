@@ -36,6 +36,7 @@ interface Props {
   itemHeight?: string
 }
 const props = defineProps<Props>()
+/** 表单项 */
 const items = defineModel<FormItem[]>('items', { required: true })
 
 // 回车聚焦下一个输入框

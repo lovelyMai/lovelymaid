@@ -31,7 +31,9 @@ const props = withDefaults(defineProps<Props>(), {
   pasteFile: false,
   filterFile: (files: File[]) => files,
 })
+/** 值 */
 const inputValue = defineModel<string>('value', { required: true })
+/** 文件 */
 const files = defineModel<FileItem[]>('files', { default: [] })
 
 // 初始化

@@ -44,7 +44,9 @@ const props = withDefaults(defineProps<Props>(), {
     `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`,
   verify: true,
 })
+/** 值 */
 const inputValue = defineModel<string>('value', { required: true })
+/** 警告 */
 const warning = defineModel<boolean>('warning', { default: false })
 
 // 初始化

@@ -19,6 +19,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   visible: true,
 })
+/** 是否展开 */
 const isOpen = defineModel<boolean>('open', { required: true })
 
 // 初始化

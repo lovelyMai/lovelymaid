@@ -19,6 +19,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   zIndex: 0,
 })
+/** 日期 */
 const date = defineModel<DateItem>('date', { default: () => formatDate(Date.now()) })
 
 // 初始化

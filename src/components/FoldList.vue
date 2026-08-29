@@ -19,7 +19,9 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   title: '标题',
 })
+/** 是否展开 */
 const isOpen = defineModel<boolean>('open', { required: true })
+/** 激活项 id */
 const activeId = defineModel<string | number>('active-id')
 
 // 初始化

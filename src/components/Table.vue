@@ -31,7 +31,9 @@ interface Props {
   loading?: boolean
 }
 const props = defineProps<Props>()
+/** 排序 */
 const sort = defineModel<SortConfig>('sort')
+/** 激活项 id */
 const activeIds = defineModel<Set<string | number>>('active-ids', { default: () => new Set() })
 
 // 表头排序

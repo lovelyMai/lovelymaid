@@ -19,6 +19,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   zIndex: 0,
 })
+/** 是否显示 */
 const visible = defineModel<boolean>('visible', { required: true })
 
 // 初始化
