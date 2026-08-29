@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 
-import { debounce } from '@/utils/function'
-import { ListItem } from '@/types'
+import { ListItem } from '@/modules/types'
+import { debounce } from '@/modules/utils/function'
 
 interface Props {
   /** 列表 */

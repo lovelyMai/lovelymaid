@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 
-import { useCssVar } from '@/utils/css-var'
+import { useCssVar } from '@/modules/utils/css-var'
 
 import ContentBar from './modules/ContentBar.vue'
 

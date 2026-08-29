@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, reactive, ref, useSlots, watch } from 'vue'
 
-import { useCssVar } from '@/utils/css-var'
-import { watchDOM } from '@/utils/dom'
-import { readDirectoryEntries } from '@/utils/file'
-import type { EnterKeyHint, FileItem } from '@/types'
+import type { FileItem } from './types/file'
+import type { EnterKeyHint } from './types/input'
+import { useCssVar } from '@/modules/utils/css-var'
+import { watchDOM } from '@/modules/utils/dom'
+import { readDirectoryEntries } from '@/modules/utils/file'
 
 import Card from './modules/Card'
 import File from './modules/File.vue'

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
-import { useCssVar } from '@/utils/css-var'
-import { watchDOM } from '@/utils/dom'
-import { clearTimer, throttle } from '@/utils/function'
-import { getLayoutLeft } from '@/utils/layout-offset'
-import type { Item } from '@/types'
+import type { Item } from './types'
+import { useCssVar } from './utils/css-var'
+import { watchDOM } from './utils/dom'
+import { clearTimer, throttle } from './utils/function'
+import { getLayoutLeft } from './utils/layout-offset'
 
 import Button from './modules/Button'
 import Card from './modules/Card'

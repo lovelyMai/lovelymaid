@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
 
-import { useCssVar } from '@/utils/css-var'
-import { formatDate, verifyDate } from '@/utils/date'
-import { watchDOM } from '@/utils/dom'
-import { createWindowManager, type WindowManager } from '@/utils/window'
-import type { OptionItem, DateItem, EnterKeyHint } from '@/types'
+import type { EnterKeyHint } from './types/input'
+import type { OptionItem, DateItem } from '@/modules/types'
+import { useCssVar } from '@/modules/utils/css-var'
+import { formatDate, verifyDate } from '@/modules/utils/date'
+import { watchDOM } from '@/modules/utils/dom'
+import { createWindowManager, type WindowManager } from '@/modules/utils/window'
 
 import Card from './modules/Card'
 import DateWindow, { type DateInstance } from './modules/Date.vue'

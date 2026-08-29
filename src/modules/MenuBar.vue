@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
 
-import { useCssVar } from '@/utils/css-var'
-import { watchDOM } from '@/utils/dom'
-import type { Item } from '@/types'
+import type { Item } from './types'
+import { useCssVar } from '@/modules/utils/css-var'
+import { watchDOM } from '@/modules/utils/dom'
 
 import Card from './modules/Card'
 

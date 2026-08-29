@@ -30,8 +30,8 @@ const distDir = join(rootDir, 'dist')
 const componentsSrcDir = join(srcDir, 'modules')
 const componentsDistDir = join(distDir, 'modules')
 
-// types 公共类型名（启动时从源码动态提取）
-let sharedTypeNames = []
+// 共享类型名 → 所在 types 目录（启动时从源码动态提取）
+let sharedTypeMap = new Map()
 
 const checker = createChecker(join(rootDir, 'tsconfig.build.json'), { schema: false })
 
@@ -79,51 +79,57 @@ function separateDeclarations(text) {
   return text.replace(/\n(?!\n)(?=export )/g, '\n\n')
 }
 
-/** 从 src/types(.ts | /) 源码递归提取所有导出的类型名（兼容单文件与目录） */
-async function extractSharedTypeNames() {
-  const names = new Set()
-  const re = /^export type (\w+)/gm
-  const scanFile = async (file) => {
+/** 递归扫描 src/modules 下所有 types/ 目录，提取导出的类型名 → 来源目录映射 */
+async function extractSharedTypeMap() {
+  const typeRe = /^export type (\w+)/gm
+  const interfaceRe = /^export interface (\w+)/gm
+  const scanFile = async (file, typesDir) => {
     const src = await readFile(file, 'utf-8')
-    let m
-    while ((m = re.exec(src)) !== null) names.add(m[1])
-  }
-
-  // 目录形态：src/types/
-  const dirPath = join(srcDir, 'types')
-  try {
-    if ((await stat(dirPath)).isDirectory()) {
-      const scan = async (dir) => {
-        for (const entry of await readdir(dir, { withFileTypes: true })) {
-          const full = join(dir, entry.name)
-          if (entry.isDirectory()) await scan(full)
-          else if (entry.name.endsWith('.ts')) await scanFile(full)
-        }
-      }
-      await scan(dirPath)
-      return [...names]
+    for (const re of [typeRe, interfaceRe]) {
+      let m
+      re.lastIndex = 0
+      while ((m = re.exec(src)) !== null) sharedTypeMap.set(m[1], typesDir)
     }
-  } catch {
-    /* 目录不存在，回退单文件 */
   }
-
-  // 单文件形态：src/types.ts
-  await scanFile(join(srcDir, 'types.ts'))
-  return [...names]
+  const findTypesDirs = async (dir) => {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name)
+      if (entry.isDirectory()) {
+        if (entry.name === 'types') {
+          for (const f of await readdir(full)) {
+            if (f.endsWith('.ts') || f.endsWith('.d.ts')) await scanFile(join(full, f), full)
+          }
+        }
+        await findTypesDirs(full)
+      }
+    }
+  }
+  await findTypesDirs(srcDir)
 }
 
-/** 收集类型文本中出现的共享类型名，生成 import 语句（统一指向 dist/types，tsc 会生成该文件） */
+/** 收集类型文本中出现的共享类型名，按来源生成 import 语句 */
 function collectSharedImports(texts, outPath) {
-  if (sharedTypeNames.length === 0) return []
+  const names = [...sharedTypeMap.keys()]
+  if (names.length === 0) return []
   const used = new Set()
-  const re = new RegExp(`\\b(${sharedTypeNames.join('|')})\\b`, 'g')
+  const re = new RegExp(`\\b(${names.join('|')})\\b`, 'g')
   for (const text of texts) {
     let m
     while ((m = re.exec(text)) !== null) used.add(m[1])
   }
   if (used.size === 0) return []
-  const rel = relative(dirname(outPath), join(distDir, 'types')).replace(/\\/g, '/')
-  return [`import type { ${[...used].join(', ')} } from '${rel}'`]
+  const importsByPath = new Map()
+  for (const name of used) {
+    const typesDir = sharedTypeMap.get(name)
+    if (!typesDir) continue
+    const distTypesDir = join(distDir, relative(srcDir, typesDir))
+    const rel = relative(dirname(outPath), distTypesDir).replace(/\\\\/g, '/')
+    if (!importsByPath.has(rel)) importsByPath.set(rel, [])
+    importsByPath.get(rel).push(name)
+  }
+  return [...importsByPath.entries()].map(
+    ([path, names]) => `import type { ${names.join(', ')} } from '${path}'`,
+  )
 }
 
 /** 从 <script setup> 提取顶层 type/interface 声明（含 JSDoc，保留 export 关键字）。
@@ -373,7 +379,7 @@ ${[...vueNamedImports].map((n) => `  export type ${n} = any`).join('\n')}
 
 async function main() {
   // 动态提取公共类型名（供组件渲染推导 import 用）
-  sharedTypeNames = await extractSharedTypeNames()
+  await extractSharedTypeMap()
 
   // 清理旧的脚本产物：
   //   - dist 下的类型声明目录：凡是含 .d.ts 的子目录整目录删除（避免残留空目录/旧目录）

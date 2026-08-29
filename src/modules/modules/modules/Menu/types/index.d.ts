@@ -1,4 +1,4 @@
-import type { OptionItem } from '@/types'
+import type { OptionItem } from '@/modules/types'
 
 export interface Props {
   /** 是否显示 */

@@ -8,9 +8,9 @@
       "value-external",
       "type-external",
       { "newlinesBetween": true },
+      "types",
       "utils",
       "assets",
-      "types",
       "services",
       { "newlinesBetween": true },
       "modules",
@@ -19,16 +19,16 @@
     ],
     "customGroups": [
       {
+        "groupName": "types",
+        "elementNamePattern": ["**/types", "**/types/**"]
+      },
+      {
         "groupName": "utils",
         "elementNamePattern": ["**/utils", "**/utils/**"]
       },
       {
         "groupName": "assets",
         "elementNamePattern": ["**/assets", "**/assets/**"]
-      },
-      {
-        "groupName": "types",
-        "elementNamePattern": ["**/types", "**/types/**"]
       },
       {
         "groupName": "services",

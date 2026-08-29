@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 
-import { createWindowManager, type WindowManager } from '@/utils/window'
-import type { OptionItem } from '@/types'
+import type { OptionItem } from './types'
+import { createWindowManager, type WindowManager } from '@/modules/utils/window'
 
 import Menu, { type MenuInstance } from './modules/Menu'
 

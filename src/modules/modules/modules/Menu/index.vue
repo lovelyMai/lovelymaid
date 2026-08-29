@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
 
-import type { WindowManager } from '@/utils/window'
 import type { MenuInstance, Props } from './types'
-import type { OptionItem } from '@/types'
+import type { OptionItem } from '@/modules/types'
+import type { WindowManager } from '@/modules/utils/window'
 import { createSubMenuManager } from './services/menu'
 
 import Menu from './index.vue'

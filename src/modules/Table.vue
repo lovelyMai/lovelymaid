@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-import { createActivationManager, type ActivationManager } from '@/utils/activation'
-import { createWindowManager, type WindowManager } from '@/utils/window'
-import type { Item } from '@/types'
+import type { Item } from './types'
+import { createActivationManager, type ActivationManager } from '@/modules/utils/activation'
+import { createWindowManager, type WindowManager } from '@/modules/utils/window'
 
 import Card from './modules/Card'
 import Loading from './modules/Loading'

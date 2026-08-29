@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
 
-import { useCssVar } from '@/utils/css-var'
-import { watchDOM } from '@/utils/dom'
-import { createWindowManager, type WindowManager } from '@/utils/window'
-import type { OptionItem } from '@/types'
+import type { OptionItem } from '@/modules/types'
+import { useCssVar } from '@/modules/utils/css-var'
+import { watchDOM } from '@/modules/utils/dom'
+import { createWindowManager, type WindowManager } from '@/modules/utils/window'
 
 import Card from './modules/Card'
 import Menu, { type MenuInstance } from './modules/Menu/index.vue'

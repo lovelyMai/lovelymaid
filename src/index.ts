@@ -1,5 +1,3 @@
-export type { Item, ListItem, OptionItem, DateItem } from './types'
-
 import '@/assets/styles/reset.css'
 import '@/assets/styles/main.css'
 import '@/assets/icons/iconfont.css'

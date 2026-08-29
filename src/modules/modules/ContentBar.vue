@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
 
-import { useCssVar } from '@/utils/css-var'
-import { watchDOM } from '@/utils/dom'
-import { debounce } from '@/utils/function'
-import { getLayoutLeft } from '@/utils/layout-offset'
+import { useCssVar } from '@/modules/utils/css-var'
+import { watchDOM } from '@/modules/utils/dom'
+import { debounce } from '@/modules/utils/function'
+import { getLayoutLeft } from '@/modules/utils/layout-offset'
 
 import Button from './modules/Button.vue'
 import Card from './modules/Card'

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-import { formatDate } from '@/utils/date'
-import type { ListItem, DateItem } from '@/types/index'
+import type { ListItem, DateItem } from '@/modules/types/index'
+import { formatDate } from '@/modules/utils/date'
 
 import Card from './modules/Card.vue'
 import Scroll from './modules/Scroll.vue'

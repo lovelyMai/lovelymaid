@@ -1,6 +1,6 @@
 import { nextTick, reactive, ref, type Ref } from 'vue'
 
-import { getViewLeft, getViewTop } from '@/utils/view-offset'
+import { getViewLeft, getViewTop } from './modules/view-offset'
 
 export type WindowManager = {
   readonly visible: boolean

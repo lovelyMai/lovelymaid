@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted } from 'vue'
 
-import { formatFileSize } from '@/utils/file'
+import { formatFileSize } from '@/modules/utils/file'
 import docxIcon from '@/assets/imgs/docx.svg'
 import pdfIcon from '@/assets/imgs/pdf.svg'
 import textIcon from '@/assets/imgs/text.svg'
