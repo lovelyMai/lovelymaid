@@ -1,3 +1,3 @@
-import Card from "./modules/Card";
+import Card from './modules/Card'
 
 export default Card
