@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
-import Button from './Button.vue'
-import Card from './Card.vue'
-import Input from './Input.vue'
 
-import type { Item } from '@/types'
 import { useCssVar } from '@/utils/css-var'
 import { watchDOM } from '@/utils/dom'
 import { clearTimer, throttle } from '@/utils/function'
 import { getLayoutLeft } from '@/utils/layout-offset'
+import type { Item } from '@/types'
+
+import Button from './modules/Button'
+import Card from './modules/Card'
+import Input from './modules/Input.vue'
 
 interface Props {
   /** 标签 */

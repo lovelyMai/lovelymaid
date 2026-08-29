@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import Card from './Card.vue'
-import Loading from './Loading.vue'
-import Menu, { type MenuInstance } from './shared/Menu.vue'
 
-import type { Item } from '@/types'
 import { createActivationManager, type ActivationManager } from '@/utils/activation'
 import { createWindowManager, type WindowManager } from '@/utils/window'
+import type { Item } from '@/types'
+
+import Card from './modules/Card'
+import Loading from './modules/Loading'
+import Menu, { type MenuInstance } from './modules/Menu'
 
 export type ColumnConfig = {
   id: string | number

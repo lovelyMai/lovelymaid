@@ -1,24 +1,13 @@
 <script setup lang="ts">
 import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
 
+import type { WindowManager } from '@/utils/window'
+import type { MenuInstance, Props } from './types'
 import type { OptionItem } from '@/types'
-import { type WindowManager } from '@/utils/window'
-import { createSubMenuManager } from '@/services/menu'
+import { createSubMenuManager } from './services/menu'
 
-interface Props {
-  /** 是否显示 */
-  visible: boolean
-  /** 位置 */
-  position: [number, number]
-  /** 最小宽度 */
-  minWidth?: string
-  /** z-index */
-  zIndex?: number
-  /** 选项 */
-  options: OptionItem[]
-  /** 选项点击事件 */
-  onOptionClick?: (option: OptionItem, index: number) => void
-}
+import Menu from './index.vue'
+
 const props = withDefaults(defineProps<Props>(), {
   zIndex: 0,
 })
@@ -71,10 +60,7 @@ onUnmounted(() => {
 })
 
 // 暴露菜单
-export type MenuInstance = {
-  root: HTMLElement | null
-  props: Props
-}
+export type { MenuInstance }
 defineExpose<MenuInstance>({
   get root() {
     return menuRef.value

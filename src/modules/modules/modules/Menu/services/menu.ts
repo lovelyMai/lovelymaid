@@ -1,8 +1,8 @@
 import { reactive, ref } from 'vue'
-import { type MenuInstance } from '@/components/internal/Menu.vue'
 
-import { type WindowManager } from '../utils/window'
 import { watchDOM } from '@/utils/dom'
+import type { WindowManager } from '@/utils/window'
+import type { MenuInstance } from '../types'
 
 export const createSubMenuManager = (
   triggerEl: HTMLElement,

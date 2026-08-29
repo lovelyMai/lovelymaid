@@ -17,4 +17,3 @@ export function watchDOM(
 
   return () => observer.disconnect()
 }
-

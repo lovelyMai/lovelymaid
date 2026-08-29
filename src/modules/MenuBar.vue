@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
-import Card from './Card.vue'
 
-import type { Item } from '@/types'
 import { useCssVar } from '@/utils/css-var'
 import { watchDOM } from '@/utils/dom'
+import type { Item } from '@/types'
+
+import Card from './modules/Card'
 
 type MenuItem = Item & {
   /** 是否禁用 */

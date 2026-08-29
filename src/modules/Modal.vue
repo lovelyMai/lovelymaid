@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import ContentBar from './ContentBar.vue'
 
 import { useCssVar } from '@/utils/css-var'
+
+import ContentBar from './modules/ContentBar.vue'
 
 interface Props {
   /** 宽 */

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
-import Card from './Card.vue'
-import Menu, { type MenuInstance } from './shared/Menu.vue'
 
-import type { OptionItem } from '@/types'
 import { useCssVar } from '@/utils/css-var'
 import { watchDOM } from '@/utils/dom'
 import { createWindowManager, type WindowManager } from '@/utils/window'
+import type { OptionItem } from '@/types'
+
+import Card from './modules/Card'
+import Menu, { type MenuInstance } from './modules/Menu/index.vue'
 
 interface Props {
   /** 输入框提示词 */

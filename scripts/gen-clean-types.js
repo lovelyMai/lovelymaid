@@ -10,7 +10,7 @@ import { writeFileSync, readFileSync, mkdirSync } from 'node:fs'
  *   node scripts/gen-clean-types.js
  *
  * 生成内容（结构镜像 src）：
- *   dist/components/…/*.vue.d.ts    组件类型（vue-component-meta 渲染）
+ *   dist/modules/…/*.vue.d.ts       组件类型（vue-component-meta 渲染）
  *   dist/types(.d.ts | /)           公共类型（tsc 编译）
  *   dist/utils/、dist/services/…    工具/服务类型（tsc 编译）
  *   dist/index.d.ts                 入口类型（tsc 编译 + 移除 CSS import）
@@ -27,8 +27,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = join(__dirname, '..')
 const srcDir = join(rootDir, 'src')
 const distDir = join(rootDir, 'dist')
-const componentsSrcDir = join(srcDir, 'components')
-const componentsDistDir = join(distDir, 'components')
+const componentsSrcDir = join(srcDir, 'modules')
+const componentsDistDir = join(distDir, 'modules')
 
 // types 公共类型名（启动时从源码动态提取）
 let sharedTypeNames = []

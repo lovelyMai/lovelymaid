@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import CheckBox from './CheckBox.vue'
-import Input from './Input.vue'
-import TextArea from './TextArea.vue'
 
 import type { DateItem, OptionItem } from '@/types'
+
+import CheckBox from './modules/CheckBox.vue'
+import Input from './modules/Input.vue'
+import TextArea from './modules/TextArea.vue'
 
 export type FormItem = {
   id: string | number

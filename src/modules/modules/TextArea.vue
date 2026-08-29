@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, reactive, ref, useSlots, watch } from 'vue'
-import Card from './Card.vue'
-import File from './shared/File.vue'
 
-import type { EnterKeyHint, FileItem } from '@/types'
 import { useCssVar } from '@/utils/css-var'
 import { watchDOM } from '@/utils/dom'
 import { readDirectoryEntries } from '@/utils/file'
+import type { EnterKeyHint, FileItem } from '@/types'
+
+import Card from './modules/Card'
+import File from './modules/File.vue'
 
 interface Props {
   /** 最小行数 */

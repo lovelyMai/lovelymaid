@@ -6,46 +6,37 @@
     "groups": [
       "value-builtin",
       "value-external",
-      "components",
+      "type-external",
       { "newlinesBetween": true },
-      "type-import",
-      "assets",
       "utils",
-      "apis",
-      "stores",
+      "assets",
+      "types",
       "services",
+      { "newlinesBetween": true },
+      "modules",
+      { "newlinesBetween": true },
       "unknown"
     ],
     "customGroups": [
       {
-        "groupName": "components",
-        "elementNamePattern": ["**/*.vue", "@/components/**", "@/modules/**", "./src", "../src"],
-        "modifiers": ["value"]
+        "groupName": "utils",
+        "elementNamePattern": ["**/utils", "**/utils/**"]
       },
       {
         "groupName": "assets",
-        "elementNamePattern": ["@/assets/**", "**/assets/**"],
-        "modifiers": ["value"]
+        "elementNamePattern": ["**/assets", "**/assets/**"]
       },
       {
-        "groupName": "utils",
-        "elementNamePattern": ["@/utils/**", "**/utils/**"],
-        "modifiers": ["value"]
-      },
-      {
-        "groupName": "apis",
-        "elementNamePattern": ["@/apis/**", "**/apis/**"],
-        "modifiers": ["value"]
-      },
-      {
-        "groupName": "stores",
-        "elementNamePattern": ["@/stores/**", "**/stores/**"],
-        "modifiers": ["value"]
+        "groupName": "types",
+        "elementNamePattern": ["**/types", "**/types/**"]
       },
       {
         "groupName": "services",
-        "elementNamePattern": ["@/services/**", "**/services/**"],
-        "modifiers": ["value"]
+        "elementNamePattern": ["**/services", "**/services/**"]
+      },
+      {
+        "groupName": "modules",
+        "elementNamePattern": ["**/modules", "**/modules/**"]
       }
     ]
   }
