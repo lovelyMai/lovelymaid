@@ -8,6 +8,7 @@
     "emitDeclarationOnly": true,
     "strict": true,
     "types": ["vue"],
+    "skipLibCheck": true,
     "rootDir": "./src",
     "outDir": "./dist",
     "paths": {
