@@ -5,7 +5,7 @@
 在你的主入口文件（通常是 `main.js` 或 `main.ts`）**最顶部**添加以下导入语句：
 
 ```javascript
-import 'lovelymaid/dist/lovelymaid.css'
+import 'lovelymaid/style.css'
 ```
 
 **重要提示：** 确保此导入语句位于项目中**所有其他样式导入之前**。这样你的自定义样式才能覆盖组件库的默认样式。
@@ -14,7 +14,7 @@ import 'lovelymaid/dist/lovelymaid.css'
 
 ```javascript
 // main.js 或 main.ts
-import 'lovelymaid/dist/lovelymaid.css' // ← 必须放在最前面！
+import 'lovelymaid/style.css'
 import './your-own-styles.css'
 import { createApp } from 'vue'
 import App from './App.vue'

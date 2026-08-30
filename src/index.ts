@@ -17,3 +17,5 @@ export { default as SideBar } from './modules/SideBar.vue'
 export { default as TabBar } from './modules/TabBar.vue'
 export { default as Table, type ColumnConfig, type SortConfig } from './modules/Table.vue'
 export { default as TextArea } from './modules/TextArea'
+
+import './side-effects'

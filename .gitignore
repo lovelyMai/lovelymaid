@@ -4,8 +4,3 @@
 # 项目
 node_modules
 dist
-
-# 测试
-App.vue
-main.ts
-index.html
