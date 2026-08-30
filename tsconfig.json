@@ -4,6 +4,7 @@
     "lib": ["ES2020", "DOM"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "noEmit": true,
     "strict": true,
     "types": ["vue"],
     "paths": {

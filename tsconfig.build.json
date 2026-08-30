@@ -4,11 +4,11 @@
     "lib": ["ES2020", "DOM"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "declaration": true,
+    "emitDeclarationOnly": true,
     "strict": true,
     "types": ["vue"],
     "rootDir": "./src",
-    "declaration": true,
-    "emitDeclarationOnly": true,
     "outDir": "./dist",
     "paths": {
       "@/*": ["./src/*"]
