@@ -338,6 +338,7 @@ async function compileTsDeclarations() {
   export default component
 ${[...vueNamedImports].map((n) => `  export type ${n} = any`).join('\n')}
 }
+declare module '*.css' {}
 `
   await writeFile(shimPath, shim, 'utf-8')
 
