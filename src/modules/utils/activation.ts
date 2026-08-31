@@ -1,6 +1,6 @@
 import { reactive, ref, watch, type Ref } from 'vue'
 
-import type { Item } from '@/modules/types'
+import type { Item } from '@/modules/types/item'
 
 export type ActivationManager = {
   activeIndexes: Set<number>

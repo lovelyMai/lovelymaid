@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
-import type { Item } from './types'
+import type { Item } from './types/item'
 import { useCssVar } from './utils/css-var'
 import { watchDOM } from './utils/dom'
 import { clearTimer, throttle } from './utils/function'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, useSlots, onUnmounted, reactive, computed, watch } from 'vue'
 
-import type { OptionItem } from '@/modules/types'
+import type { OptionItem } from '@/modules/types/item'
 import { useCssVar } from '@/modules/utils/css-var'
 import { watchDOM } from '@/modules/utils/dom'
 import { createWindowManager, type WindowManager } from '@/modules/utils/window'

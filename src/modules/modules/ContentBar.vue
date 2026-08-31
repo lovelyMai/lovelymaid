@@ -6,7 +6,7 @@ import { watchDOM } from '@/modules/utils/dom'
 import { debounce } from '@/modules/utils/function'
 import { getLayoutLeft } from '@/modules/utils/layout-offset'
 
-import Button from './modules/Button.vue'
+import Button from './modules/Button/index.vue'
 import Card from './modules/Card'
 import Loading from './modules/Loading'
 

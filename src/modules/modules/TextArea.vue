@@ -8,7 +8,7 @@ import { watchDOM } from '@/modules/utils/dom'
 import { readDirectoryEntries } from '@/modules/utils/file'
 
 import Card from './modules/Card'
-import File from './modules/File.vue'
+import File from './modules/File/index.vue'
 
 interface Props {
   /** 最小行数 */
@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 /** 值 */
 const inputValue = defineModel<string>('value', { required: true })
 /** 文件 */
-const files = defineModel<FileItem[]>('files', { default: [] })
+const files = defineModel<FileItem[]>('files', { default: () => [] })
 
 // 初始化
 const textareaContainerRef = ref<HTMLElement | null>(null)

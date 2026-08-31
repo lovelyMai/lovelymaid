@@ -6,8 +6,8 @@ import docxIcon from '@/assets/imgs/docx.svg'
 import pdfIcon from '@/assets/imgs/pdf.svg'
 import textIcon from '@/assets/imgs/text.svg'
 
-import Card from './modules/Card.vue'
-import Loading from './modules/Loading.vue'
+import Card from '../modules/Card.vue'
+import Loading from '../modules/Loading.vue'
 
 interface Props {
   /** 文件 */

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import type { DateItem, OptionItem } from './types'
+import type { DateItem, OptionItem } from './types/item'
 
 import CheckBox from './modules/CheckBox.vue'
 import Input from './modules/Input.vue'

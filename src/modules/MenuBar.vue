@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
 
-import type { Item } from './types'
+import type { Item } from './types/item'
 import { useCssVar } from '@/modules/utils/css-var'
 import { watchDOM } from '@/modules/utils/dom'
 

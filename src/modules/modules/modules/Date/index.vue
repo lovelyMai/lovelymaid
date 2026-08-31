@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-import type { ListItem, DateItem } from '@/modules/types/index'
+import type { ListItem, DateItem } from '@/modules/types/item'
 import { formatDate } from '@/modules/utils/date'
 
-import Card from './modules/Card.vue'
-import Scroll from './modules/Scroll.vue'
+import Card from '../modules/Card.vue'
+import Scroll from '../modules/Scroll.vue'
 
 interface Props {
   /** 是否显示 */

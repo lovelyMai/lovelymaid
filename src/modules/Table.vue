@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-import type { Item } from './types'
+import type { Item } from './types/item'
 import { createActivationManager, type ActivationManager } from '@/modules/utils/activation'
 import { createWindowManager, type WindowManager } from '@/modules/utils/window'
 
