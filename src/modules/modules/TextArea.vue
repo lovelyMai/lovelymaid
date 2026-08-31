@@ -73,6 +73,7 @@ watch([inputValue, files], async () => {
 const autoResize = () => {
   textareaRef.value!.style.height = 'auto'
   textareaRef.value!.style.height = `${textareaRef.value!.scrollHeight}px`
+  textareaRef.value!.scrollTop = textareaRef.value!.scrollHeight
 }
 
 // 中文输入法下不触发回车事件
