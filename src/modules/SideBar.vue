@@ -114,7 +114,7 @@ watch(
       </div>
     </div>
     <div :class="$style.mask">
-      <slot>111</slot>
+      <slot></slot>
       <Loading :loading="props.loading" />
     </div>
   </Card>

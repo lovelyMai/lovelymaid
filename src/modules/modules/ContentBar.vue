@@ -154,6 +154,7 @@ watch(
   display: flow-root;
   position: relative;
   z-index: 0;
+  min-height: calc(100% - 50px);
 }
 
 .center {
