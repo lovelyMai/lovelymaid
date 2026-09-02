@@ -82,7 +82,7 @@ export const createWindowManager = (
   let lastEvent: MouseEvent | undefined
   let ticking = false
   let scrollParents: (HTMLElement | Document)[] = []
-  let openTimer: number | undefined
+  let openTimer: ReturnType<typeof setTimeout> | undefined
   const onScroll = () => {
     if (ticking) return
     requestAnimationFrame(() => {

@@ -79,16 +79,17 @@ function separateDeclarations(text) {
   return text.replace(/\n(?!\n)(?=export )/g, '\n\n')
 }
 
-/** 递归扫描 src/modules 下所有 types/ 目录，提取导出的类型名 → 来源目录映射 */
+/** 递归扫描 src/modules 下所有 types/ 目录，提取导出的类型名 → 来源文件映射（去扩展名） */
 async function extractSharedTypeMap() {
   const typeRe = /^export type (\w+)/gm
   const interfaceRe = /^export interface (\w+)/gm
   const scanFile = async (file, typesDir) => {
     const src = await readFile(file, 'utf-8')
+    const baseName = file.replace(/\.(?:ts|d\.ts)$/, '')
     for (const re of [typeRe, interfaceRe]) {
       let m
       re.lastIndex = 0
-      while ((m = re.exec(src)) !== null) sharedTypeMap.set(m[1], typesDir)
+      while ((m = re.exec(src)) !== null) sharedTypeMap.set(m[1], baseName)
     }
   }
   const findTypesDirs = async (dir) => {
@@ -121,10 +122,10 @@ function collectSharedImports(texts, outPath) {
   if (used.size === 0) return []
   const importsByPath = new Map()
   for (const name of used) {
-    const typesDir = sharedTypeMap.get(name)
-    if (!typesDir) continue
-    const distTypesDir = join(distDir, relative(srcDir, typesDir))
-    let rel = relative(dirname(outPath), distTypesDir).replace(/\\\\/g, '/')
+    const srcBase = sharedTypeMap.get(name)
+    if (!srcBase) continue
+    const distFile = join(distDir, relative(srcDir, srcBase) + '.d.ts')
+    let rel = relative(dirname(outPath), distFile).replace(/\\\\/g, '/')
     if (!rel.startsWith('.') && !rel.startsWith('/')) rel = './' + rel
     if (!importsByPath.has(rel)) importsByPath.set(rel, [])
     importsByPath.get(rel).push(name)
@@ -154,6 +155,19 @@ function extractExportTypes(vueSource) {
     }
   }
   return types
+}
+
+/** 从 <script setup> 提取 export type { ... } re-export 声明 */
+function extractTypeReExports(vueSource) {
+  const m = vueSource.match(/<script setup[^>]*>([\s\S]*?)<\/script>/)
+  if (!m) return []
+  const re = /export\s+type\s*\{([^}]+)\}/g
+  const results = []
+  let match
+  while ((match = re.exec(m[1])) !== null) {
+    results.push(`export type {${match[1]}}`)
+  }
+  return results
 }
 
 // ─── 渲染函数 ───
@@ -233,6 +247,7 @@ function renderComponent(propsBlock, slotsBlock, exposedBlock, emitsBlock) {
 /** 组装一个 .vue.d.ts 文件内容 */
 function renderVueDts(vueSource, meta, outPath) {
   const exportTypes = extractExportTypes(vueSource)
+  const typeReExports = extractTypeReExports(vueSource)
   const propsBlock = renderProps(meta)
   const slotsBlock = renderSlots(meta)
   const exposedBlock = renderExposed(meta)
@@ -241,6 +256,7 @@ function renderVueDts(vueSource, meta, outPath) {
   // 收集所有类型文本，推导 types 的 import
   const typeTexts = [
     ...exportTypes,
+    ...typeReExports,
     propsBlock ?? '',
     slotsBlock ?? '',
     exposedBlock ?? '',
@@ -274,6 +290,10 @@ function renderVueDts(vueSource, meta, outPath) {
   }
   result.push(renderComponent(propsBlock, slotsBlock, exposedBlock, emitsBlock))
   result.push('export default _default')
+  if (typeReExports.length > 0) {
+    result.push('')
+    result.push(typeReExports.join('\n'))
+  }
   result.push('')
 
   return result.join('\n')
@@ -358,26 +378,50 @@ declare module '*.css' {}
   }
 
   program.emit(undefined, (fileName, text) => {
-    // 确保输出目录存在
     mkdirSync(dirname(fileName), { recursive: true })
-    // '@/' 别名 → 相对路径（从输出文件到 dist 目标的相对位置，兼容单双引号）
     let out = text.replace(/['"]@\/([^'"]+)['"]/g, (_, p) => {
       const target = join(distDir, p)
       const rel = relative(dirname(fileName), target).replace(/\\/g, '/')
       return `'${rel}'`
     })
-    // index.d.ts：移除 CSS import
+    // TS6 rewriteRelativeImportExtensions 会把 import type X, { Y } 生成为无效语法
+    // 修正为 import type { default as X, Y }
+    out = out.replace(/import\s+type\s+([\w$]+)\s*,\s*\{([^}]+)\}\s*from/g, (_, name, bindings) => {
+      const cleaned = bindings.replace(/\btype\s+/g, '')
+      return `import type { default as ${name},${cleaned}} from`
+    })
     if (fileName.endsWith('index.d.ts')) {
       out = out
         .split('\n')
         .filter((l) => !l.includes('assets/styles/') && !l.includes('assets/icons/'))
         .join('\n')
     }
-    // 4 空格缩进 → 2 空格，顶层声明之间空一行
     writeFileSync(fileName, separateDeclarations(dedent4to2(out)))
   })
+  // 调试：检查 Menu.d.ts 的 emit 内容
 
   await rm(shimPath)
+
+  // tsc 不会重新 emit 已有的 .d.ts 文件，手动拷贝源码 types 目录中的 .d.ts 到 dist
+  const copyTypesDts = async (dir) => {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name)
+      if (entry.isDirectory()) {
+        if (entry.name === 'types') {
+          for (const f of await readdir(full)) {
+            if (f.endsWith('.d.ts')) {
+              const dest = join(distDir, relative(srcDir, full), f)
+              await mkdir(dirname(dest), { recursive: true })
+              await writeFile(dest, await readFile(join(full, f), 'utf-8'))
+            }
+          }
+        } else {
+          await copyTypesDts(full)
+        }
+      }
+    }
+  }
+  await copyTypesDts(srcDir)
 }
 
 async function main() {

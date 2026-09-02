@@ -71,7 +71,7 @@ const maxDistance = ref<number>(0)
 let cleanup: () => void
 let virtualFrame: number | undefined
 let calcPosFrame: number | undefined
-let backgroundTimer: number | undefined
+let backgroundTimer: ReturnType<typeof setTimeout> | undefined
 onMounted(() => {
   if (!tabbarRef.value) return
   cleanup = watchDOM(tabbarRef.value, () => {
@@ -423,7 +423,7 @@ watch(searchIsActive, (newValue) => {
 
 .search .input {
   height: 100%;
-  --font-size: 18px;
+  font-size: 18px;
 }
 
 .slide {

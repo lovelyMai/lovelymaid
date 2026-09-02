@@ -34,9 +34,9 @@ const onOptionClick = (option: OptionItem, index: number) => {
 </script>
 
 <template>
-  <span :class="$style.select" ref="selectRef">
+  <div :class="$style.select" ref="selectRef">
     <slot>
-      <span :class="['lovelymai', 'lovely-ellipsis', $style.ellipsis]"></span>
+      <div :class="['lovelymai', 'lovely-ellipsis', $style.ellipsis]"></div>
     </slot>
     <Menu
       :ref="(ins) => (menuRef = (ins as MenuInstance | null)?.root ?? null)"
@@ -49,7 +49,7 @@ const onOptionClick = (option: OptionItem, index: number) => {
     >
       <slot name="item" :item="item" :index="index"></slot>
     </Menu>
-  </span>
+  </div>
 </template>
 
 <style module>
@@ -57,8 +57,9 @@ const onOptionClick = (option: OptionItem, index: number) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 20px;
-  height: 20px;
+  width: 100%;
+  height: 100%;
+  font-size: inherit;
   cursor: pointer;
 }
 </style>

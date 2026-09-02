@@ -129,10 +129,10 @@ const inputValue = ref<string>('')
   <Card class="Card">
     <Form v-model:items="formItems" />
     <Button class="Button" type="glass" :on-click="() => (modalIsVisible = true)">打开</Button>
-    <TextArea v-model:value="textareaValue" paste-file v-model:files="files">
+    <TextArea v-model:value="textareaValue" paste-file v-model:files="files" style="max-height: 150px;">
       <div style="height: 50px">111</div>
     </TextArea>
-    <Select :options="formItems"><span>111</span></Select>
+    <Select :options="formItems" style="width: 60px;height: 30px;font-size: 20px;"></Select>
   </Card>
   <Table
     class="Table"

@@ -230,9 +230,8 @@ defineExpose({
   position: relative;
   height: 35px;
   border-radius: calc(var(--inputContainer-height) * 0.5px);
-  --font-size: 14px;
-  --font-weight: 400;
-  --line-height: 18px;
+  font-size: 14px;
+  font-weight: 400;
   --clear-color: var(--lovelymai-color-gray-300);
   --placeholder-color: var(--lovelymai-color-gray-400);
 }
@@ -265,9 +264,8 @@ defineExpose({
   background-color: transparent;
   border: none;
   border-radius: calc(var(--input-height) * 0.5px);
-  font-size: var(--font-size);
-  font-weight: var(--font-weight);
-  line-height: var(--line-height);
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .input {

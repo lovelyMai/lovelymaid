@@ -171,25 +171,25 @@ defineExpose({
 .textareaContainer {
   position: relative;
   border-radius: 20px;
-  --max-height: auto;
-  --font-size: 14px;
-  --font-weight: 400;
-  --line-height: 18px;
+  max-height: auto;
+  font-size: 14px;
+  font-weight: 00;
+  line-height: 18px;
 }
 
 .textarea {
   display: block;
   width: 100%;
-  max-height: var(--max-height);
+  max-height: inherit;
   padding: 12px;
   padding-top: calc(var(--textarea-paddingTop) * 1px);
   padding-bottom: calc(var(--textarea-paddingBottom) * 1px);
   background-color: transparent;
   border: none;
   border-radius: calc(20px - 1px);
-  font-size: var(--font-size);
-  font-weight: var(--font-weight);
-  line-height: var(--line-height);
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
   caret-color: var(--lovelymai-color-blue-200);
   outline: 0px solid transparent;
   transition: outline 0.2s ease;

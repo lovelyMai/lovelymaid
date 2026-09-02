@@ -68,7 +68,7 @@ onUnmounted(() => {
 })
 
 // 切换 visilble
-let timer: number | undefined
+let timer: ReturnType<typeof setTimeout> | undefined
 watch(
   () => props.visible,
   async (newVisible) => {
