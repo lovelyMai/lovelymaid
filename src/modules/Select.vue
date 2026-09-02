@@ -27,31 +27,33 @@ onMounted(() => {
 onUnmounted(() => {
   menuManager.value?.cleanup()
 })
+const onOptionClick = (option: OptionItem, index: number) => {
+  props.onOptionClick?.(option, index)
+  menuManager.value?.close()
+}
 </script>
 
 <template>
-  <span :class="['lovelymai', 'lovely-ellipsis', $style.select]" ref="selectRef">
+  <span :class="$style.select" ref="selectRef">
+    <slot>
+      <span :class="['lovelymai', 'lovely-ellipsis', $style.ellipsis]"></span>
+    </slot>
     <Menu
       :ref="(ins) => (menuRef = (ins as MenuInstance | null)?.root ?? null)"
       :visible="menuManager?.visible ?? false"
       :position="menuManager?.position ?? [0, 0]"
       :z-index="props.zIndex"
       :options="props.options"
-      :on-option-click="
-        (option, index) => {
-          props.onOptionClick?.(option, index)
-          menuManager?.close()
-        }
-      "
+      :on-option-click="onOptionClick"
       v-slot="{ item, index }"
     >
-      <slot :item="item" :index="index"></slot>
+      <slot name="item" :item="item" :index="index"></slot>
     </Menu>
   </span>
 </template>
 
 <style module>
-.select {
+.ellipsis {
   display: flex;
   justify-content: center;
   align-items: center;

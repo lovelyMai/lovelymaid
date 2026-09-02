@@ -132,6 +132,7 @@ const inputValue = ref<string>('')
     <TextArea v-model:value="textareaValue" paste-file v-model:files="files">
       <div style="height: 50px">111</div>
     </TextArea>
+    <Select :options="formItems"><span>111</span></Select>
   </Card>
   <Table
     class="Table"
