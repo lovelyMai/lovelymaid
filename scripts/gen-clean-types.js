@@ -109,7 +109,8 @@ async function extractSharedTypeMap() {
 
 /** 收集类型文本中出现的共享类型名，按来源生成 import 语句 */
 function collectSharedImports(texts, outPath) {
-  const names = [...sharedTypeMap.keys()]
+  const localNames = new Set(['Props', 'Slots', 'Exposed', 'Emits'])
+  const names = [...sharedTypeMap.keys()].filter((n) => !localNames.has(n))
   if (names.length === 0) return []
   const used = new Set()
   const re = new RegExp(`\\b(${names.join('|')})\\b`, 'g')
@@ -123,7 +124,8 @@ function collectSharedImports(texts, outPath) {
     const typesDir = sharedTypeMap.get(name)
     if (!typesDir) continue
     const distTypesDir = join(distDir, relative(srcDir, typesDir))
-    const rel = relative(dirname(outPath), distTypesDir).replace(/\\\\/g, '/')
+    let rel = relative(dirname(outPath), distTypesDir).replace(/\\\\/g, '/')
+    if (!rel.startsWith('.') && !rel.startsWith('/')) rel = './' + rel
     if (!importsByPath.has(rel)) importsByPath.set(rel, [])
     importsByPath.get(rel).push(name)
   }
