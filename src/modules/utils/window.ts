@@ -117,7 +117,7 @@ export const createWindowManager = (
     open(e)
   }
   if (method === 'down') {
-    triggerEl.addEventListener('mousedown', onTrigger)
+    triggerEl.addEventListener('pointerdown', onTrigger)
   } else {
     triggerEl.addEventListener('contextmenu', onTrigger)
   }
@@ -137,7 +137,7 @@ export const createWindowManager = (
     close()
   }
   const cleanup = () => {
-    triggerEl.removeEventListener('mousedown', onTrigger)
+    triggerEl.removeEventListener('pointerdown', onTrigger)
     triggerEl.removeEventListener('contextmenu', onTrigger)
     clearTimeout(openTimer)
     document.removeEventListener('click', stopClickPropagation, true)
