@@ -19,11 +19,11 @@ export const createSubMenuManager = (
       position.value = [width, -5]
     })
     visible.value = true
-    parentEl.addEventListener('mouseover', onParentOverToChange)
-    parentEl.addEventListener('mouseover', onParentOverToClose)
+    parentEl.addEventListener('pointerover', onParentOverToChange)
+    parentEl.addEventListener('pointerover', onParentOverToClose)
   }
-  triggerEl.addEventListener('mouseenter', open)
-  const onParentOverToChange = (e: MouseEvent) => {
+  triggerEl.addEventListener('pointerenter', open)
+  const onParentOverToChange = (e: PointerEvent) => {
     if (!menuInstance.root) return
     const target = e.target as HTMLElement
     if (menuInstance.root.contains(target)) {
@@ -38,10 +38,10 @@ export const createSubMenuManager = (
     if (!visible.value) return
     visible.value = false
     cleanWatchDOM?.()
-    parentEl?.removeEventListener('mouseover', onParentOverToChange)
-    parentEl?.removeEventListener('mouseover', onParentOverToClose)
+    parentEl?.removeEventListener('pointerover', onParentOverToChange)
+    parentEl?.removeEventListener('pointerover', onParentOverToClose)
   }
-  const onParentOverToClose = (e: MouseEvent) => {
+  const onParentOverToClose = (e: PointerEvent) => {
     if (!parentEl) return
     const target = e.target as HTMLElement
     // 离开 triggerEl 但还在它的父元素内时关闭
@@ -53,9 +53,9 @@ export const createSubMenuManager = (
     open()
   }
   const cleanup = () => {
-    triggerEl.removeEventListener('mouseenter', open)
-    parentEl?.removeEventListener('mouseover', onParentOverToChange)
-    parentEl?.removeEventListener('mouseover', onParentOverToClose)
+    triggerEl.removeEventListener('pointerenter', open)
+    parentEl?.removeEventListener('pointerover', onParentOverToChange)
+    parentEl?.removeEventListener('pointerover', onParentOverToClose)
   }
 
   return reactive({ visible, position, open, close, cleanup })

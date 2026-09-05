@@ -38,7 +38,7 @@ export const createWindowManager = (
 ): WindowManager => {
   const visible = ref<boolean>(false)
   const position = ref<[number, number]>([0, 0])
-  const calcPos = (e?: MouseEvent) => {
+  const calcPos = (e?: PointerEvent) => {
     if (!windowRef.value) return
     let X: number = 0
     let Y: number = 0
@@ -79,7 +79,7 @@ export const createWindowManager = (
     }
     position.value = [X, Y]
   }
-  let lastEvent: MouseEvent | undefined
+  let lastEvent: PointerEvent | undefined
   let ticking = false
   let scrollParents: (HTMLElement | Document)[] = []
   let openTimer: ReturnType<typeof setTimeout> | undefined
@@ -91,7 +91,7 @@ export const createWindowManager = (
     })
     ticking = true
   }
-  const open = async (e?: MouseEvent) => {
+  const open = async (e?: PointerEvent) => {
     lastEvent = e
     visible.value = true
     await nextTick()
@@ -107,7 +107,7 @@ export const createWindowManager = (
       document.addEventListener('click', onDocClick, true)
     }, 200)
   }
-  const onTrigger = (e: MouseEvent) => {
+  const onTrigger = (e: PointerEvent) => {
     e.stopPropagation()
     document.addEventListener('click', stopClickPropagation, true)
     if (method === 'contextmenu') {
@@ -129,7 +129,7 @@ export const createWindowManager = (
     clearTimeout(openTimer)
     document.removeEventListener('click', onDocClick, true)
   }
-  const onDocClick = (e: MouseEvent) => {
+  const onDocClick = (e: PointerEvent) => {
     if (!windowRef.value) return
     if (windowRef.value.contains(e.target as HTMLElement)) return
     e.stopPropagation()

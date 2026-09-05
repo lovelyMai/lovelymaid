@@ -280,7 +280,7 @@ defineExpose({
       <span
         class="lovelymai lovely-clear"
         v-show="!props.disabled && inputValue"
-        @mouseup.stop="() => clear()"
+        @pointerup.stop="() => clear()"
       ></span>
     </div>
     <Menu
