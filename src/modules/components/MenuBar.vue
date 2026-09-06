@@ -38,6 +38,11 @@ onMounted(() => {
 onUnmounted(() => {
   cleanup?.()
 })
+
+// 暴露插槽
+defineSlots<{
+  default: (props: { menu: MenuItem; index: number }) => void
+}>()
 </script>
 
 <template>

@@ -31,6 +31,12 @@ const onOptionClick = (option: OptionItem, index: number) => {
   props.onOptionClick?.(option, index)
   menuManager.value?.close()
 }
+
+// 暴露插槽
+defineSlots<{
+  default: () => void
+  item: (props: { item: OptionItem; index: number }) => void
+}>()
 </script>
 
 <template>

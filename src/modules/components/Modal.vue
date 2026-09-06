@@ -51,6 +51,13 @@ const close = () => {
   visible.value = false
   props.onClose?.()
 }
+
+// 暴露插槽
+defineSlots<{
+  default: () => void
+  header: () => void
+  center: () => void
+}>()
 </script>
 
 <template>

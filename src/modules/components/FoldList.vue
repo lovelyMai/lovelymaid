@@ -62,6 +62,11 @@ const onItemClick = (item: ListItem, index: number) => {
   activeId.value = item.id
   props.onItemClick?.(item, index)
 }
+
+// 暴露插槽
+defineSlots<{
+  default: (props: { item: ListItem; index: number }) => void
+}>()
 </script>
 
 <template>
@@ -153,8 +158,8 @@ const onItemClick = (item: ListItem, index: number) => {
 }
 
 .list .item.active {
-  background-color: var(--lovelymai-color-gray-200);
-  color: var(--lovelymai-color-blue-200);
+  background-color: var(--lovelymai-color-gray-150);
+  color: var(--lovelymai-color-blue-300);
 }
 
 @keyframes slideAnimation {

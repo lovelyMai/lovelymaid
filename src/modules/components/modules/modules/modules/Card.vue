@@ -1,4 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// 暴露插槽
+defineSlots<{
+  default: () => void
+}>()
+</script>
 
 <template>
   <div class="lovelymai-glass-container">

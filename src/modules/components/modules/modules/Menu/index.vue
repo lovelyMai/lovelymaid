@@ -103,6 +103,7 @@ defineExpose<MenuInstance>({
   props,
 })
 
+// 暴露插槽
 defineSlots<{
   default: (props: { item: OptionItem; index: number }) => void
 }>()

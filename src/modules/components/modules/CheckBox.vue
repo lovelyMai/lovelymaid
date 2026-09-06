@@ -175,6 +175,11 @@ defineExpose({
   },
   select: () => inputRef.value?.select(),
 })
+
+// 暴露插槽
+defineSlots<{
+  default: () => void
+}>()
 </script>
 
 <template>

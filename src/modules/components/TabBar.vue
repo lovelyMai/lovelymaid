@@ -283,6 +283,11 @@ watch(searchIsActive, (newValue) => {
     setTimeout(() => (searchIsShow.value = false), 200)
   }
 })
+
+// 暴露插槽
+defineSlots<{
+  default: (props: { tab: Item; index: number }) => void
+}>()
 </script>
 
 <template>

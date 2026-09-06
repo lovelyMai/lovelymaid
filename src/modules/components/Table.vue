@@ -95,6 +95,11 @@ onMounted(() => {
 onUnmounted(() => {
   menuManager.value?.cleanup()
 })
+
+// 暴露插槽
+defineSlots<{
+  default: (props: { row: Item; column: ColumnConfig }) => void
+}>()
 </script>
 
 <template>

@@ -94,6 +94,12 @@ watch(
     }
   },
 )
+
+// 暴露插槽
+defineSlots<{
+  default: () => void
+  header: () => void
+}>()
 </script>
 
 <template>
