@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { inject, onUnmounted, provide, ref, watch, nextTick } from 'vue'
+import { inject, onUnmounted, provide, reactive, ref, watch, nextTick } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
 
 import type { MenuInstance, Props } from './types'
 import type { OptionItem } from '@/modules/components/types/item'
+import { useCssVar, type StyleObject } from '@/modules/components/utils/css-var'
 import type { WindowManager } from '@/modules/components/utils/window'
 import { createSubMenuManager } from './services/sub-menu'
 
@@ -59,6 +61,39 @@ onUnmounted(() => {
   clearSubManagers()
 })
 
+// 悬浮高亮
+const itemsRef = ref<(HTMLElement | null)[]>([])
+const styles = reactive<Record<number, StyleObject>>({})
+const setItemRef = (index: number) => (el: Element | ComponentPublicInstance | null) => {
+  const item = el as HTMLElement | null
+  itemsRef.value[index] = item
+  if (item) {
+    if (!styles[index]) {
+      styles[index] = {
+        item: {
+          'background-color': 'transparent',
+          color: '#000',
+        },
+      }
+      useCssVar(item, styles[index])
+    }
+  } else {
+    delete styles[index]
+  }
+}
+const onItemEnter = (index: number) => {
+  const style = styles[index]
+  if (!style) return
+  style.item['background-color'] = 'var(--lovelymai-color-blue-200)'
+  style.item.color = '#fff'
+}
+const onItemLeave = (index: number) => {
+  const style = styles[index]
+  if (!style) return
+  style.item['background-color'] = 'transparent'
+  style.item.color = '#000'
+}
+
 // 暴露菜单
 export type { MenuInstance }
 defineExpose<MenuInstance>({
@@ -86,15 +121,18 @@ defineSlots<{
           zIndex: props.zIndex,
           minWidth: props.minWidth ?? '',
         }"
-        @click.stop
+        @pointerup.stop
       >
         <li
           :class="$style.item"
           v-for="(item, index) in props.options"
           :key="item.id"
+          :ref="setItemRef(index)"
           :data-index="index"
           :data-has-children="item.options ? 'true' : 'false'"
-          @click.stop="() => props.onOptionClick?.(item, index)"
+          @pointerup.stop="() => props.onOptionClick?.(item, index)"
+          @pointerenter="() => onItemEnter(index)"
+          @pointerleave="() => onItemLeave(index)"
         >
           <div :class="$style.left">
             <slot :item="item" :index="index"></slot>
@@ -140,16 +178,10 @@ defineSlots<{
   z-index: 0;
   padding: 5px;
   height: 28px;
+  background-color: var(--item-background-color);
   border-radius: 8px;
-  color: #000;
+  color: var(--item-color);
   cursor: pointer;
-}
-
-@media (hover: hover) {
-  .menu .item:hover {
-    background-color: var(--lovelymai-color-blue-200);
-    color: #fff;
-  }
 }
 
 .menu .item .left {

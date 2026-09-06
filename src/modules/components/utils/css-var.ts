@@ -1,6 +1,6 @@
 import { watch } from 'vue'
 
-type StyleObject = Record<string, Record<string, string | number>>
+export type StyleObject = Record<string, Record<string, string | number>>
 
 export const useCssVar = (el: HTMLElement, styles: StyleObject) => {
   const applyStyles = () => {
