@@ -123,6 +123,7 @@ defineSlots<{
           minWidth: props.minWidth ?? '',
         }"
         @pointerup.stop
+        @click.stop
       >
         <li
           :class="$style.item"
