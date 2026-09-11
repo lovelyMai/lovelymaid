@@ -57,9 +57,9 @@ const sortedRows = computed<Item[]>(() => {
   if (!valid) return props.rows
   return [...props.rows].sort((a, b) => {
     if (sort.value!.order === 'asc') {
-      return a[sortProp].localeCompare(b[sortProp], undefined, { numeric: true })
+      return String(a[sortProp]).localeCompare(String(b[sortProp]), undefined, { numeric: true })
     } else {
-      return b[sortProp].localeCompare(a[sortProp], undefined, { numeric: true })
+      return String(b[sortProp]).localeCompare(String(a[sortProp]), undefined, { numeric: true })
     }
   })
 })
