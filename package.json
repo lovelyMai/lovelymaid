@@ -37,8 +37,5 @@
   },
   "peerDependencies": {
     "vue": "^3.4.0"
-  },
-  "overrides": {
-    "typescript": "^6.0.3"
   }
 }
