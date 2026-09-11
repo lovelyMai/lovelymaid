@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, mkdirSync } from 'node:fs'
+import { writeFileSync, mkdirSync } from 'node:fs'
 /**
  * 生成组件库的可读类型声明 (.d.ts)
  *
