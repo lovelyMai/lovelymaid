@@ -158,7 +158,7 @@ defineSlots<{
 }
 
 .list .item.active {
-  background-color: var(--lovelymai-color-gray-175);
+  background-color: var(--lovelymai-color-gray-200);
   color: var(--lovelymai-color-blue-300);
 }
 
