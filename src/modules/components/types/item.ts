@@ -1,6 +1,6 @@
 export type Item = {
   id: string | number
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type ListItem = Item & { name: string }
