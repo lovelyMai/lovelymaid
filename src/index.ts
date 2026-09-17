@@ -24,4 +24,4 @@ export {
 } from './modules/components/Table.vue'
 export { default as TextArea } from './modules/components/TextArea'
 
-import './side-effects'
+import './modules/side-effects'
